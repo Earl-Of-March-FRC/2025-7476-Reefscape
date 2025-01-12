@@ -1,5 +1,5 @@
 # This is a basic workflow to build robot code.
-name: Build Robot Code
+name: CI
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the main branch.
 on:
@@ -11,6 +11,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    name: Build Robot Code
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
     # This grabs the WPILib docker container
@@ -28,4 +29,30 @@ jobs:
     # Runs a single command using the runners shell
     - name: Compile robot code
       run: ./gradlew build -x test
+
+  test:
+    name: Test Robot Code
+    # The type of runner that the job will run on
+    runs-on: ubuntu-22.04
+    needs: build
+    # This grabs the WPILib docker container
+    container: wpilib/roborio-cross-ubuntu:2025-22.04
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v4
+    # Declares the repository safe and not under dubious ownership.
+    - name: Add repository to git safe directories
+      run: git config --global --add safe.directory $GITHUB_WORKSPACE
+    # Grant execute permission for gradlew
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    # Runs a single command using the runners shell
+    - name: Test robot code
+      run: ./gradlew test
+    # - name: Publish Test Report
+    #     uses: mikepenz/action-junit-report@v5
+    #     if: success() || failure() # always run even if the previous step fails
+    #     with:
+    #       report_paths: '**/build/test-results/test/TEST-*.xml'
   
