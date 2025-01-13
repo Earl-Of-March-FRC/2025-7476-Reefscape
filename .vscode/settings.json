@@ -56,5 +56,8 @@
     "edu.wpi.first.math.proto.*",
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
-  ]
+  ],
+  "files.autoSave": "onFocusChange",
+  "editor.defaultFormatter": "redhat.java",
+  "editor.formatOnSave": true
 }
