@@ -7,8 +7,10 @@ package frc.robot;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.CalibrateCmd;
 import frc.robot.commands.DriveCmd;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroADXRS450;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 import edu.wpi.first.math.MathUtil;
@@ -28,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
 
   private final Drivetrain driveSub;
+  private final Gyro gyro;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
@@ -36,6 +39,7 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    gyro = new GyroADXRS450();
     driveSub = new Drivetrain(
         new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId, DriveConstants.kFrontLeftTurningCanId,
             DriveConstants.kFrontLeftChassisAngularOffset),
@@ -45,7 +49,7 @@ public class RobotContainer {
             DriveConstants.kBackLeftChassisAngularOffset),
         new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId, DriveConstants.kRearRightTurningCanId,
             DriveConstants.kBackRightChassisAngularOffset),
-        new GyroADXRS450());
+        gyro);
 
     driveSub.setDefaultCommand(
         new DriveCmd(
@@ -75,6 +79,7 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    driverController.b().onTrue(new CalibrateCmd(gyro));
   }
 
   /**

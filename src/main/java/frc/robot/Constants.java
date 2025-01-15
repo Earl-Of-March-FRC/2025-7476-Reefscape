@@ -82,6 +82,7 @@ public final class Constants {
     public static final int kDriverControllerXAxis = 0;
     public static final int kDriverControllerYAxis = 1;
     public static final int kDriverControllerRotAxis = 4;
+    public static final int kDriverControllerCalibrateButton = 1;
   }
 
   public static final class AutoConstants {
