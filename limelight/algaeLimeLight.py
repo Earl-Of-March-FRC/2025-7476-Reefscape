@@ -24,6 +24,11 @@ def find_algae(image):
     mask = cv2.erode(mask, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
 
+    # Check if the mask is valid
+    if mask is None:
+        print("Error: Mask is None")
+        return None, None, None
+
     # Find contours in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
