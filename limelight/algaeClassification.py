@@ -32,15 +32,16 @@ def detect_algae(image):
         circularity = 4 * np.pi * (area / (perimeter * perimeter)) if perimeter > 0 else 0
         print(f"Circularity: {circularity}\nArea: {area}\nAlgae: {algae_count}\n")
         # Ignore small contours or those that are not circular
-        if area > 10_000 and circularity > 0.6:
+        if area > 1_000 and circularity > 0.6:
             # Approximate the contour to a circle
             ((x, y), radius) = cv2.minEnclosingCircle(contour)
-
+            print(f"Radius: {radius}")
             if radius > 10:
                 # Draw the circle on the original image
                 cv2.circle(image, (int(x), int(y)), int(radius), (255, 0, 255), 2)
                 cv2.putText(image, f"{algae_count}", (int(x) - 20, int(y) - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
                 algae_count += 1
+                quit()
 
     return image, mask
 
