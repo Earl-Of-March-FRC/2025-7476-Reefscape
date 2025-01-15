@@ -103,4 +103,9 @@ public final class Constants {
   public static final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static final class IntakeConstants {
+    public static final int pivotMotorPort = 0;
+    public static final int rollersMotorPort = 0;
+  }
 }
