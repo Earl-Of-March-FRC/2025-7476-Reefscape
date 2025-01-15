@@ -5,8 +5,12 @@ import numpy as np
 LOWER_BALL = np.array([80, 50, 60])  # Lower bound for algae ball color
 UPPER_BALL = np.array([100, 255, 255])  # Upper bound for algae ball color
 
-# runPipeline() is called every frame by Limelight's backend.
 def runPipeline(image, llrobot):
+    # Check if the image is valid
+    if image is None:
+        print("Error: Image is None")
+        return None, None, None
+
     # Convert the input image to the HSV color space
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -19,6 +23,11 @@ def runPipeline(image, llrobot):
     # Apply morphological operations to reduce noise
     mask = cv2.erode(mask, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
+
+    # Check if the mask is valid
+    if mask is None:
+        print("Error: Mask is None")
+        return None, None, None
 
     # Find contours in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -40,7 +49,7 @@ def runPipeline(image, llrobot):
             circularity = 4 * np.pi * (area / (perimeter * perimeter)) if perimeter > 0 else 0
 
             # Check if the contour meets the criteria
-            if area > 200 and circularity > 0.5:
+            if area > 10_000 and circularity > 0.6:
                 # Approximate the contour to a circle
                 (x, y), radius = cv2.minEnclosingCircle(contour)
 
