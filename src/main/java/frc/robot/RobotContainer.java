@@ -9,6 +9,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveCmd;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.GyroADXRS450;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -43,7 +44,8 @@ public class RobotContainer {
         new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId, DriveConstants.kRearLeftTurningCanId,
             DriveConstants.kBackLeftChassisAngularOffset),
         new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId, DriveConstants.kRearRightTurningCanId,
-            DriveConstants.kBackRightChassisAngularOffset));
+            DriveConstants.kBackRightChassisAngularOffset),
+        new GyroADXRS450());
 
     driveSub.setDefaultCommand(
         new DriveCmd(
