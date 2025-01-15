@@ -16,6 +16,7 @@ import frc.robot.Constants.DriveConstants;
 
 public class Drivetrain extends SubsystemBase {
   private final MAXSwerveModule[] modules = new MAXSwerveModule[4]; // FL, FR, BL, BR
+  private final Gyro gyro;
 
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -28,11 +29,12 @@ public class Drivetrain extends SubsystemBase {
       new Pose2d(0, 0, new Rotation2d()));
 
   public Drivetrain(MAXSwerveModule moduleFL, MAXSwerveModule moduleFR, MAXSwerveModule moduleBL,
-      MAXSwerveModule moduleBR) {
+      MAXSwerveModule moduleBR, Gyro gyro) {
     modules[0] = moduleFL;
     modules[1] = moduleFR;
     modules[2] = moduleBL;
     modules[3] = moduleBR;
+    this.gyro = gyro;
   }
 
   @Override
@@ -49,8 +51,13 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void runVelocity(ChassisSpeeds speeds, Boolean isFieldRelative) {
-    // TODO: Add field oriented
-
+    if (isFieldRelative) {
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+          speeds.vxMetersPerSecond,
+          speeds.vyMetersPerSecond,
+          speeds.omegaRadiansPerSecond,
+          gyro.getRotation2d());
+    }
     SwerveModuleState[] states = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.kMaxSpeedMetersPerSecond);
 
