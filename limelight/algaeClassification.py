@@ -44,21 +44,32 @@ def detect_algae(image):
 
     return image, mask
 
-# Load the image
-image_path = "limelight/ball-imgs/images (2).jpg" # change img (#) to test different images
-image = cv2.imread(image_path)
+# Open the video stream (0 for default camera or replace with a video file path)
+cap = cv2.VideoCapture(0)
 
-# Check if image was successfully loaded
-if image is None:
-    print("Error: Could not load image.")
+# Check if the camera opened successfully
+if not cap.isOpened():
+    print("Error: Could not open video stream.")
 else:
-    # Detect the ball in the image
-    processed_image, mask = detect_algae(image)
+    while True:
+        # Read a frame from the camera
+        ret, frame = cap.read()
 
-    # Display the processed image
-    cv2.imshow("Ball Detection", processed_image)
-    cv2.imshow("Mask", mask)
+        if not ret:
+            print("Error: Failed to capture image.")
+            break
+        
+        # Detect algae in the frame
+        processed_frame, mask = detect_algae(frame)
 
-    # Wait until a key is pressed, then close the windows
-    cv2.waitKey(0)
+        # Display the processed frame
+        cv2.imshow("Ball Detection", processed_frame)
+        cv2.imshow("Mask", mask)
+
+        # Check for a key press to exit the loop
+        if cv2.waitKey(1) & 0xFF == ord('q'):  # Press 'q' to quit
+            break
+
+    # Release the video capture object and close all OpenCV windows
+    cap.release()
     cv2.destroyAllWindows()
