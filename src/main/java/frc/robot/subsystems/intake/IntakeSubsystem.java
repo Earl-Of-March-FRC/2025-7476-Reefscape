@@ -15,9 +15,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase implements IntakeInterface {
-
-  private final WPI_TalonSRX pivot = new WPI_TalonSRX(IntakeConstants.pivotMotorPort);
-  private final WPI_TalonSRX rollers = new WPI_TalonSRX(IntakeConstants.rollersMotorPort);
+  private final WPI_TalonSRX pivot = new WPI_TalonSRX(IntakeConstants.kPivotMotorPort);
+  private final WPI_TalonSRX rollers = new WPI_TalonSRX(IntakeConstants.kRollersMotorPort);
 
   private final Encoder pivotEncoder = new Encoder(0, 0);
 
@@ -69,5 +68,4 @@ public class IntakeSubsystem extends SubsystemBase implements IntakeInterface {
   public double getPivotRate() {
     return pivotEncoder.getRate();
   }
-
 }
