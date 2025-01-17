@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import java.util.function.DoubleSupplier;
+import edu.wpi.first.math.util.Units;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -102,5 +104,27 @@ public final class Constants {
 
   public static final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int leftJoystickAxis = 1;
+    public static final double joystickDeadband = 0.08;
+  }
+
+  public static final class MotorConstants {
+    public static final int motorID = 6;
+    public static final double maxSpeed = 0.5;
+    public static final double autoSpeed = 0.2;
+    public static final double autoTimeout = 5;
+  }
+
+  public static final class EncoderConstants {
+    public static final double wheelRadius = 3;
+    public static final double gearRatio = 8.46;
+    public static final double ticksPerRevolution = 4096;
+    public static final double encoderCountsToMeters = Units.inchesToMeters((2 * Math.PI * wheelRadius) / gearRatio);
+  }
+
+  public static final class PIDConstants {
+    public static final double pos_kp = 0.1;
+    public static final double pos_ki = 0.1;
+    public static final double pos_kd = 0.1;
   }
 }
