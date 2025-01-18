@@ -30,65 +30,75 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-    private final Drivetrain driveSub;
-    private final Gyro gyro;
+        private final Drivetrain driveSub;
+        private final Gyro gyro;
 
-    private final CommandXboxController driverController = new CommandXboxController(
-            OperatorConstants.kDriverControllerPort);
+        private final CommandXboxController driverController = new CommandXboxController(
+                        OperatorConstants.kDriverControllerPort);
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-        gyro = new GyroNavX();
-        driveSub = new Drivetrain(
-                new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId, DriveConstants.kFrontLeftTurningCanId,
-                        DriveConstants.kFrontLeftChassisAngularOffset),
-                new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId, DriveConstants.kFrontRightTurningCanId,
-                        DriveConstants.kFrontRightChassisAngularOffset),
-                new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId, DriveConstants.kRearLeftTurningCanId,
-                        DriveConstants.kBackLeftChassisAngularOffset),
-                new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId, DriveConstants.kRearRightTurningCanId,
-                        DriveConstants.kBackRightChassisAngularOffset),
-                gyro);
+        /**
+         * The container for the robot. Contains subsystems, OI devices, and commands.
+         */
+        public RobotContainer() {
+                gyro = new GyroADXRS450();
+                driveSub = new Drivetrain(
+                                new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
+                                                DriveConstants.kFrontLeftTurningCanId,
+                                                DriveConstants.kFrontLeftChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
+                                                DriveConstants.kFrontRightTurningCanId,
+                                                DriveConstants.kFrontRightChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
+                                                DriveConstants.kRearLeftTurningCanId,
+                                                DriveConstants.kBackLeftChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
+                                                DriveConstants.kRearRightTurningCanId,
+                                                DriveConstants.kBackRightChassisAngularOffset),
+                                gyro);
 
-        driveSub.setDefaultCommand(
-                new DriveCmd(
-                        driveSub,
-                        () -> MathUtil.applyDeadband(-driverController.getRawAxis(OIConstants.kDriverControllerYAxis),
-                                OIConstants.kDriveDeadband),
-                        () -> MathUtil.applyDeadband(-driverController.getRawAxis(OIConstants.kDriverControllerXAxis),
-                                OIConstants.kDriveDeadband),
-                        () -> MathUtil.applyDeadband(-driverController.getRawAxis(OIConstants.kDriverControllerRotAxis),
-                                OIConstants.kDriveDeadband)));
+                driveSub.setDefaultCommand(
+                                new DriveCmd(
+                                                driveSub,
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerYAxis),
+                                                                OIConstants.kDriveDeadband),
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerXAxis),
+                                                                OIConstants.kDriveDeadband),
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerRotAxis),
+                                                                OIConstants.kDriveDeadband)));
 
-        configureBindings();
-    }
+                configureBindings();
+        }
 
-    /**
-     * Use this method to define your trigger->command mappings. Triggers can be
-     * created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-     * an arbitrary
-     * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-     * {@link
-     * CommandXboxController
-     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-     * joysticks}.
-     */
-    private void configureBindings() {
-        driverController.b().onTrue(new CalibrateCmd(gyro));
-    }
+        /**
+         * Use this method to define your trigger->command mappings. Triggers can be
+         * created via the
+         * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+         * an arbitrary
+         * predicate, or via the named factories in {@link
+         * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+         * {@link
+         * CommandXboxController
+         * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+         * PS4} controllers or
+         * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+         * joysticks}.
+         */
+        private void configureBindings() {
+                driverController.b().onTrue(new CalibrateCmd(gyro));
+        }
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        return null;
-    }
+        /**
+         * Use this to pass the autonomous command to the main {@link Robot} class.
+         *
+         * @return the command to run in autonomous
+         */
+        public Command getAutonomousCommand() {
+                return null;
+        }
 }

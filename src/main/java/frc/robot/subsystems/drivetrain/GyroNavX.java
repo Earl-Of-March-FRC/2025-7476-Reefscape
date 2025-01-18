@@ -9,7 +9,7 @@ import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class GyroNavX implements Gyro {
-  private final AHRS gyro = new AHRS(NavXComType.kMXP_SPI);
+  private final AHRS gyro = new AHRS(NavXComType.kI2C);
 
   public GyroNavX() {
 
