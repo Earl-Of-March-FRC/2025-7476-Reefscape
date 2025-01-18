@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -107,5 +108,16 @@ public final class Constants {
   public static final class IntakeConstants {
     public static final int kShoulderMotorPort = 0;
     public static final int kRollersMotorPort = 0;
+
+    public static final double kPShoulderController = 0.2;
+    public static final double kIShoulderController = 0;
+    public static final double kDShoulderController = 0;
+
+    public static final double kShoulderMaxVelocity = 0;
+    public static final double kShoulderMaxAcceleration = 0;
+
+    // constraints for the shoulder profiled PID controller
+    public static final TrapezoidProfile.Constraints kShoulderControllerConstraints = new TrapezoidProfile.Constraints(
+        kShoulderMaxVelocity, kShoulderMaxAcceleration);
   }
 }
