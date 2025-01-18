@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class IntakeRollers extends Command {
+public class SetRollerSpeed extends Command {
 
   private IntakeSubsystem intakeSub;
   private double speed;
 
   /** Creates a new IntakeRollers. */
-  public IntakeRollers(IntakeSubsystem intakeSub, double speed) {
+  public SetRollerSpeed(IntakeSubsystem intakeSub, double speed) {
 
     this.intakeSub = intakeSub;
     this.speed = speed;

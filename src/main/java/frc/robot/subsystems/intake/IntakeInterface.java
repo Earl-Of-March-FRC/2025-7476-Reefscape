@@ -4,12 +4,12 @@ public interface IntakeInterface {
 
     public void setRollerSpeed(double speed);
 
-    public void setPivotSpeed(double speed);
+    public void setShoulderSpeed(double speed);
 
-    public void pivotHold(double currentAngle);
+    public void shoulderHold(double currentAngle);
 
-    public double getPivotPosition();
+    public double getShoulderPosition();
 
-    public double getPivotRate();
+    public double getShoulderRate();
 
 }

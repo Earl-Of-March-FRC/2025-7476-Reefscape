@@ -4,22 +4,29 @@
 
 package frc.robot.commands.intake;
 
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class IntakeHold extends Command {
-  /** Creates a new IntakeHold. */
+public class ShoulderManual extends Command {
+  /** Creates a new PivotManual. */
 
   private IntakeSubsystem intakeSub;
-  private double angle;
+  private DoubleSupplier speed;
 
-  public IntakeHold(IntakeSubsystem intakeSub) {
+  SlewRateLimiter filter = new SlewRateLimiter(0.9);
+
+  public ShoulderManual(IntakeSubsystem intakeSub, DoubleSupplier d) {
     // Use addRequirements() here to declare subsystem dependencies.
 
     this.intakeSub = intakeSub;
-    angle = intakeSub.getPivotPosition();
+    this.speed = d;
+
     addRequirements(intakeSub);
+
   }
 
   // Called when the command is initially scheduled.
@@ -30,12 +37,17 @@ public class IntakeHold extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intakeSub.pivotHold(angle);
+    if (Math.abs(speed.getAsDouble()) < 0.3) {
+      intakeSub.setShoulderSpeed(speed.getAsDouble());
+    } else {
+      intakeSub.setShoulderSpeed(filter.calculate(speed.getAsDouble()) * 0.7);
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    intakeSub.setShoulderSpeed(0);
   }
 
   // Returns true when the command should end.
