@@ -8,24 +8,24 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.arm.ArmSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ShoulderManual extends Command {
-  /** Creates a new PivotManual. */
+public class ArmManual extends Command {
 
-  private IntakeSubsystem intakeSub;
+  private ArmSubsystem armSub;
   private DoubleSupplier speed;
 
   SlewRateLimiter filter = new SlewRateLimiter(0.9);
 
-  public ShoulderManual(IntakeSubsystem intakeSub, DoubleSupplier d) {
+  /** Creates a new PivotManual. */
+  public ArmManual(ArmSubsystem armSub, DoubleSupplier d) {
     // Use addRequirements() here to declare subsystem dependencies.
 
-    this.intakeSub = intakeSub;
+    this.armSub = armSub;
     this.speed = d;
 
-    addRequirements(intakeSub);
+    addRequirements(armSub);
 
   }
 
@@ -38,16 +38,16 @@ public class ShoulderManual extends Command {
   @Override
   public void execute() {
     if (Math.abs(speed.getAsDouble()) < 0.3) {
-      intakeSub.setShoulderSpeed(speed.getAsDouble());
+      armSub.setArmSpeed(speed.getAsDouble());
     } else {
-      intakeSub.setShoulderSpeed(filter.calculate(speed.getAsDouble()) * 0.7);
+      armSub.setArmSpeed(filter.calculate(speed.getAsDouble()) * 0.7);
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intakeSub.setShoulderSpeed(0);
+    armSub.setArmSpeed(0);
   }
 
   // Returns true when the command should end.

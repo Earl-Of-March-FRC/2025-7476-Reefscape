@@ -8,18 +8,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ShoulderHold extends Command {
-  /** Creates a new IntakeHold. */
+public class SetIntakeSpeed extends Command {
 
   private IntakeSubsystem intakeSub;
-  private double angle;
+  private double speed;
 
-  public ShoulderHold(IntakeSubsystem intakeSub) {
-    // Use addRequirements() here to declare subsystem dependencies.
+  /** Creates a new IntakeSubsystem. */
+  public SetIntakeSpeed(IntakeSubsystem intakeSub, double speed) {
 
     this.intakeSub = intakeSub;
-    angle = intakeSub.getShoulderPosition();
+    this.speed = speed;
+
     addRequirements(intakeSub);
+    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
@@ -30,12 +31,13 @@ public class ShoulderHold extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intakeSub.shoulderHold(angle);
+    intakeSub.setIntakeSpeed(speed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    intakeSub.setIntakeSpeed(0);
   }
 
   // Returns true when the command should end.

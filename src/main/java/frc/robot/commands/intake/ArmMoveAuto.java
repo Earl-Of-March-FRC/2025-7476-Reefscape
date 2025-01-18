@@ -5,50 +5,49 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.IntakeConstants;
-import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.subsystems.arm.ArmSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ShoulderMoveAuto extends Command {
+public class ArmMoveAuto extends Command {
 
-  private IntakeSubsystem intakeSub;
+  private ArmSubsystem armSub;
   private ProfiledPIDController pidController;
 
   /** Creates a new ShoulderMoveAuto. */
-  public ShoulderMoveAuto(IntakeSubsystem intakeSub, double goalAngle) {
+  public ArmMoveAuto(ArmSubsystem armSub, double goalAngle) {
 
-    this.intakeSub = intakeSub;
+    this.armSub = armSub;
 
     // creates Profiled PID Controller
     pidController = new ProfiledPIDController(
         // sets PID gains
-        IntakeConstants.kPShoulderController,
-        IntakeConstants.kIShoulderController,
-        IntakeConstants.kDShoulderController,
+        ArmConstants.kPArmController,
+        ArmConstants.kIArmController,
+        ArmConstants.kDArmController,
 
         // sets constraints
-        IntakeConstants.kShoulderControllerConstraints);
+        ArmConstants.kArmControllerConstraints);
 
     // sets goal and tolerance for controller
     pidController.setGoal(goalAngle);
     pidController.setTolerance(1);
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intakeSub);
+    addRequirements(armSub);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    pidController.reset(intakeSub.getShoulderPosition());
+    pidController.reset(armSub.getArmPosition());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intakeSub.setShoulderSpeed(pidController.calculate(intakeSub.getShoulderPosition()));
+    armSub.setArmSpeed(pidController.calculate(armSub.getArmPosition()));
   }
 
   // Called once the command ends or is interrupted.

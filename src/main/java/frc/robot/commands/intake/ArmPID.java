@@ -6,18 +6,20 @@ package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.arm.ArmSubsystem;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ShoulderPID extends SequentialCommandGroup {
+public class ArmPID extends SequentialCommandGroup {
   /** Creates a new ArmPID. */
-  public ShoulderPID(IntakeSubsystem intakeSub, double goalAngle) {
+  public ArmPID(ArmSubsystem armSub, double goalAngle) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new ShoulderMoveAuto(intakeSub, goalAngle).raceWith(new WaitCommand(1.7)));
-    addRequirements(intakeSub);
+    addCommands(new ArmMoveAuto(armSub, goalAngle)
+        .raceWith(new WaitCommand(1.7)));
+
+    addRequirements(armSub);
   }
 
 }

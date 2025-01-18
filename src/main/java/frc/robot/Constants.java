@@ -105,19 +105,22 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
-  public static final class IntakeConstants {
-    public static final int kShoulderMotorPort = 0;
-    public static final int kRollersMotorPort = 0;
+  public static final class ArmConstants {
+    public static final int kArmMotorPort = 0;
 
-    public static final double kPShoulderController = 0.2;
-    public static final double kIShoulderController = 0;
-    public static final double kDShoulderController = 0;
+    public static final double kPArmController = 0.2;
+    public static final double kIArmController = 0;
+    public static final double kDArmController = 0;
 
-    public static final double kShoulderMaxVelocity = 0;
-    public static final double kShoulderMaxAcceleration = 0;
+    public static final double kArmMaxVelocity = 0;
+    public static final double kArmMaxAcceleration = 0;
 
     // constraints for the shoulder profiled PID controller
-    public static final TrapezoidProfile.Constraints kShoulderControllerConstraints = new TrapezoidProfile.Constraints(
-        kShoulderMaxVelocity, kShoulderMaxAcceleration);
+    public static final TrapezoidProfile.Constraints kArmControllerConstraints = new TrapezoidProfile.Constraints(
+        kArmMaxVelocity, kArmMaxAcceleration);
+  }
+
+  public static final class IntakeConstants {
+    public static final int kRollersMotorPort = 0;
   }
 }
