@@ -5,8 +5,8 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.intake.ShoulderPID;
-import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.commands.intake.ArmPID;
+import frc.robot.subsystems.arm.ArmSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-  private final IntakeSubsystem IntakeSub = new IntakeSubsystem();
+  private final ArmSubsystem armSub = new ArmSubsystem();
 
   private final CommandXboxController driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
@@ -55,11 +55,17 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    new JoystickButton(oController, 1).whileTrue(new ShoulderPID(IntakeSub, 0));
-    new JoystickButton(oController, 2).whileTrue(new ShoulderPID(IntakeSub, 315));
-    new JoystickButton(oController, 3).whileTrue(new ShoulderPID(IntakeSub, 285));
-    new JoystickButton(oController, 5).whileTrue(new ShoulderPID(IntakeSub, 210));
-    new JoystickButton(oController, 7).whileTrue(new ShoulderPID(IntakeSub, 150));
+
+    // button A - start
+    new JoystickButton(oController, 1).whileTrue(new ArmPID(armSub, 0));
+    // button B - floor intake
+    new JoystickButton(oController, 2).whileTrue(new ArmPID(armSub, 315));
+    // button X - L2
+    new JoystickButton(oController, 3).whileTrue(new ArmPID(armSub, 285));
+    // button left bumper - L3
+    new JoystickButton(oController, 5).whileTrue(new ArmPID(armSub, 210));
+    // button right bumper - processor
+    new JoystickButton(oController, 7).whileTrue(new ArmPID(armSub, 150));
   }
 
   /**
