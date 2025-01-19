@@ -10,6 +10,7 @@ These branches contain potentially incomplete, in-development code
 
 `drivetrain` - Swerve drivetrain  
 `intake` - Intake subsystem  
-`launcher` - Launcher subsystem  
+`indexer` - Indexer subsystem
+`shooter` - shooter subsystem  
 `vision` - Vision code  
 `auto` - Autonomous / semi-auto driving code  
