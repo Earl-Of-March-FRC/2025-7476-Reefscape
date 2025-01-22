@@ -27,7 +27,6 @@ public class GyroNavX implements Gyro {
 
   @Override
   public void calibrate() {
-    gyro.zeroYaw();
     gyro.reset();
   }
 }

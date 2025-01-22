@@ -33,8 +33,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-        private final Drivetrain driveSub;
-        private final Gyro gyro;
+        public final Drivetrain driveSub;
+        public final Gyro gyro;
 
         private final CommandXboxController driverController = new CommandXboxController(
                         OperatorConstants.kDriverControllerPort);
@@ -45,6 +45,8 @@ public class RobotContainer {
          */
         public RobotContainer() {
                 gyro = new GyroNavX();
+                gyro.calibrate();
+
                 driveSub = new Drivetrain(
                                 new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
                                                 DriveConstants.kFrontLeftTurningCanId,

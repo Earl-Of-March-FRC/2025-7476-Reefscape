@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.drivetrain;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -39,7 +41,10 @@ public class Drivetrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-
+    for (int i = 1; i <= 4; i++) {
+      Logger.recordOutput("Swerve/Module" + i + "/State", modules[i].getState());
+      Logger.recordOutput("Swerve/Module" + i + "/Position", modules[i].getPosition());
+    }
   }
 
   public void runVelocityFieldRelative(ChassisSpeeds speeds) {
@@ -63,6 +68,7 @@ public class Drivetrain extends SubsystemBase {
 
     for (int i = 0; i < 4; i++) {
       modules[i].setDesiredState(states[i]);
+      Logger.recordOutput("Swerve/Module" + i + "/Setpoint", states[i]);
     }
   }
 
