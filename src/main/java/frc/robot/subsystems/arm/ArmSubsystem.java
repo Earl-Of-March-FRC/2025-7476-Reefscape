@@ -4,71 +4,54 @@
 
 package frc.robot.subsystems.arm;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
-  private final SparkMax arm = new SparkMax(ArmConstants.kArmMotorPort, SparkMax.MotorType.kBrushless);
+  private final SparkMax armSpark = new SparkMax(ArmConstants.kArmMotorPort, SparkMax.MotorType.kBrushless);
+  private final SparkAbsoluteEncoder armEncoder = armSpark.getAbsoluteEncoder();
+  private final SparkClosedLoopController armClosedLoopController = armSpark.getClosedLoopController();
 
-  private final SparkMaxConfig armConfig = new SparkMaxConfig();
+  private double m_armAngularOffset = 0;
 
-  private final Encoder armEncoder = new Encoder(0, 0);
-
-  // private final RelativeEncoder shoulderEncoder = shoulder.getEncoder();
-  // private final SparkClosedLoopController shoulderController =
-  // shoulder.getClosedLoopController();
-
-  private final ArmFeedforward feedforward = new ArmFeedforward(0, 0, 0, 0);
-  private final PIDController pid = new PIDController(0, 0, 0);
-
-  /** Creates a new IntakeSubsystem. */
+  /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {
-    // shoulderConfig.setInverted(false);
-    // rollers.setInverted(false);
-    armConfig.idleMode(IdleMode.kBrake);
-    // pivotEncoder.setDistancePerPulse(360.00 / 2048.00); // This method does not
-    // exist for RelativeEncoder
+
+    // configures arm motor
+    armSpark.configure(ArmConfigs.armConfig, ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
 
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    SmartDashboard.putNumber("arm position", getArmPosition());
-    SmartDashboard.putBoolean("Arm More Than 107", getArmPosition() > 107);
-
   }
 
+  // sets the arm speed
   public void setArmSpeed(double speed) {
-    arm.set(speed);
+    armSpark.set(speed);
   }
 
-  public void armHold(double currentAngle) {
-    final double feed = feedforward.calculate(Math.toRadians(currentAngle), 0);
-
-    final double output = pid.calculate(getArmRate(), 0);
-
-    arm.setVoltage(output + feed);
-
-  }
-
+  // returns the arm's current position
   public double getArmPosition() {
-    return armEncoder.getDistance();
+    return armEncoder.getPosition() - m_armAngularOffset;
   }
 
-  public double getArmRate() {
-    return armEncoder.getRate();
+  // returns the arm's current velocity
+  public double getArmVelocity() {
+    return armEncoder.getVelocity();
+  }
+
+  // sets the reference value / setpoint for the arm controller
+  public void setReferenceAngle(double referenceAngle) {
+    armClosedLoopController.setReference(referenceAngle + m_armAngularOffset, ControlType.kPosition);
   }
 }

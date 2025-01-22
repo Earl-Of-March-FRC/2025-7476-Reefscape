@@ -5,7 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.intake.ArmPID;
+import frc.robot.commands.arm.ArmMoveAuto;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -57,15 +57,15 @@ public class RobotContainer {
   private void configureBindings() {
 
     // button A - start
-    new JoystickButton(oController, 1).whileTrue(new ArmPID(armSub, 0));
+    new JoystickButton(oController, 1).whileTrue(new ArmMoveAuto(armSub, 0));
     // button B - floor intake
-    new JoystickButton(oController, 2).whileTrue(new ArmPID(armSub, 315));
+    new JoystickButton(oController, 2).whileTrue(new ArmMoveAuto(armSub, 315));
     // button X - L2
-    new JoystickButton(oController, 3).whileTrue(new ArmPID(armSub, 285));
+    new JoystickButton(oController, 3).whileTrue(new ArmMoveAuto(armSub, 285));
     // button left bumper - L3
-    new JoystickButton(oController, 5).whileTrue(new ArmPID(armSub, 210));
+    new JoystickButton(oController, 5).whileTrue(new ArmMoveAuto(armSub, 210));
     // button right bumper - processor
-    new JoystickButton(oController, 7).whileTrue(new ArmPID(armSub, 150));
+    new JoystickButton(oController, 7).whileTrue(new ArmMoveAuto(armSub, 150));
   }
 
   /**

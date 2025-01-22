@@ -108,9 +108,10 @@ public final class Constants {
   public static final class ArmConstants {
     public static final int kArmMotorPort = 0;
 
-    public static final double kPArmController = 0.2;
+    public static final double kPArmController = 0;
     public static final double kIArmController = 0;
     public static final double kDArmController = 0;
+    public static final double kArmVelocityFF = 0;
 
     public static final double kArmMaxVelocity = 0;
     public static final double kArmMaxAcceleration = 0;

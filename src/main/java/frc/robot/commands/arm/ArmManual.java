@@ -18,7 +18,7 @@ public class ArmManual extends Command {
 
   SlewRateLimiter filter = new SlewRateLimiter(0.9);
 
-  /** Creates a new PivotManual. */
+  /** Creates a new ArmManual. */
   public ArmManual(ArmSubsystem armSub, DoubleSupplier d) {
     // Use addRequirements() here to declare subsystem dependencies.
 
