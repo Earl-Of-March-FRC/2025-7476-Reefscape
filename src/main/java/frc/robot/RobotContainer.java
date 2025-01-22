@@ -5,7 +5,11 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+<<<<<<< HEAD
 import frc.robot.commands.arm.ArmMoveAuto;
+=======
+import frc.robot.commands.arm.ArmPID;
+>>>>>>> 71b9f6eda77b87df3b1a709ce651ec85170bd035
 import frc.robot.subsystems.arm.ArmSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
