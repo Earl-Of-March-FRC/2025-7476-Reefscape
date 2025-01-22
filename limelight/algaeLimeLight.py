@@ -5,6 +5,7 @@ import numpy as np
 LOWER_BALL = np.array([80, 50, 60])  # Lower bound for algae ball color
 UPPER_BALL = np.array([100, 255, 255])  # Upper bound for algae ball color
 
+
 # Define minimum area and circularity for the contour filtering
 MIN_AREA = 5000  # Minimum area of the contour to be considered
 MIN_CIRCULARITY = 0.3  # Minimum circularity to consider as a valid algae ball
@@ -42,8 +43,10 @@ def find_algae(image):
 
             # Only consider significant circles
             if radius > 10:
-                # Draw the circle on the original image
-                cv2.circle(image, (int(x), int(y)), int(radius), (255, 0, 255), 7)
+                if hasBorderBoxes:
+                    # Draw the circle on the original image
+                    cv2.circle(image, (int(x), int(y)), int(radius), (255, 0, 255), 7)
+                    
 
                 # Print the values of the algae's attributes
                 print(f"Circularity: {circularity}\nArea: {area}\n")
@@ -55,13 +58,17 @@ def find_algae(image):
     return algae_balls
     
 def runPipeline(image, llrobot):
+    global hasBorderBoxes
+    hasBorderBoxes = llrobot[0] == 1
+    print(hasBorderBoxes)
     algae_balls = find_algae(image)
     
     llpython = [0] * 8
 
     if algae_balls:
-        x, y, w, h = algae_balls[0]
-        llpython = [1, x, y, w, h, len(algae_balls), 0, 0]
+        x1, y1, w1, h1 = algae_balls[0]
+        x2, y2, w2, h2 = algae_balls[0]
+        llpython = [x1, y1, w1, h1,x2,y2,w2,h2]
     
     largest_contour = np.array([[]])  # Placeholder, not used but required for return
 
