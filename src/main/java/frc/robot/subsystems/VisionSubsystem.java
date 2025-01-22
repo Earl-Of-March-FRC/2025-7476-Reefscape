@@ -22,6 +22,7 @@ public class VisionSubsystem extends SubsystemBase {
     double[] dataToSend = { ((Constants.LimelightConstants.hasBorders) ? 2 : 1) }; // 2 is true 1 is false
     LimelightHelpers.setPythonScriptData("", dataToSend);
     networkTable = NetworkTableInstance.getDefault().getTable(LimelightConstants.kNetworkTableKey);
+
   }
 
   @Override
