@@ -51,8 +51,8 @@ public class Drivetrain extends SubsystemBase {
             modules[0].getPosition(), modules[1].getPosition(),
             modules[2].getPosition(), modules[3].getPosition()
         });
-    SmartDashboard.putNumber("Pose X", pose.getX());
-    SmartDashboard.putNumber("Pose Y", pose.getY());
+
+    Logger.recordOutput("Odometry", pose);
 
     for (int i = 1; i <= 4; i++) {
       Logger.recordOutput("Swerve/Module" + i + "/State", modules[i].getState());
