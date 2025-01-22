@@ -38,7 +38,6 @@ public class Robot extends LoggedRobot {
     if (isReal()) {
       Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
       Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-      new PowerDistribution(Constants.kPDPCanId, ModuleType.kRev); // Enables power distribution logging
     }
 
     Logger.start();
@@ -75,7 +74,7 @@ public class Robot extends LoggedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    Logger.recordOutput("Gyro/Rotation", robotContainer.gyro.getRotation2d().getDegrees());
+    Logger.recordOutput("Gyro/Rotation", robotContainer.gyro.getRotation2d());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

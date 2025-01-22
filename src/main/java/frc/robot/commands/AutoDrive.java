@@ -33,7 +33,7 @@ public class AutoDrive extends Command {
   }
 
   public AutoDrive(Drivetrain driveSub) {
-    this(driveSub, 3, 0.2, 0, 0);
+    this(driveSub, 3, 1, 0, 0);
   }
 
   public AutoDrive(Drivetrain driveSub, double x, double y, double ohm) {

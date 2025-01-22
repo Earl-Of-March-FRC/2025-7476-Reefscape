@@ -54,10 +54,14 @@ public class Drivetrain extends SubsystemBase {
 
     Logger.recordOutput("Odometry", pose);
 
-    for (int i = 1; i <= 4; i++) {
-      Logger.recordOutput("Swerve/Module" + i + "/State", modules[i].getState());
-      Logger.recordOutput("Swerve/Module" + i + "/Position", modules[i].getPosition());
+    SwerveModuleState[] states = new SwerveModuleState[4];
+    SwerveModulePosition[] positions = new SwerveModulePosition[4];
+    for (int i = 0; i < 4; i++) {
+      states[i] = modules[i].getState();
+      positions[i] = modules[i].getPosition();
     }
+    Logger.recordOutput("Swerve/Module/State", states);
+    Logger.recordOutput("Swerve/Module/Position", positions);
   }
 
   public void runVelocityFieldRelative(ChassisSpeeds speeds) {
@@ -81,8 +85,8 @@ public class Drivetrain extends SubsystemBase {
 
     for (int i = 0; i < 4; i++) {
       modules[i].setDesiredState(states[i]);
-      Logger.recordOutput("Swerve/Module" + i + "/Setpoint", states[i]);
     }
+    Logger.recordOutput("Swerve/Module/Setpoint", states);
   }
 
   public SwerveModuleState[] getModuleState() {
