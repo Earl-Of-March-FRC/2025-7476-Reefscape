@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -106,5 +108,14 @@ public final class Constants {
 
   public static final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+  }
+
+  public static final class IndexerConstants {
+    public static final int kMotorPort = 10;
+    public static final MotorType kMotorType = MotorType.kBrushless;
+
+    // DIO Ports for sensors. TBD
+    public static final int kIntakeSensorChannel = 0;
+    public static final int kShooterSensorChannel = 1;
   }
 }

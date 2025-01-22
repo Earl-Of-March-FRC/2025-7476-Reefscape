@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.CalibrateCmd;
@@ -14,6 +15,7 @@ import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroADXRS450;
 import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import frc.robot.subsystems.indexer.IndexerSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -32,6 +34,8 @@ public class RobotContainer {
 
         private final Drivetrain driveSub;
         private final Gyro gyro;
+
+        private final IndexerSubsystem indexerSub;
 
         private final CommandXboxController driverController = new CommandXboxController(
                         OperatorConstants.kDriverControllerPort);
@@ -55,6 +59,9 @@ public class RobotContainer {
                                                 DriveConstants.kRearRightTurningCanId,
                                                 DriveConstants.kBackRightChassisAngularOffset),
                                 gyro);
+
+                indexerSub = new IndexerSubsystem(IndexerConstants.kMotorPort, IndexerConstants.kMotorType,
+                                IndexerConstants.kIntakeSensorChannel, IndexerConstants.kShooterSensorChannel);
 
                 driveSub.setDefaultCommand(
                                 new DriveCmd(
