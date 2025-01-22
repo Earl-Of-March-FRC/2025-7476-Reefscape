@@ -11,17 +11,21 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 
 public class Drivetrain extends SubsystemBase {
   private final MAXSwerveModule[] modules = new MAXSwerveModule[4]; // FL, FR, BL, BR
   private final Gyro gyro;
+  Pose2d pose;
 
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
       new Rotation2d(),
       new SwerveModulePosition[] {
+          new SwerveModulePosition(),
           new SwerveModulePosition(),
           new SwerveModulePosition(),
           new SwerveModulePosition()
@@ -39,7 +43,14 @@ public class Drivetrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-
+    var gyroAngle = gyro.getRotation2d();
+    pose = odometry.update(gyroAngle,
+        new SwerveModulePosition[] {
+            modules[0].getPosition(), modules[1].getPosition(),
+            modules[2].getPosition(), modules[3].getPosition()
+        });
+    SmartDashboard.putNumber("Pose X", pose.getX());
+    SmartDashboard.putNumber("Pose Y", pose.getY());
   }
 
   public void runVelocityFieldRelative(ChassisSpeeds speeds) {
