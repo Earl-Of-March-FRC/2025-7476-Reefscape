@@ -103,6 +103,7 @@ public final class Constants {
   public static final class LimelightConstants {
     public static final String kNetworkTableKey = "limelight";
     public static final String kNetworkTableEntry = "llpython";
+    public static final boolean hasBorders = true;
   }
 
   public static final class OperatorConstants {
