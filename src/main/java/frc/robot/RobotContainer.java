@@ -13,7 +13,6 @@ import frc.robot.commands.DriveCmd;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroADXRS450;
-import frc.robot..drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
