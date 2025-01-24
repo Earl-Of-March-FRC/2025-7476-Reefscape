@@ -13,7 +13,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class AutoDrive extends Command {
+public class TimedAutoDrive extends Command {
   private Timer timer = new Timer();
   private Drivetrain driveSub;
   double xVel;
@@ -22,7 +22,7 @@ public class AutoDrive extends Command {
   double seconds;
 
   /** Creates a new AutoDrive. */
-  public AutoDrive(Drivetrain driveSub, double secs, double x, double y, double ohm) {
+  public TimedAutoDrive(Drivetrain driveSub, double secs, double x, double y, double ohm) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.driveSub = driveSub;
     addRequirements(driveSub);
@@ -32,11 +32,11 @@ public class AutoDrive extends Command {
     seconds = secs;
   }
 
-  public AutoDrive(Drivetrain driveSub) {
+  public TimedAutoDrive(Drivetrain driveSub) {
     this(driveSub, 3, 1, 0, 0);
   }
 
-  public AutoDrive(Drivetrain driveSub, double x, double y, double ohm) {
+  public TimedAutoDrive(Drivetrain driveSub, double x, double y, double ohm) {
     this(driveSub, 3, x, y, ohm);
   }
 
