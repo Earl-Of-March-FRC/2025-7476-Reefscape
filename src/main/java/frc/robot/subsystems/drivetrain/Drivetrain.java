@@ -137,7 +137,7 @@ public class Drivetrain extends SubsystemBase {
     SwerveModuleState[] states = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
 
     // Desaturate the wheel speeds to ensure they are within the maximum speed
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.kMaxSpeedMetersPerSecond);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.kMaxWheelSpeedMetersPerSecond);
 
     // Set the desired state for each swerve module
     for (int i = 0; i < 4; i++) {

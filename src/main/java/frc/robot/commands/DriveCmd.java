@@ -60,7 +60,7 @@ public class DriveCmd extends Command {
     double xVel = xSupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
     double yVel = ySupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
     double omega = omegaSupplier.get() * DriveConstants.kMaxAngularSpeed;
-    driveSub.runVelocityFieldRelative(new ChassisSpeeds(xVel, yVel, omega));
+    driveSub.runVelocityRobotRelative(new ChassisSpeeds(xVel, yVel, omega));
   }
 
   /**
