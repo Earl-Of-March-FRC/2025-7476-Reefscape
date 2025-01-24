@@ -100,6 +100,9 @@ public class RobotContainer {
                 driverController.b().onTrue(new CalibrateCmd(driveSub));
         }
 
+        /**
+         * Use this method to define the autonomous command.
+         */
         private void configureAutos() {
                 autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
                 autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
