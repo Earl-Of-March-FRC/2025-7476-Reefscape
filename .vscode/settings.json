@@ -59,5 +59,6 @@
   ],
   "files.autoSave": "onFocusChange",
   "editor.defaultFormatter": "redhat.java",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "editor.indentSize": 2
 }
