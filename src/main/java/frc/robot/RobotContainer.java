@@ -97,7 +97,7 @@ public class RobotContainer {
          * joysticks}.
          */
         private void configureBindings() {
-                driverController.b().onTrue(new CalibrateCmd(gyro));
+                driverController.b().onTrue(new CalibrateCmd(driveSub));
         }
 
         private void configureAutos() {

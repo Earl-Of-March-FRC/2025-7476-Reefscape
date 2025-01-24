@@ -8,14 +8,13 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 
 /**
@@ -29,7 +28,7 @@ public class Drivetrain extends SubsystemBase {
   private final MAXSwerveModule[] modules = new MAXSwerveModule[4]; // FL, FR, BL, BR
 
   // Gyro sensor to get the robot's orientation
-  private final Gyro gyro;
+  public final Gyro gyro;
 
   // Current pose of the robot
   Pose2d pose;
@@ -149,44 +148,57 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput("Swerve/Module/Setpoint", states);
   }
 
-    /**
+  /**
    * Gets the current state of each swerve module.
    * 
-   * @return An array of SwerveModuleState representing the state of each swerve module.
+   * @return An array of SwerveModuleState representing the state of each swerve
+   *         module.
    */
   public SwerveModuleState[] getModuleState() {
-      return new SwerveModuleState[] {
-          modules[0].getState(),
-          modules[1].getState(),
-          modules[2].getState(),
-          modules[3].getState()
-      };
+    return new SwerveModuleState[] {
+        modules[0].getState(),
+        modules[1].getState(),
+        modules[2].getState(),
+        modules[3].getState()
+    };
   }
-  
+
   /**
    * Gets the current position of each swerve module.
    * 
-   * @return An array of SwerveModulePosition representing the position of each swerve module.
+   * @return An array of SwerveModulePosition representing the position of each
+   *         swerve module.
    */
   public SwerveModulePosition[] getModulePositions() {
-      return new SwerveModulePosition[] {
-          modules[0].getPosition(),
-          modules[1].getPosition(),
-          modules[2].getPosition(),
-          modules[3].getPosition()
-      };
+    return new SwerveModulePosition[] {
+        modules[0].getPosition(),
+        modules[1].getPosition(),
+        modules[2].getPosition(),
+        modules[3].getPosition()
+    };
   }
-  
+
   /**
    * Gets the current chassis speeds relative to the robot.
    * 
-   * @return A ChassisSpeeds object representing the robot-relative chassis speeds.
+   * @return A ChassisSpeeds object representing the robot-relative chassis
+   *         speeds.
    */
   public ChassisSpeeds getRobotRelativeChassisSpeeds() {
-      return DriveConstants.kDriveKinematics.toChassisSpeeds(
-          modules[0].getState(),
-          modules[1].getState(),
-          modules[2].getState(),
-          modules[3].getState());
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(
+        modules[0].getState(),
+        modules[1].getState(),
+        modules[2].getState(),
+        modules[3].getState());
+  }
+
+  public void setOdometry(Pose2d pose) {
+    odometry.resetPosition(gyro.getRotation2d(), getModulePositions(), pose);
+  }
+
+  public void resetOdometry() {
+    setOdometry(new Pose2d(
+        new Translation2d(0, 0),
+        new Rotation2d()));
   }
 }

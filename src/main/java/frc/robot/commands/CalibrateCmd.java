@@ -4,25 +4,25 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.subsystems.drivetrain.Gyro;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CalibrateCmd extends Command {
-  private final Gyro gyro;
+  private final Drivetrain driveSub;
 
   /** Creates a new Calibrate. */
-  public CalibrateCmd(Gyro gyro) {
+  public CalibrateCmd(Drivetrain driveSub) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.gyro = gyro;
+    this.driveSub = driveSub;
+    addRequirements(driveSub);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    gyro.calibrate();
+    driveSub.gyro.calibrate();
+    driveSub.resetOdometry();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
