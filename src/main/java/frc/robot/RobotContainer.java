@@ -16,6 +16,9 @@ import frc.robot.subsystems.drivetrain.GyroADXRS450;
 import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -40,7 +43,8 @@ public class RobotContainer {
   private final CommandXboxController driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
 
-  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
+  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine",
+      AutoBuilder.buildAutoChooser());;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
