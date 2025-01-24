@@ -7,18 +7,19 @@ package frc.robot;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.AutoDrive;
 import frc.robot.commands.CalibrateCmd;
 import frc.robot.commands.DriveCmd;
+import frc.robot.commands.TimedAutoDrive;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroADXRS450;
 import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -38,7 +39,8 @@ public class RobotContainer {
 
         private final CommandXboxController driverController = new CommandXboxController(
                         OperatorConstants.kDriverControllerPort);
-        SendableChooser<Command> m_chooser = new SendableChooser<>();
+
+        private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
 
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -77,11 +79,8 @@ public class RobotContainer {
                                                                 -driverController.getRawAxis(
                                                                                 OIConstants.kDriverControllerRotAxis),
                                                                 OIConstants.kDriveDeadband)));
-
+                configureAutos();
                 configureBindings();
-                final Command m_simpleAuto = new AutoDrive(driveSub);
-                m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
-                SmartDashboard.putData(m_chooser);
         }
 
         /**
@@ -99,7 +98,16 @@ public class RobotContainer {
          * joysticks}.
          */
         private void configureBindings() {
-                driverController.b().onTrue(new CalibrateCmd(gyro));
+                driverController.b().onTrue(new CalibrateCmd(driveSub));
+        }
+
+        /**
+         * Use this method to define the autonomous command.
+         */
+        private void configureAutos() {
+                autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+                autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
+                SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
         }
 
         /**
@@ -108,6 +116,6 @@ public class RobotContainer {
          * @return the command to run in autonomous
          */
         public Command getAutonomousCommand() {
-                return m_chooser.getSelected();
+                return autoChooser.get();
         }
 }
