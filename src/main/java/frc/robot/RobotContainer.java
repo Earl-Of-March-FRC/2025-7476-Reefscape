@@ -43,8 +43,7 @@ public class RobotContainer {
   private final CommandXboxController driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
 
-  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine",
-      AutoBuilder.buildAutoChooser());;
+  private final LoggedDashboardChooser<Command> autoChooser;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -83,6 +82,9 @@ public class RobotContainer {
                 -driverController.getRawAxis(
                     OIConstants.kDriverControllerRotAxis),
                 OIConstants.kDriveDeadband)));
+
+    autoChooser = new LoggedDashboardChooser<>("Auto Routine",
+        AutoBuilder.buildAutoChooser());
     configureAutos();
     configureBindings();
   }

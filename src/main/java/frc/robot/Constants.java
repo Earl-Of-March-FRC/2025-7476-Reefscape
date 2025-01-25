@@ -58,6 +58,7 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 8;
 
     public static final boolean kGyroReversed = false;
+    public static final double kSkewCompensationFactor = -0.05;
   }
 
   public static final class ModuleConstants {
@@ -95,11 +96,11 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
     public static final double kMaxAngularSpeed = 2 * Math.PI;
 
-    public static final double kPTranslationController = 1;
+    public static final double kPTranslationController = 1.5;
     public static final double kPThetaController = 1;
-    public static final double kITranslationController = 0;
+    public static final double kITranslationController = 0.75;
     public static final double kIThetaController = 0;
-    public static final double kDTranslationController = 0;
+    public static final double kDTranslationController = 0.25;
     public static final double kDThetaController = 0;
 
     // Constraint for the motion profiled robot angle controller

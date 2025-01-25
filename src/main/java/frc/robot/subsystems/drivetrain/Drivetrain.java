@@ -165,11 +165,13 @@ public class Drivetrain extends SubsystemBase {
   public void runVelocity(ChassisSpeeds speeds, Boolean isFieldRelative) {
     // If the speeds are field-relative, convert them to robot-relative speeds
     if (isFieldRelative) {
+      Rotation2d compensatedAngle = gyro.getRotation2d()
+          .plus(Rotation2d.fromDegrees(gyro.getRate() * DriveConstants.kSkewCompensationFactor));
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
           speeds.vxMetersPerSecond,
           speeds.vyMetersPerSecond,
           speeds.omegaRadiansPerSecond,
-          gyro.getRotation2d());
+          compensatedAngle);
     }
 
     // Convert the chassis speeds to swerve module states

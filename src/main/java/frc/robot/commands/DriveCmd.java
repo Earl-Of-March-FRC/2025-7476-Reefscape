@@ -12,13 +12,14 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 /**
- * The DriveCmd class is a command that controls the drivetrain using joystick inputs.
+ * The DriveCmd class is a command that controls the drivetrain using joystick
+ * inputs.
  */
 public class DriveCmd extends Command {
 
   // Reference to the drivetrain subsystem
   private Drivetrain driveSub;
-  
+
   // Suppliers for joystick inputs
   private Supplier<Double> xSupplier;
   private Supplier<Double> ySupplier;
@@ -27,9 +28,9 @@ public class DriveCmd extends Command {
   /**
    * Creates a new DriveCmd.
    * 
-   * @param driveSub The drivetrain subsystem used by this command.
-   * @param xSupplier Supplier for the x-axis joystick input.
-   * @param ySupplier Supplier for the y-axis joystick input.
+   * @param driveSub      The drivetrain subsystem used by this command.
+   * @param xSupplier     Supplier for the x-axis joystick input.
+   * @param ySupplier     Supplier for the y-axis joystick input.
    * @param omegaSupplier Supplier for the omega (rotation) joystick input.
    */
   public DriveCmd(Drivetrain driveSub, Supplier<Double> xSupplier, Supplier<Double> ySupplier,
@@ -60,7 +61,8 @@ public class DriveCmd extends Command {
     double xVel = xSupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
     double yVel = ySupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
     double omega = omegaSupplier.get() * DriveConstants.kMaxAngularSpeed;
-    driveSub.runVelocityRobotRelative(new ChassisSpeeds(xVel, yVel, omega));
+    driveSub.runVelocityFieldRelative(new ChassisSpeeds(xVel, yVel, omega));
+
   }
 
   /**
