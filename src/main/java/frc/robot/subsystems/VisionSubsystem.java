@@ -19,25 +19,31 @@ public class VisionSubsystem extends SubsystemBase {
   /** Creates a new VisionSubsystem. */
   public VisionSubsystem() {
     // Send data to Python
-    double[] dataToSend = { ((Constants.LimelightConstants.hasBorders) ? 1 : 0) };
+    double[] dataToSend = { ((Constants.LimelightConstants.hasBorders) ? 2 : 1) }; // 2 is true 1 is false
     LimelightHelpers.setPythonScriptData("", dataToSend);
     networkTable = NetworkTableInstance.getDefault().getTable(LimelightConstants.kNetworkTableKey);
-
   }
 
   @Override
   public void periodic() {
 
     pythonEntry = networkTable.getEntry(LimelightConstants.kNetworkTableEntry).getDoubleArray(new double[] {});
+    double tx = networkTable.getEntry("tx").getDouble(0);
+    double ty = networkTable.getEntry("ty").getDouble(0);
+    SmartDashboard.putNumber("Horizontal Offset", tx);
+    SmartDashboard.putNumber("Vertical Offset", ty);
 
-    // SmartDashboard.putNumber("Limelight x", pythonEntry[0]);
-    // SmartDashboard.putNumber("Limelight y", pythonEntry[1]);
-    // SmartDashboard.putNumber("Limelight w", pythonEntry[2]);
-    // SmartDashboard.putNumber("Limelight h", pythonEntry[3]);
     SmartDashboard.putNumber("Limelight distance", pythonEntry[0]);
-    SmartDashboard.putNumber("Limelight H-angle", pythonEntry[0]);
-    SmartDashboard.putNumber("Limelight V-angle", pythonEntry[0]);
+    SmartDashboard.putNumber("Limelight H-angle", pythonEntry[1]);
+    SmartDashboard.putNumber("Limelight V-angle", pythonEntry[2]);
+
+    // SmartDashboard.putNumber("Horizontal Offset", aprilTagEntry[0]);
+    // SmartDashboard.putNumber("Vertical Offset", aprilTagEntry[1]);
 
     // This method will be called once per scheduler run
+  }
+
+  public void setPipeline(int pipelineIndex) {
+    LimelightHelpers.setPipelineIndex("", pipelineIndex);
   }
 }
