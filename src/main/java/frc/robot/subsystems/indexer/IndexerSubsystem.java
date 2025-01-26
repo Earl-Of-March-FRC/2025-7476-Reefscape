@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.indexer;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkSim;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -12,7 +14,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 
@@ -43,8 +44,8 @@ public class IndexerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("indexerIntakeSensor", getIntakeSensor());
-    SmartDashboard.putBoolean("indexerShooterSensor", getShooterSensor());
+    Logger.recordOutput("indexerIntakeSensor", getIntakeSensor());
+    Logger.recordOutput("indexerShooterSensor", getShooterSensor());
   }
 
   @Override
