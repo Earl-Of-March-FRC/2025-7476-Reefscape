@@ -108,12 +108,6 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
-  public static final class LimelightConstants {
-    public static final String kNetworkTableKey = "limelight";
-    public static final String kNetworkTableEntry = "llpython";
-    public static final boolean hasBorders = true;
-  }
-
   public static final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
