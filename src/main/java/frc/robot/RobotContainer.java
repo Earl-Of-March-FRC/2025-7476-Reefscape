@@ -29,21 +29,26 @@ public class RobotContainer {
   private final VisionSubsystem visionSubsystem;
   public final Gyro gyro;
   public final Drivetrain driveSub;
+  private final LimelightSubsystem limelightSubsystem;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
   private final LoggedDashboardChooser<Command> autoChooser;
+  private final CommandXboxController driverController = new CommandXboxController(
+      OperatorConstants.kDriverControllerPort);
+  private final LoggedDashboardChooser<Command> autoChooser;
 
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     // Initialize VisionSubsystem
     this.visionSubsystem = new VisionSubsystem();
 
-    // Create and bind SetPipelineCommand to the Y button press
-    SetPipelineCommand setPipelineCommand = new SetPipelineCommand(visionSubsystem, driverController);
-    driverController.y().onTrue(setPipelineCommand);
-
     gyro = new GyroNavX();
     gyro.calibrate();
+
+    this.limelightSubsystem = new LimelightSubsystem();
 
     driveSub = new Drivetrain(
         new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
@@ -82,8 +87,25 @@ public class RobotContainer {
     configureBindings();
   }
 
+  /**
+   * Use this method to define your trigger->command mappings. Triggers can be
+   * created via the
+   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+   * an arbitrary
+   * predicate, or via the named factories in {@link
+   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+   * {@link
+   * CommandXboxController
+   * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+   * PS4} controllers or
+   * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+   * joysticks}.
+   */
   private void configureBindings() {
     driverController.b().onTrue(new CalibrateCmd(driveSub));
+
+    // Bind the Y button to the SetPipelineCommand
+    driverController.y().onTrue(new SetPipelineCommand(limelightSubsystem, driverController.y()));
   }
 
   /**
@@ -95,6 +117,11 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
   }
 
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
