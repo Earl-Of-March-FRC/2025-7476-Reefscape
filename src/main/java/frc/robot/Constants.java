@@ -25,7 +25,8 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
+    public static final double kMaxSpeedMetersPerSecond = 2; // Default 4.8 - Max net robot translational speed
+    public static final double kMaxWheelSpeedMetersPerSecond = 4.8; // Max possible speed for wheel
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
     // Chassis configuration
@@ -63,11 +64,11 @@ public final class Constants {
     // The MAXSwerve module can be configured with one of three pinion gears: 12T,
     // 13T, or 14T. This changes the drive speed of the module (a pinion gear with
     // more teeth will result in a robot that drives faster).
-    public static final int kDrivingMotorPinionTeeth = 14;
+    public static final int kDrivingMotorPinionTeeth = 13;
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = 0.0762;
+    public static final double kWheelDiameterMeters = Units.inchesToMeters(3);
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
     // teeth on the bevel pinion
@@ -86,10 +87,13 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
+    // Auto Parameters - Note that these are not the maximum capable speeds of
+    // the robot, rather the allowed maximum speeds
+    public static final double kMaxSpeedMetersPerSecond = 2; // Default 4.8
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+    public static final double kMaxAngularSpeed = 2 * Math.PI;
 
     public static final double kPXController = 1;
     public static final double kPYController = 1;
@@ -107,4 +111,7 @@ public final class Constants {
   public static final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  // PDP CAN IDs
+  public static final int kPDPCanId = 0;
 }

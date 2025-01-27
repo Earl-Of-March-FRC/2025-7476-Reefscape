@@ -3,13 +3,15 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.subsystems.drivetrain;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class GyroNavX implements Gyro {
-  private final AHRS gyro = new AHRS(NavXComType.kI2C);
+  private final AHRS gyro = new AHRS(NavXComType.kUSB1);
 
   public GyroNavX() {
 
@@ -28,6 +30,5 @@ public class GyroNavX implements Gyro {
   @Override
   public void calibrate() {
     gyro.zeroYaw();
-    gyro.reset();
   }
 }
