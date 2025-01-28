@@ -4,8 +4,21 @@
 
 package frc.robot;
 
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.CalibrateCmd;
+import frc.robot.commands.DriveCmd;
+import frc.robot.commands.TimedAutoDrive;
+import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Gyro;
+import frc.robot.subsystems.drivetrain.GyroADXRS450;
+import frc.robot.subsystems.drivetrain.GyroNavX;
+import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.ShooterAutoCmd;
 import frc.robot.commands.ShooterCmd;
 import edu.wpi.first.math.MathUtil;
@@ -13,6 +26,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -29,33 +43,55 @@ import frc.robot.subsystems.Shooter.ShooterSubsystem;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
+
+  public final Drivetrain driveSub;
+  public final Gyro gyro;
   private final ShooterSubsystem shooter = new ShooterSubsystem();
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController controller = new CommandXboxController(OperatorConstants.kDriverControllerPort);
-  private final CommandXboxController m_driverController = new CommandXboxController(
+  private final CommandXboxController driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
+  private final CommandXboxController controller = new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    // Manual control
-    // shooter.setDefaultCommand(
-    // new ShooterRPMCmd(
-    // shooter,
-    // () -> SmartDashboard.getNumber("speedTop", 0),
-    // () -> SmartDashboard.getNumber("speedBottom", 0),
-    // ));
+    gyro = new GyroNavX();
+    gyro.calibrate();
 
-    // Timed autonomous
-    autoChooser.setDefaultOption("Phase 1 Auto",
-        new ShooterAutoCmd(shooter, MotorConstants.autoSpeed, MotorConstants.autoTimeout));
+    driveSub = new Drivetrain(
+        new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
+            DriveConstants.kFrontLeftTurningCanId,
+            DriveConstants.kFrontLeftChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
+            DriveConstants.kFrontRightTurningCanId,
+            DriveConstants.kFrontRightChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
+            DriveConstants.kRearLeftTurningCanId,
+            DriveConstants.kBackLeftChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
+            DriveConstants.kRearRightTurningCanId,
+            DriveConstants.kBackRightChassisAngularOffset),
+        gyro);
 
-    // Configure the trigger bindings
+    driveSub.setDefaultCommand(
+        new DriveCmd(
+            driveSub,
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerYAxis),
+                OIConstants.kDriveDeadband),
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerXAxis),
+                OIConstants.kDriveDeadband),
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerRotAxis),
+                OIConstants.kDriveDeadband)));
+    configureAutos();
     configureBindings();
   }
 
@@ -74,6 +110,22 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    driverController.b().onTrue(new CalibrateCmd(driveSub));
+    controller.b()
+        .whileTrue(new ShooterRPMCmd(shooter,
+            () -> -1,
+            () -> -1));
+  }
+
+  /**
+   * Use this method to define the autonomous command.
+   */
+  private void configureAutos() {
+    autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+    autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
+    autoChooser.addOption("Phase 1 Auto",
+        new ShooterAutoCmd(shooter, MotorConstants.autoSpeed, MotorConstants.autoTimeout));
+    SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     controller.b()
         .whileTrue(new ShooterRPMCmd(shooter,
@@ -94,10 +146,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return new ShooterAutoCmd(shooter, MotorConstants.autoSpeed, MotorConstants.autoTimeout);
-    // return new ShooterCmd(shooter, () ->
-    // MotorConstants.autoSpeed).withTimeout(5);
-    // return Commands.print("Auto ran!");
+    return null;
   }
 }
