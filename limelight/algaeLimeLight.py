@@ -1,14 +1,33 @@
 import cv2
 import numpy as np
+import math
+
+KNOWN_DISTANCE = 95.25  # Known distance for algae ball (in cm)
+KNOWN_DIAMETER = 41.275  # Known diameter of algae ball (in cm)
+FOCAL_LENGTH = 54.2193717956543 # in cm
 
 # Approximate algae color in HSV
 LOWER_BALL = np.array([80, 50, 60])  # Lower bound for algae ball color
 UPPER_BALL = np.array([100, 255, 255])  # Upper bound for algae ball color
 
-
 # Define minimum area and circularity for the contour filtering
 MIN_AREA = 5000  # Minimum area of the contour to be considered
 MIN_CIRCULARITY = 0.3  # Minimum circularity to consider as a valid algae ball
+
+hasBorderBoxes = True
+
+
+# Focal length finder function (calculates the focal length based on a reference image and real-world object size)
+def focal_length_finder(measured_distance, real_diameter, radius_in_rf_image):
+    # Calculate the focal length using the known reference image data
+    focal_length = (radius_in_rf_image * measured_distance) / real_diameter
+    return focal_length
+
+def calculate_distance(focal_length, radius_in_image):
+    # Using the formula: distance = (known diameter * focal length) / image radius
+    distance = (KNOWN_DIAMETER * focal_length) / radius_in_image
+    return distance
+
 
 def find_algae(image):
     # Convert the input image to the HSV color space
@@ -52,25 +71,32 @@ def find_algae(image):
                 print(f"Circularity: {circularity}\nArea: {area}\n")
 
                 # Update llpython array with bounding box values
-                x, y, w, h = cv2.boundingRect(contour)
-                algae_balls.append((x, y, w, h))
+                x, y,_,_ = cv2.boundingRect(contour)
+                algae_balls.append((x, y, radius))
                 
     return algae_balls
-    
+
+
 def runPipeline(image, llrobot):
     global hasBorderBoxes
-    hasBorderBoxes = llrobot[0] == 1
-    print(hasBorderBoxes)
+    llrobot = [0,0,0]
+    hasBorderBoxes = llrobot[0] != 1
     algae_balls = find_algae(image)
-    
+
     llpython = [0] * 8
 
-    if algae_balls:
-        x1, y1, w1, h1 = algae_balls[0]
-        x2, y2, w2, h2 = algae_balls[0]
-        llpython = [x1, y1, w1, h1,x2,y2,w2,h2]
+    for algae_ball in algae_balls:
+        x, y, radius = algae_ball
+        print(radius)
     
+        fl = focal_length_finder(KNOWN_DISTANCE,KNOWN_DIAMETER,radius)
+        print(f"FL : {fl}")
+        # Use the first detected algae ball for calculations
+        distance = calculate_distance(FOCAL_LENGTH, radius)
+        print(f"Distance: {distance:.2f} cm")
+        
+        llpython = [distance]
+
     largest_contour = np.array([[]])  # Placeholder, not used but required for return
 
-    # Return the largest contour, the modified image, and the custom robot data
     return largest_contour, image, llpython
