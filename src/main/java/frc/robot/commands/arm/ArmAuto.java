@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ArmMoveAuto extends Command {
+public class ArmAuto extends Command {
 
   private ArmSubsystem armSub;
   private double goalAngle;
 
-  /** Creates a new ArmPID. */
-  public ArmMoveAuto(ArmSubsystem armSub, double goalAngle) {
+  /** Creates a new ArmAuto. */
+  public ArmAuto(ArmSubsystem armSub, double goalAngle) {
 
     this.armSub = armSub;
     this.goalAngle = goalAngle;
