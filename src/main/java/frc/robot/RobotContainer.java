@@ -11,16 +11,17 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.CalibrateCmd;
 import frc.robot.commands.DriveCmd;
 import frc.robot.commands.TimedAutoDrive;
+import frc.robot.commands.shooter.SetShooterSpeed;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroADXRS450;
 import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.ShooterAutoCmd;
-import frc.robot.commands.ShooterCmd;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -30,8 +31,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.ShooterRPMCmd;
-import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -44,108 +43,106 @@ import frc.robot.subsystems.Shooter.ShooterSubsystem;
  */
 public class RobotContainer {
 
-  public final Drivetrain driveSub;
-  public final Gyro gyro;
-  private final ShooterSubsystem shooter = new ShooterSubsystem();
+        public final Drivetrain driveSub;
+        public final Gyro gyro;
+        private final ShooterSubsystem shooter = new ShooterSubsystem();
 
-  private final CommandXboxController driverController = new CommandXboxController(
-      OperatorConstants.kDriverControllerPort);
-  private final CommandXboxController controller = new CommandXboxController(OperatorConstants.kDriverControllerPort);
+        private final CommandXboxController driverController = new CommandXboxController(
+                        OperatorConstants.kDriverControllerPort);
+        private final CommandXboxController controller = new CommandXboxController(
+                        OperatorConstants.kDriverControllerPort);
 
-  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
+        private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
 
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
-  public RobotContainer() {
-    gyro = new GyroNavX();
-    gyro.calibrate();
+        /**
+         * The container for the robot. Contains subsystems, OI devices, and commands.
+         */
+        public RobotContainer() {
+                gyro = new GyroNavX();
+                gyro.calibrate();
 
-    driveSub = new Drivetrain(
-        new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
-            DriveConstants.kFrontLeftTurningCanId,
-            DriveConstants.kFrontLeftChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
-            DriveConstants.kFrontRightTurningCanId,
-            DriveConstants.kFrontRightChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
-            DriveConstants.kRearLeftTurningCanId,
-            DriveConstants.kBackLeftChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
-            DriveConstants.kRearRightTurningCanId,
-            DriveConstants.kBackRightChassisAngularOffset),
-        gyro);
+                driveSub = new Drivetrain(
+                                new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
+                                                DriveConstants.kFrontLeftTurningCanId,
+                                                DriveConstants.kFrontLeftChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
+                                                DriveConstants.kFrontRightTurningCanId,
+                                                DriveConstants.kFrontRightChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
+                                                DriveConstants.kRearLeftTurningCanId,
+                                                DriveConstants.kBackLeftChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
+                                                DriveConstants.kRearRightTurningCanId,
+                                                DriveConstants.kBackRightChassisAngularOffset),
+                                gyro);
 
-    driveSub.setDefaultCommand(
-        new DriveCmd(
-            driveSub,
-            () -> MathUtil.applyDeadband(
-                -driverController.getRawAxis(
-                    OIConstants.kDriverControllerYAxis),
-                OIConstants.kDriveDeadband),
-            () -> MathUtil.applyDeadband(
-                -driverController.getRawAxis(
-                    OIConstants.kDriverControllerXAxis),
-                OIConstants.kDriveDeadband),
-            () -> MathUtil.applyDeadband(
-                -driverController.getRawAxis(
-                    OIConstants.kDriverControllerRotAxis),
-                OIConstants.kDriveDeadband)));
-    configureAutos();
-    configureBindings();
-  }
+                driveSub.setDefaultCommand(
+                                new DriveCmd(
+                                                driveSub,
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerYAxis),
+                                                                OIConstants.kDriveDeadband),
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerXAxis),
+                                                                OIConstants.kDriveDeadband),
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerRotAxis),
+                                                                OIConstants.kDriveDeadband)));
+                configureAutos();
+                configureBindings();
+        }
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be
-   * created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-   * an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-   * {@link
-   * CommandXboxController
-   * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or
-   * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
-  private void configureBindings() {
-    driverController.b().onTrue(new CalibrateCmd(driveSub));
-    controller.b()
-        .whileTrue(new ShooterRPMCmd(shooter,
-            () -> -1,
-            () -> -1));
-  }
+        /**
+         * Use this method to define your trigger->command mappings. Triggers can be
+         * created via the
+         * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+         * an arbitrary
+         * predicate, or via the named factories in {@link
+         * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+         * {@link
+         * CommandXboxController
+         * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+         * PS4} controllers or
+         * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+         * joysticks}.
+         */
+        private void configureBindings() {
+                driverController.b().onTrue(new CalibrateCmd(driveSub));
+                controller.b()
+                                .whileTrue(new SetShooterSpeed(shooter, () -> 0.5));
+        }
 
-  /**
-   * Use this method to define the autonomous command.
-   */
-  private void configureAutos() {
-    autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
-    autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
-    autoChooser.addOption("Phase 1 Auto",
-        new ShooterAutoCmd(shooter, MotorConstants.autoSpeed, MotorConstants.autoTimeout));
-    SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    controller.b()
-        .whileTrue(new ShooterRPMCmd(shooter,
-            () -> -1,
-            () -> -1));
-    // () -> SmartDashboard.getNumber("speedBottom", 0),
-    // () -> SmartDashboard.getNumber("speedTop", 0)));
+        /**
+         * Use this method to define the autonomous command.
+         */
+        private void configureAutos() {
+                autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+                autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
+                // autoChooser.addOption("Phase 1 Auto",
+                // new ShooterAutoCmd(shooter, MotorConstants.autoSpeed,
+                // MotorConstants.autoTimeout));
+                SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
+                // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+                controller.b()
+                                .whileTrue(new SetShooterSpeed(shooter, () -> 0.5));
+                // () -> SmartDashboard.getNumber("speedBottom", 0),
+                // () -> SmartDashboard.getNumber("speedTop", 0)));
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-    // pressed,
-    // cancelling on release.
-    // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-  }
+                // Schedule `exampleMethodCommand` when the Xbox controller's B button is
+                // pressed,
+                // cancelling on release.
+                // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+        }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    return null;
-  }
+        /**
+         * Use this to pass the autonomous command to the main {@link Robot} class.
+         *
+         * @return the command to run in autonomous
+         */
+        public Command getAutonomousCommand() {
+                return null;
+        }
 }

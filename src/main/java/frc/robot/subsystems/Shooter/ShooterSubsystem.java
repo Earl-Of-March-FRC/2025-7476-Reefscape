@@ -2,73 +2,59 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Shooter;
+package frc.robot.subsystems.shooter;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkMax;
 
-import frc.robot.Constants;
-import frc.robot.Constants.EncoderConstants;
-import frc.robot.Constants.MotorConstants;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-// import edu.wpi.first.units.Angle;
-// import edu.wpi.first.units.Velocity;
-//I'm not sure if this is the right import
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Configs.ShooterConfigs;
+import frc.robot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ShooterSubsystem extends SubsystemBase {
-  private final WPI_TalonSRX motor = new WPI_TalonSRX(3);
-  private final WPI_TalonSRX top = new WPI_TalonSRX(6);
-  private final Encoder encoder = new Encoder(0, 1);
 
-  private final PIDController posPID = new PIDController(
-      SmartDashboard.getNumber("PID pos P", Constants.PIDConstants.pos_kp),
-      SmartDashboard.getNumber("PID pos I", Constants.PIDConstants.pos_ki),
-      SmartDashboard.getNumber("PID pos D", Constants.PIDConstants.pos_kd));
+  private final SparkMax topShooterSpark = new SparkMax(ShooterConstants.kTopShooterMotorPort,
+      SparkMax.MotorType.kBrushless);
+  private final RelativeEncoder topShooterEncoder = topShooterSpark.getEncoder();
+  private final SparkClosedLoopController topShooterClosedLoopController = topShooterSpark.getClosedLoopController();
 
-  /** Creates a new ShooterSubsystem. */
+  private final SparkMax bottomShooterSpark = new SparkMax(ShooterConstants.kTopShooterMotorPort,
+      SparkMax.MotorType.kBrushless);
+  private final RelativeEncoder bottomShooterEncoder = bottomShooterSpark.getEncoder();
+  private final SparkClosedLoopController bottomShooterClosedLoopController = bottomShooterSpark
+      .getClosedLoopController();
+
   public ShooterSubsystem() {
-    motor.setNeutralMode(NeutralMode.Brake);
-    top.setNeutralMode(NeutralMode.Brake);
-    motor.setInverted(true);
-    encoder.reset();
-  }
+    // configures shooter motors
+    topShooterSpark.configure(ShooterConfigs.shooterConfig, ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
 
-  public void shoot(double speed) {
-    double clampedSpeed = MathUtil.clamp(speed, -MotorConstants.maxSpeed, MotorConstants.maxSpeed);
-    motor.set(clampedSpeed);
-    top.set(clampedSpeed);
-  }
-
-  public double getDistance() {
-    return encoder.getDistance() * EncoderConstants.encoderCountsToMeters;
-  }
-
-  public void setSpeedRPM(double RPM) {
-    motor.set(TalonSRXControlMode.Velocity, RPM / 600 * Constants.EncoderConstants.ticksPerRevolution);
-  }
-
-  public void setSpeedPercent(double speedBottom, double speedTop) {
-    motor.set(TalonSRXControlMode.PercentOutput, speedBottom / 600 * Constants.EncoderConstants.ticksPerRevolution);
-    top.set(TalonSRXControlMode.PercentOutput, speedTop / 600 * Constants.EncoderConstants.ticksPerRevolution);
-  }
-
-  public void setSpeedAngle(double angle) { // angle in degree
-    motor.set(TalonSRXControlMode.Position, angle / 360 * Constants.EncoderConstants.ticksPerRevolution);
-  }
-
-  public PIDController getPosPID() {
-    return posPID;
+    bottomShooterSpark.configure(ShooterConfigs.shooterConfig.inverted(true), ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Encoder Position: ", getDistance());
   }
+
+  public void setShooterSpeed(double speed) {
+    topShooterSpark.set(speed);
+    bottomShooterSpark.set(speed);
+  }
+
+  public double getShooterVelocity() {
+    return topShooterEncoder.getVelocity();
+  }
+
+  // sets the reference velocity for the shooter controller
+  public void setReferenceSpeed(double referenceSpeed) {
+    topShooterClosedLoopController.setReference(referenceSpeed, ControlType.kVelocity);
+    bottomShooterClosedLoopController.setReference(referenceSpeed, ControlType.kVelocity);
+  }
+
 }

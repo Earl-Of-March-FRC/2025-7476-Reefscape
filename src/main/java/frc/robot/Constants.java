@@ -136,6 +136,17 @@ public final class Constants {
     public static final double pos_kd = 0.1;
   }
 
+  public static final class ShooterConstants {
+    public static final int kTopShooterMotorPort = 0;
+    public static final int kBottomShooterMotorPort = 0;
+
+    public static final double kPShooterController = 0;
+    public static final double kIShooterController = 0;
+    public static final double kDShooterController = 0;
+    public static final double kShooterVelocityFF = 0;
+  }
+
   // PDP CAN IDs
   public static final int kPDPCanId = 0;
+
 }
