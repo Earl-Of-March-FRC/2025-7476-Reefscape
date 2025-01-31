@@ -1,148 +1,73 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.MotorConstants;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.CalibrateCmd;
-import frc.robot.commands.DriveCmd;
-import frc.robot.commands.TimedAutoDrive;
-import frc.robot.commands.shooter.SetShooterSpeed;
-import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.drivetrain.Gyro;
-import frc.robot.subsystems.drivetrain.GyroADXRS450;
-import frc.robot.subsystems.drivetrain.GyroNavX;
-import frc.robot.subsystems.drivetrain.MAXSwerveModule;
-import frc.robot.subsystems.shooter.ShooterSubsystem;
-
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.shooter.SetShooterSpeed;
+import frc.robot.commands.shooter.ShooterPID;
+import frc.robot.subsystems.Shooter.ShooterSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
-/**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
 public class RobotContainer {
-
-        public final Drivetrain driveSub;
-        public final Gyro gyro;
         private final ShooterSubsystem shooter = new ShooterSubsystem();
-
-        private final CommandXboxController driverController = new CommandXboxController(
-                        OperatorConstants.kDriverControllerPort);
         private final CommandXboxController controller = new CommandXboxController(
-                        OperatorConstants.kDriverControllerPort);
+                        OperatorConstants.kOperatorControllerPort);
 
-        private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
+        // Use WPILib's SendableChooser to allow selection of autonomous routine
+        private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
-        /**
-         * The container for the robot. Contains subsystems, OI devices, and commands.
-         */
         public RobotContainer() {
-                gyro = new GyroNavX();
-                gyro.calibrate();
+                // Put default values for shooter speed on SmartDashboard
+                SmartDashboard.putNumber("ShooterGoalSpeed", 0.5); // Default speed value (can be adjusted)
+                System.out.println("SmartDashboard ShooterGoalSpeed initialized to 0.5");
 
-                driveSub = new Drivetrain(
-                                new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
-                                                DriveConstants.kFrontLeftTurningCanId,
-                                                DriveConstants.kFrontLeftChassisAngularOffset),
-                                new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
-                                                DriveConstants.kFrontRightTurningCanId,
-                                                DriveConstants.kFrontRightChassisAngularOffset),
-                                new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
-                                                DriveConstants.kRearLeftTurningCanId,
-                                                DriveConstants.kBackLeftChassisAngularOffset),
-                                new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
-                                                DriveConstants.kRearRightTurningCanId,
-                                                DriveConstants.kBackRightChassisAngularOffset),
-                                gyro);
-
-                driveSub.setDefaultCommand(
-                                new DriveCmd(
-                                                driveSub,
-                                                () -> MathUtil.applyDeadband(
-                                                                -driverController.getRawAxis(
-                                                                                OIConstants.kDriverControllerYAxis),
-                                                                OIConstants.kDriveDeadband),
-                                                () -> MathUtil.applyDeadband(
-                                                                -driverController.getRawAxis(
-                                                                                OIConstants.kDriverControllerXAxis),
-                                                                OIConstants.kDriveDeadband),
-                                                () -> MathUtil.applyDeadband(
-                                                                -driverController.getRawAxis(
-                                                                                OIConstants.kDriverControllerRotAxis),
-                                                                OIConstants.kDriveDeadband)));
                 configureAutos();
-                configureBindings();
+                configureBindings(); // Register button bindings for shooter commands
         }
 
-        /**
-         * Use this method to define your trigger->command mappings. Triggers can be
-         * created via the
-         * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-         * an arbitrary
-         * predicate, or via the named factories in {@link
-         * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-         * {@link
-         * CommandXboxController
-         * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-         * PS4} controllers or
-         * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-         * joysticks}.
-         */
         private void configureBindings() {
-                driverController.b().onTrue(new CalibrateCmd(driveSub));
-                controller.b()
-                                .whileTrue(new SetShooterSpeed(shooter, () -> 0.5));
+                // Map button B to set a fixed shooter speed (e.g., 0.5)
+                controller.b().whileTrue(new SetShooterSpeed(shooter, () -> {
+                        double speed = 0.5;
+                        System.out.println("Button B pressed - Setting shooter speed to: " + speed);
+                        return speed;
+                }));
+
+                // Map button A to trigger the ShooterPID command with a goal speed from the
+                // SmartDashboard
+                controller.a().onTrue(new ShooterPID(shooter, () -> {
+                        double speed = SmartDashboard.getNumber("ShooterGoalSpeed", 0.0);
+                        System.out.println("Button A pressed - ShooterGoalSpeed from SmartDashboard: " + speed);
+                        return speed;
+                }));
         }
 
-        /**
-         * Use this method to define the autonomous command.
-         */
         private void configureAutos() {
-                autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
-                autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
-                // autoChooser.addOption("Phase 1 Auto",
-                // new ShooterAutoCmd(shooter, MotorConstants.autoSpeed,
-                // MotorConstants.autoTimeout));
-                SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
-                // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-                controller.b()
-                                .whileTrue(new SetShooterSpeed(shooter, () -> 0.5));
-                // () -> SmartDashboard.getNumber("speedBottom", 0),
-                // () -> SmartDashboard.getNumber("speedTop", 0)));
+                // Add autonomous options to the chooser
+                autoChooser.setDefaultOption("Do Nothing", new InstantCommand()); // Default option
+                autoChooser.addOption("My Custom Auto Command", new InstantCommand()); // Add your custom autonomous
+                                                                                       // commands here
 
-                // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-                // pressed,
-                // cancelling on release.
-                // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+                // Update the SmartDashboard with the options
+                SmartDashboard.putData("Auto Routine", autoChooser);
+                System.out.println("Auto Chooser initialized with options");
         }
 
-        /**
-         * Use this to pass the autonomous command to the main {@link Robot} class.
-         *
-         * @return the command to run in autonomous
-         */
         public Command getAutonomousCommand() {
-                return null;
+                // Get the selected autonomous command from the chooser
+                Command selectedCommand = autoChooser.getSelected();
+                System.out.println("Selected Auto Command: " + selectedCommand.getName());
+                return selectedCommand;
+        }
+
+        // Optional: Add a periodic method to update SmartDashboard values dynamically
+        public void updateSmartDashboard() {
+                double currentSpeed = shooter.getShooterVelocity(); // Assuming you have a method to get the current
+                                                                    // shooter speed
+                SmartDashboard.putNumber("CurrentShooterSpeed", currentSpeed);
+                System.out.println("Current Shooter Speed: " + currentSpeed);
         }
 }

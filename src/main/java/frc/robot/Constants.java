@@ -114,6 +114,7 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final int leftJoystickAxis = 1;
     public static final double joystickDeadband = 0.08;
+    public static int kOperatorControllerPort;
   }
 
   public static final class MotorConstants {
