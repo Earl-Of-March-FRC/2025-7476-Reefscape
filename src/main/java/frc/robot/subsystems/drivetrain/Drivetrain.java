@@ -8,15 +8,26 @@ import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -45,8 +56,11 @@ public class Drivetrain extends SubsystemBase {
   // Current pose of the robot
   Pose2d pose;
 
+  private final PhotonCamera camera;
+
+  private final PhotonPoseEstimator photonPoseEstimator;
   // Odometry class for tracking the robot's position on the field
-  SwerveDriveOdometry odometry = new SwerveDriveOdometry(
+  SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
       new Rotation2d(),
       new SwerveModulePosition[] {
@@ -101,6 +115,12 @@ public class Drivetrain extends SubsystemBase {
           return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false; // default to blue
         },
         this);
+
+    camera = new PhotonCamera("camera2");
+    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    Transform3d robotToCam = new Transform3d(new Translation3d(0, 0.0, 0), new Rotation3d(0, 0, 0));
+    photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+        robotToCam);
   }
 
   /**
@@ -119,6 +139,13 @@ public class Drivetrain extends SubsystemBase {
             modules[2].getPosition(), modules[3].getPosition()
         });
 
+    Optional<EstimatedRobotPose> estimatedPose = getEstimatedGlobalPose(odometry.getEstimatedPosition());
+
+    if (estimatedPose.isPresent()) {
+      Logger.recordOutput("Vision/Pose", estimatedPose.get().estimatedPose);
+      odometry.addVisionMeasurement(convertPose3d(estimatedPose.get().estimatedPose),
+          estimatedPose.get().timestampSeconds);
+    }
     // Log the current pose to the logger
     Logger.recordOutput("Odometry", pose);
 
@@ -249,7 +276,7 @@ public class Drivetrain extends SubsystemBase {
    * @return A Pose2d object representing the current pose of the robot.
    */
   public Pose2d getPose() {
-    return odometry.getPoseMeters();
+    return odometry.getEstimatedPosition();
   }
 
   public ChassisSpeeds getChassisSpeedsRobotRelative() {
@@ -259,4 +286,17 @@ public class Drivetrain extends SubsystemBase {
         modules[2].getState(),
         modules[3].getState());
   }
+
+  public Pose2d convertPose3d(Pose3d p) {
+    double x = p.getX();
+    double y = p.getY();
+    Rotation2d rot = new Rotation2d(p.getRotation().getAngle());
+    return new Pose2d(x, y, rot);
+  }
+
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+    photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+    return photonPoseEstimator.update(camera.getLatestResult());
+  }
+
 }
