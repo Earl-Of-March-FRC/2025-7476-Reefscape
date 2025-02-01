@@ -1,6 +1,8 @@
 package frc.robot.commands.shooter;
 
 import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
@@ -17,19 +19,19 @@ public class ShooterPID extends Command {
   @Override
   public void initialize() {
     double speed = goalSpeed.getAsDouble();
-    shooterSub.setReferenceSpeed(speed);
-    System.out.println("ShooterPID command started with goal speed: " + speed);
+    shooterSub.setReferenceSpeed(speed); // Set the goal speed for the shooter
   }
 
   @Override
   public void execute() {
-    // Optional: Add additional logic or logging here
+    double currentSpeed = shooterSub.getShooterVelocity();
+    SmartDashboard.putNumber("Shooter/CurrentSpeed", currentSpeed);
   }
 
   @Override
   public void end(boolean interrupted) {
-    shooterSub.setReferenceSpeed(0);
-    System.out.println("ShooterPID command ended");
+    shooterSub.setReferenceSpeed(0); // Stop the shooter when the command ends
+    // System.out.println("ShooterPID ended. Interrupted: " + interrupted);
   }
 
   @Override

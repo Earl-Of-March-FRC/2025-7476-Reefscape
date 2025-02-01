@@ -141,8 +141,8 @@ public final class Constants {
     public static final int kTopShooterMotorPort = 0;
     public static final int kBottomShooterMotorPort = 0;
 
-    public static final double kPShooterController = 0;
-    public static final double kIShooterController = 0;
+    public static final double kPShooterController = 0.000025;
+    public static final double kIShooterController = 0.0;// 000000012;
     public static final double kDShooterController = 0;
     public static final double kShooterVelocityFF = 0;
   }

@@ -65,6 +65,7 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     // Logger.recordOutput("Gyro/Rotation", robotContainer.gyro.getRotation2d());
+    Logger.recordOutput("shooter", robotContainer.shooter.getShooterVelocity());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

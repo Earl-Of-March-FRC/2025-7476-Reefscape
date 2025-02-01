@@ -16,20 +16,17 @@ public class SetShooterSpeed extends Command {
 
   @Override
   public void initialize() {
-    System.out.println("SetShooterSpeed command started");
   }
 
   @Override
   public void execute() {
     double speedValue = speed.getAsDouble();
     shooterSub.setShooterSpeed(speedValue);
-    System.out.println("Setting shooter speed to: " + speedValue);
   }
 
   @Override
   public void end(boolean interrupted) {
     shooterSub.setShooterSpeed(0);
-    System.out.println("SetShooterSpeed command ended");
   }
 
   @Override

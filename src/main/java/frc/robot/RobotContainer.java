@@ -12,9 +12,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class RobotContainer {
-        private final ShooterSubsystem shooter = new ShooterSubsystem();
-        private final CommandXboxController controller = new CommandXboxController(
-                        OperatorConstants.kOperatorControllerPort);
+        final ShooterSubsystem shooter = new ShooterSubsystem();
+        private final CommandXboxController controller = new CommandXboxController(0);
 
         // Use WPILib's SendableChooser to allow selection of autonomous routine
         private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -30,26 +29,16 @@ public class RobotContainer {
 
         private void configureBindings() {
                 // Map button B to set a fixed shooter speed (e.g., 0.5)
-                controller.b().whileTrue(new SetShooterSpeed(shooter, () -> {
-                        double speed = 0.5;
-                        System.out.println("Button B pressed - Setting shooter speed to: " + speed);
-                        return speed;
-                }));
-
-                // Map button A to trigger the ShooterPID command with a goal speed from the
-                // SmartDashboard
-                controller.a().onTrue(new ShooterPID(shooter, () -> {
-                        double speed = SmartDashboard.getNumber("ShooterGoalSpeed", 0.0);
-                        System.out.println("Button A pressed - ShooterGoalSpeed from SmartDashboard: " + speed);
-                        return speed;
-                }));
+                controller.b().whileTrue(new ShooterPID(shooter, () -> 200.0));
         }
 
         private void configureAutos() {
                 // Add autonomous options to the chooser
-                autoChooser.setDefaultOption("Do Nothing", new InstantCommand()); // Default option
-                autoChooser.addOption("My Custom Auto Command", new InstantCommand()); // Add your custom autonomous
-                                                                                       // commands here
+                // autoChooser.setDefaultOption("Do Nothing", new InstantCommand()); // Default
+                // option
+                // autoChooser.addOption("My Custom Auto Command", new InstantCommand()); // Add
+                // your custom autonomous
+                // commands here
 
                 // Update the SmartDashboard with the options
                 SmartDashboard.putData("Auto Routine", autoChooser);
