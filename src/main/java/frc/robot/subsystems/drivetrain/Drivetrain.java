@@ -56,7 +56,8 @@ public class Drivetrain extends SubsystemBase {
   // Current pose of the robot
   Pose2d pose;
 
-  private final PhotonCamera camera;
+  private final PhotonCamera camera1;
+  private final PhotonCamera camera2;
 
   private final PhotonPoseEstimator photonPoseEstimator;
   // Odometry class for tracking the robot's position on the field
@@ -116,7 +117,8 @@ public class Drivetrain extends SubsystemBase {
         },
         this);
 
-    camera = new PhotonCamera("camera2");
+    camera1 = new PhotonCamera("camera1");
+    camera2 = new PhotonCamera("camera2");
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
     Transform3d robotToCam = new Transform3d(new Translation3d(0, 0.0, 0), new Rotation3d(0, 0, 0));
     photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
@@ -296,7 +298,7 @@ public class Drivetrain extends SubsystemBase {
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-    return photonPoseEstimator.update(camera.getLatestResult());
+    return photonPoseEstimator.update(camera1.getLatestResult());
   }
 
 }
