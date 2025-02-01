@@ -18,6 +18,7 @@ import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.arm.ArmManual;
 import frc.robot.commands.arm.ArmPID;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -38,13 +39,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-        public final Drivetrain driveSub;
-        public final Gyro gyro;
         private final ArmSubsystem armSub = new ArmSubsystem();
 
-        private final CommandXboxController driverController = new CommandXboxController(
-                        OperatorConstants.kDriverControllerPort);
-        private final CommandXboxController oController = new CommandXboxController(1);
+        private final CommandXboxController oController = new CommandXboxController(0);
 
         private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
 
@@ -52,39 +49,7 @@ public class RobotContainer {
          * The container for the robot. Contains subsystems, OI devices, and commands.
          */
         public RobotContainer() {
-                gyro = new GyroNavX();
-                gyro.calibrate();
 
-                driveSub = new Drivetrain(
-                                new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
-                                                DriveConstants.kFrontLeftTurningCanId,
-                                                DriveConstants.kFrontLeftChassisAngularOffset),
-                                new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
-                                                DriveConstants.kFrontRightTurningCanId,
-                                                DriveConstants.kFrontRightChassisAngularOffset),
-                                new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
-                                                DriveConstants.kRearLeftTurningCanId,
-                                                DriveConstants.kBackLeftChassisAngularOffset),
-                                new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
-                                                DriveConstants.kRearRightTurningCanId,
-                                                DriveConstants.kBackRightChassisAngularOffset),
-                                gyro);
-
-                driveSub.setDefaultCommand(
-                                new DriveCmd(
-                                                driveSub,
-                                                () -> MathUtil.applyDeadband(
-                                                                -driverController.getRawAxis(
-                                                                                OIConstants.kDriverControllerYAxis),
-                                                                OIConstants.kDriveDeadband),
-                                                () -> MathUtil.applyDeadband(
-                                                                -driverController.getRawAxis(
-                                                                                OIConstants.kDriverControllerXAxis),
-                                                                OIConstants.kDriveDeadband),
-                                                () -> MathUtil.applyDeadband(
-                                                                -driverController.getRawAxis(
-                                                                                OIConstants.kDriverControllerRotAxis),
-                                                                OIConstants.kDriveDeadband)));
                 configureAutos();
                 configureBindings();
         }
@@ -104,27 +69,27 @@ public class RobotContainer {
          * joysticks}.
          */
         private void configureBindings() {
-                driverController.b().onTrue(new CalibrateCmd(driveSub));
 
                 // button A - start
                 oController.a().onTrue(new ArmPID(armSub, 0));
                 // button B - floor intake
-                oController.b().onTrue(new ArmPID(armSub, 315));
+                oController.b().onTrue(new ArmPID(armSub, (180.0 / 360)));
                 // button X - L2
-                oController.x().onTrue(new ArmPID(armSub, 285));
+                oController.x().onTrue(new ArmPID(armSub, (285.0 / 360)));
                 // button left bumper - L3
                 oController.leftBumper().onTrue(new ArmPID(armSub, 210));
                 // button right bumper - processor
                 oController.rightBumper().onTrue(new ArmPID(armSub, 150));
+
         }
 
         /**
          * Use this method to define the autonomous command.
          */
         private void configureAutos() {
-                autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
-                autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
-                SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
+                // autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+
+                // SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
         }
 
         /**

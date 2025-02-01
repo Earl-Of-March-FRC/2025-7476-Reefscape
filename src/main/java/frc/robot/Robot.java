@@ -72,7 +72,7 @@ public class Robot extends LoggedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    Logger.recordOutput("Gyro/Rotation", robotContainer.gyro.getRotation2d());
+    // Logger.recordOutput("Gyro/Rotation", robotContainer.gyro.getRotation2d());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -117,6 +117,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    System.out.println();
   }
 
   @Override

@@ -11,12 +11,13 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
-  private final SparkMax armSpark = new SparkMax(ArmConstants.kArmMotorPort, SparkMax.MotorType.kBrushless);
+  private final SparkMax armSpark = new SparkMax(2, SparkMax.MotorType.kBrushless);
   private final SparkAbsoluteEncoder armEncoder = armSpark.getAbsoluteEncoder();
   private final SparkClosedLoopController armClosedLoopController = armSpark.getClosedLoopController();
 
@@ -33,6 +34,9 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    double p = armEncoder.getPosition();
+    SmartDashboard.putNumber("position", p);
+    // System.out.println(p);
   }
 
   // sets the arm speed
