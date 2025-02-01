@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.LimelightConstants;
-import frc.robot.limelight.LimelightHelpers;
+import frc.robot.LimelightHelpers;
 
 public class VisionSubsystem extends SubsystemBase {
   private final NetworkTable networkTable;

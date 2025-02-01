@@ -16,30 +16,30 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 public class TimedAutoDrive extends Command {
   // Timer to keep track of the elapsed time
   private Timer timer = new Timer();
-  
+
   // Reference to the drivetrain subsystem
   private Drivetrain driveSub;
-  
+
   // Desired velocities and duration for the autonomous drive
   double xVel;
   double yVel;
   double omega;
   double seconds;
 
-  /** 
+  /**
    * Creates a new TimedAutoDrive command.
    * 
    * @param driveSub The drivetrain subsystem used by this command.
-   * @param secs The duration for which the robot should drive.
-   * @param x The desired x-axis velocity.
-   * @param y The desired y-axis velocity.
-   * @param ohm The desired rotational velocity.
+   * @param secs     The duration for which the robot should drive.
+   * @param x        The desired x-axis velocity.
+   * @param y        The desired y-axis velocity.
+   * @param ohm      The desired rotational velocity.
    */
   public TimedAutoDrive(Drivetrain driveSub, double secs, double x, double y, double ohm) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.driveSub = driveSub;
     addRequirements(driveSub);
-    
+
     // Set the desired velocities and duration
     xVel = x * AutoConstants.kMaxSpeedMetersPerSecond;
     yVel = y * AutoConstants.kMaxSpeedMetersPerSecond;

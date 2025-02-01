@@ -54,7 +54,8 @@ public class DriveCmd extends Command {
 
   /**
    * Called every time the scheduler runs while the command is scheduled.
-   * This method reads the joystick inputs and sets the drivetrain speeds accordingly.
+   * This method reads the joystick inputs and sets the drivetrain speeds
+   * accordingly.
    */
   @Override
   public void execute() {
