@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -120,6 +121,22 @@ public final class Constants {
 
   public static final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+  }
+
+  public static final class PhotonConstants {
+    public static final double camera1Roll = 0;
+    public static final double camera1Pitch = 0;
+    public static final double camera1Yaw = 0;
+    public static final double camera1X = 0.29;
+    public static final double camera1Y = 0.21;
+    public static final double camera1Z = 0.52;
+
+    public static final double camera2Roll = -4.851 * Math.PI / 180;
+    public static final double camera2Pitch = 0;
+    public static final double camera2Yaw = Math.PI;
+    public static final double camera2X = 0.17;
+    public static final double camera2Y = 0.18;
+    public static final double camera2Z = 0.45;
   }
 
   // PDP CAN IDs

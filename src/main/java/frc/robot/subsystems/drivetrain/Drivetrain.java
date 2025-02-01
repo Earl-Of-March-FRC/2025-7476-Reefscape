@@ -23,6 +23,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -36,6 +37,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
@@ -121,11 +123,21 @@ public class Drivetrain extends SubsystemBase {
     camera1 = new PhotonCamera("camera1");
     camera2 = new PhotonCamera("camera2");
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-    Transform3d robotToCam = new Transform3d(new Translation3d(0, 0.0, 0), new Rotation3d(0, 0, 0));
+    Transform3d robotToCam1 = new Transform3d(
+        new Translation3d(Constants.PhotonConstants.camera1X, Constants.PhotonConstants.camera1Y,
+            Constants.PhotonConstants.camera1Z),
+        new Rotation3d(Constants.PhotonConstants.camera1Roll, Constants.PhotonConstants.camera1Pitch,
+            Constants.PhotonConstants.camera1Yaw));
+    Transform3d robotToCam2 = new Transform3d(
+        new Translation3d(Constants.PhotonConstants.camera2X, Constants.PhotonConstants.camera2Y,
+            Constants.PhotonConstants.camera2Z),
+        new Rotation3d(Constants.PhotonConstants.camera2Roll, Constants.PhotonConstants.camera2Pitch,
+            Constants.PhotonConstants.camera2Yaw));
+
     photonPoseEstimator1 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        robotToCam);
+        robotToCam1);
     photonPoseEstimator2 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        robotToCam);
+        robotToCam2);
   }
 
   /**
@@ -148,12 +160,12 @@ public class Drivetrain extends SubsystemBase {
     Optional<EstimatedRobotPose> estimatedPose2 = getEstimatedGlobalPose2(odometry.getEstimatedPosition());
 
     if (estimatedPose1.isPresent()) {
-      Logger.recordOutput("Vision/Pose", estimatedPose1.get().estimatedPose);
+      Logger.recordOutput("Vision/Pose1", estimatedPose1.get().estimatedPose);
       odometry.addVisionMeasurement(convertPose3d(estimatedPose1.get().estimatedPose),
           estimatedPose1.get().timestampSeconds);
     }
     if (estimatedPose2.isPresent()) {
-      Logger.recordOutput("Vision/Pose", estimatedPose2.get().estimatedPose);
+      Logger.recordOutput("Vision/Pose2", estimatedPose2.get().estimatedPose);
       odometry.addVisionMeasurement(convertPose3d(estimatedPose2.get().estimatedPose),
           estimatedPose2.get().timestampSeconds);
     }
