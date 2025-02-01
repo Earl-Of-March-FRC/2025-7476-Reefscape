@@ -7,8 +7,8 @@ def detect_algae(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
     # Approximate algae color in HSV -- might need some playing around with in person 
-    lower_ball = np.array([80, 50, 60])   # Lower bound for algae ball color
-    upper_ball = np.array([100, 255, 255]) # Upper bound for algae ball color
+    lower_ball = np.array([86, 169, 98])   # Lower bound for algae ball color
+    upper_ball = np.array([87, 141, 225]) # Upper bound for algae ball color
 
     # Apply Gaussian Blur to reduce noise
     blurred = cv2.GaussianBlur(hsv, (9, 9), 0)
