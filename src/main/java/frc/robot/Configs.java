@@ -59,20 +59,23 @@ public final class Configs {
                 public static final SparkMaxConfig armConfig = new SparkMaxConfig();
 
                 static {
-
-                        double a = 1.0 / 360;
-
                         armConfig
-                                        .idleMode(IdleMode.kBrake)
-                                        .smartCurrentLimit(20);
+                                        .idleMode(IdleMode.kBrake) // Set to kBrake to hold position when not moving
+                                        .smartCurrentLimit(30); // Adjust current limit as needed
+
+                        // Configure the absolute encoder
+                        armConfig.absoluteEncoder
+                                        .inverted(false) // Set to true if the encoder reads backward
+                                        .positionConversionFactor(1.0) // Adjust based on encoder output (1.0 for
+                                                                       // rotations, 1.0/360 for degrees)
+                                        .zeroOffset(0.0); // Adjust based on the encoder's home position
+
+                        // Configure closed-loop control
                         armConfig.closedLoop
-                                        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                                        .feedbackSensor(FeedbackSensor.kPrimaryEncoder) // Use absolute encoder
                                         .pidf(ArmConstants.kPArmController, ArmConstants.kIArmController,
                                                         ArmConstants.kDArmController, ArmConstants.kArmVelocityFF)
-                                        .outputRange(-1, 1);
-                        armConfig.absoluteEncoder
-                                        .inverted(false)
-                                        .positionConversionFactor(a);
+                                        .outputRange(-1, 1); // Set output range for the controller
                 }
         }
 }

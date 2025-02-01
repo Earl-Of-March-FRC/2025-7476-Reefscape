@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems.arm;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -17,8 +19,8 @@ import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
-  private final SparkMax armSpark = new SparkMax(2, SparkMax.MotorType.kBrushless);
-  private final SparkAbsoluteEncoder armEncoder = armSpark.getAbsoluteEncoder();
+  private final SparkMax armSpark = new SparkMax(1, SparkMax.MotorType.kBrushless);
+  private final RelativeEncoder armEncoder = armSpark.getEncoder();
   private final SparkClosedLoopController armClosedLoopController = armSpark.getClosedLoopController();
 
   private double m_armAngularOffset = 0;
@@ -34,7 +36,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    double p = armEncoder.getPosition();
+    double p = armEncoder.getPosition() * 360;
     SmartDashboard.putNumber("position", p);
     // System.out.println(p);
   }

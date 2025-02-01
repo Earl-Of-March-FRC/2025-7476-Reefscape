@@ -15,11 +15,14 @@ import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroADXRS450;
 import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.arm.ArmManual;
 import frc.robot.commands.arm.ArmPID;
+import frc.robot.commands.intake.SetIntakeSpeed;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -40,7 +43,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
 
         private final ArmSubsystem armSub = new ArmSubsystem();
-
+        private final IntakeSubsystem intakeSub = new IntakeSubsystem();
         private final CommandXboxController oController = new CommandXboxController(0);
 
         private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
@@ -70,17 +73,21 @@ public class RobotContainer {
          */
         private void configureBindings() {
 
-                // button A - start
-                oController.a().onTrue(new ArmPID(armSub, 0));
-                // button B - floor intake
-                oController.b().onTrue(new ArmPID(armSub, (180.0 / 360)));
-                // button X - L2
-                oController.x().onTrue(new ArmPID(armSub, (285.0 / 360)));
-                // button left bumper - L3
-                oController.leftBumper().onTrue(new ArmPID(armSub, 210));
-                // button right bumper - processor
-                oController.rightBumper().onTrue(new ArmPID(armSub, 150));
-
+                /*
+                 * // button A - start
+                 * oController.a().onTrue(new ArmPID(armSub, 0));
+                 * // button B - floor intake
+                 * oController.b().onTrue(new ArmPID(armSub, (180.0 / 360)));
+                 * // button X - L2
+                 * oController.x().onTrue(new ArmPID(armSub, (285.0 / 360)));
+                 * // button left bumper - L3
+                 * oController.leftBumper().onTrue(new ArmPID(armSub, 210));
+                 * // button right bumper - processor
+                 * oController.rightBumper().onTrue(new ArmPID(armSub, 150));
+                 * 
+                 */
+                oController.a().onTrue(new SetIntakeSpeed(intakeSub, 0.5));
+                oController.b().onTrue(new SetIntakeSpeed(intakeSub, 0));
         }
 
         /**
