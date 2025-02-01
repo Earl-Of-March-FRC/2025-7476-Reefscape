@@ -59,7 +59,8 @@ public class Drivetrain extends SubsystemBase {
   private final PhotonCamera camera1;
   private final PhotonCamera camera2;
 
-  private final PhotonPoseEstimator photonPoseEstimator;
+  private final PhotonPoseEstimator photonPoseEstimator1;
+  private final PhotonPoseEstimator photonPoseEstimator2;
   // Odometry class for tracking the robot's position on the field
   SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
@@ -121,7 +122,9 @@ public class Drivetrain extends SubsystemBase {
     camera2 = new PhotonCamera("camera2");
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
     Transform3d robotToCam = new Transform3d(new Translation3d(0, 0.0, 0), new Rotation3d(0, 0, 0));
-    photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+    photonPoseEstimator1 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+        robotToCam);
+    photonPoseEstimator2 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToCam);
   }
 
@@ -141,12 +144,18 @@ public class Drivetrain extends SubsystemBase {
             modules[2].getPosition(), modules[3].getPosition()
         });
 
-    Optional<EstimatedRobotPose> estimatedPose = getEstimatedGlobalPose(odometry.getEstimatedPosition());
+    Optional<EstimatedRobotPose> estimatedPose1 = getEstimatedGlobalPose1(odometry.getEstimatedPosition());
+    Optional<EstimatedRobotPose> estimatedPose2 = getEstimatedGlobalPose2(odometry.getEstimatedPosition());
 
-    if (estimatedPose.isPresent()) {
-      Logger.recordOutput("Vision/Pose", estimatedPose.get().estimatedPose);
-      odometry.addVisionMeasurement(convertPose3d(estimatedPose.get().estimatedPose),
-          estimatedPose.get().timestampSeconds);
+    if (estimatedPose1.isPresent()) {
+      Logger.recordOutput("Vision/Pose", estimatedPose1.get().estimatedPose);
+      odometry.addVisionMeasurement(convertPose3d(estimatedPose1.get().estimatedPose),
+          estimatedPose1.get().timestampSeconds);
+    }
+    if (estimatedPose2.isPresent()) {
+      Logger.recordOutput("Vision/Pose", estimatedPose2.get().estimatedPose);
+      odometry.addVisionMeasurement(convertPose3d(estimatedPose2.get().estimatedPose),
+          estimatedPose2.get().timestampSeconds);
     }
     // Log the current pose to the logger
     Logger.recordOutput("Odometry", pose);
@@ -296,9 +305,13 @@ public class Drivetrain extends SubsystemBase {
     return new Pose2d(x, y, rot);
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
-    photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-    return photonPoseEstimator.update(camera1.getLatestResult());
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose1(Pose2d prevEstimatedRobotPose) {
+    photonPoseEstimator1.setReferencePose(prevEstimatedRobotPose);
+    return photonPoseEstimator1.update(camera1.getLatestResult());
   }
 
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
+    photonPoseEstimator2.setReferencePose(prevEstimatedRobotPose);
+    return photonPoseEstimator2.update(camera2.getLatestResult());
+  }
 }
