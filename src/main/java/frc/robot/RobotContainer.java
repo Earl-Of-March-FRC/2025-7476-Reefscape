@@ -29,7 +29,7 @@ public class RobotContainer {
 
         private void configureBindings() {
                 // Map button B to set a fixed shooter speed (e.g., 0.5)
-                controller.b().whileTrue(new ShooterPID(shooter, () -> 200.0));
+                controller.b().whileTrue(new ShooterPID(shooter, () -> 60.0));
         }
 
         private void configureAutos() {
