@@ -5,20 +5,25 @@ import logging
 
 from network_tables import NetworkTable
 
-KNOWN_DIAMETER = 412.75  # Known diameter of algae ball (in mm)
+KNOWN_DIAMETER = 413.75  # Known diameter of algae ball (in mm)
 
 # Approximate algae color in HSV
+
+
 LOWER_BALL = np.array([80, 50, 60])  # Lower bound for algae ball color
 UPPER_BALL = np.array([100, 255, 255])  # Upper bound for algae ball color
+
 
 # Define minimum area and circularity for the contour filtering
 MIN_AREA = 3000  # Minimum area of the contour to be considered
 MIN_CIRCULARITY = 0.3  # Minimum circularity to consider as a valid algae ball
 
 # Define camera matrix for webcam
-CAM_MATRIX = np.array([[818.03555109, 0, 314.24724784], 
+CAM_MATRIX = np.array([[1413.70008, 0, 314.24724784], 
                        [0, 817.48854915, 240.10474105], 
                        [0, 0, 1]])
+
+STREAM_URL = "http://localhost:1181/stream.mjpg"
 
 
 # Class for Object Detection
@@ -48,7 +53,7 @@ class ObjectDetection:
         mask = cv2.dilate(mask, None, iterations=5)  # Increased dilation to cover partial objects
 
         # Use Canny edge detection to find edges
-        edges = cv2.Canny(mask, 100, 200)
+        edges = cv2.Canny(mask, 100, 300)
         
         # Dilate the edges to connect broken parts, especially for obstructions
         dilated_edges = cv2.dilate(edges, None, iterations=5)
@@ -87,7 +92,7 @@ class ObjectDetection:
             # Remove padding from coordinates (accounting for the added border)
             unpadded_x = int(x) - padding
             unpadded_y = int(y) - padding
-            cv2.circle(image, (unpadded_x, unpadded_y), int(radius), (255, 0, 255), 5)
+            cv2.circle(image, (unpadded_x, unpadded_y), int(radius / 2), (255, 0, 255), 5)
 
         return image, mask, edges, filled_edges, largest_ball
 
@@ -134,9 +139,10 @@ class Computation:
 
 # Main part of the code
 def main():
+    
     # Open the video stream (0 for default camera or replace with a video file path)
-    cap = cv2.VideoCapture(1)
-    ntable = NetworkTable()
+    cap = cv2.VideoCapture(STREAM_URL)
+    # ntable = NetworkTable()
 
     # Check if the camera opened successfully
     if not cap.isOpened():
@@ -161,20 +167,20 @@ def main():
         if largest_ball:
             # If we found a valid ball, calculate distance and display it
             x, y, diameter = largest_ball
-            distance = computation.calculate_distance_with_offset(diameter)
-            angle = computation.calculate_horizontal_angle(processed_frame, x, 0)
+            distance = (computation.calculate_distance_with_offset(diameter)) / 10 # in cm
+            angle = computation.calculate_horizontal_angle(processed_frame, x, 44)
             distance_in_inches = distance / 25.4
 
-            ntable.send_data(distance_in_inches, angle)
+            # ntable.send_data(distance_in_inches, angle)
 
-            # print(f"Distance to algae ball: {distance_in_inches:.2f} in")
+            print(f"Distance to algae ball: {distance:.2f} cm")
             # print(f"Angle to algae ball relative to camera: {angle:.2f} deg")
 
         # Display the processed frame
         cv2.imshow("Ball Detection", processed_frame)
         cv2.imshow("Contour", mask)
-        cv2.imshow("Edges", edges)
-        cv2.imshow("Filled Edges", filled_edges)
+        # cv2.imshow("Edges", edges)
+        # cv2.imshow("Filled Edges", filled_edges)
 
         # Check for a key press to exit the loop
         if cv2.waitKey(1) & 0xFF == ord('q'):  # Press 'q' to quit
