@@ -10,6 +10,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ShooterConfigs;
 
+/**
+ * ShooterSubsystem controls the shooter mechanism of the robot.
+ * It manages motor speed, velocity, and PID control for the shooter.
+ */
 public class ShooterSubsystem extends SubsystemBase {
     private final SparkMax topShooterSpark = new SparkMax(2, SparkMax.MotorType.kBrushless);
     private final RelativeEncoder topShooterEncoder = topShooterSpark.getEncoder();
@@ -20,6 +24,9 @@ public class ShooterSubsystem extends SubsystemBase {
     private final SparkClosedLoopController bottomShooterClosedLoopController = bottomShooterSpark
             .getClosedLoopController();
 
+    /**
+     * Constructs a new ShooterSubsystem and configures the shooter motors.
+     */
     public ShooterSubsystem() {
         // Configure motors
         topShooterSpark.configure(ShooterConfigs.shooterConfig, ResetMode.kResetSafeParameters,
@@ -28,22 +35,42 @@ public class ShooterSubsystem extends SubsystemBase {
                 PersistMode.kPersistParameters);
     }
 
+    /**
+     * This method is called periodically by the scheduler.
+     * It publishes shooter velocity to the SmartDashboard.
+     */
     @Override
     public void periodic() {
-        // Publish shooter velocity to SmartDashboard
         SmartDashboard.putNumber("TopShooterVelocity", topShooterEncoder.getVelocity());
         SmartDashboard.putNumber("BottomShooterVelocity", bottomShooterEncoder.getVelocity());
     }
 
+    /**
+     * Sets the speed of both shooter motors.
+     *
+     * @param speed The speed to set the motors to, typically in the range [-1.0,
+     *              1.0].
+     */
     public void setShooterSpeed(double speed) {
         topShooterSpark.set(speed);
         bottomShooterSpark.set(speed);
     }
 
+    /**
+     * Gets the velocity of the top shooter motor.
+     *
+     * @return The velocity of the top shooter motor in RPM.
+     */
     public double getShooterVelocity() {
         return topShooterEncoder.getVelocity();
     }
 
+    /**
+     * Sets a reference speed for the shooter motors using closed-loop velocity
+     * control.
+     *
+     * @param referenceSpeed The target speed in RPM.
+     */
     public void setReferenceSpeed(double referenceSpeed) {
         topShooterClosedLoopController.setReference(referenceSpeed, ControlType.kVelocity);
         bottomShooterClosedLoopController.setReference(referenceSpeed, ControlType.kVelocity);
