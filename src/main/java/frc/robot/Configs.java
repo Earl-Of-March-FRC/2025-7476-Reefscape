@@ -78,4 +78,14 @@ public final class Configs {
                                         .outputRange(-1, 1); // Set output range for the controller
                 }
         }
+
+        public static final class IntakeConfigs {
+                public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();
+
+                static {
+                        intakeConfig
+                                        .idleMode(IdleMode.kBrake)
+                                        .smartCurrentLimit(30);
+                }
+        }
 }
