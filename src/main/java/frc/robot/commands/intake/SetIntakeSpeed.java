@@ -7,13 +7,20 @@ package frc.robot.commands.intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+/**
+ * This command sets the speed of the intake rollers.
+ */
 public class SetIntakeSpeed extends Command {
 
   private IntakeSubsystem intakeSub;
   private double speed;
 
-  /** Creates a new SetIntakeSpeed. */
+  /**
+   * Sets the speed of the intake rollers.
+   * 
+   * @param intakeSub The instance of the IntakeSubsystem class to be used.
+   * @param speed     Desired speed, from -1 to 1.
+   */
   public SetIntakeSpeed(IntakeSubsystem intakeSub, double speed) {
 
     this.intakeSub = intakeSub;

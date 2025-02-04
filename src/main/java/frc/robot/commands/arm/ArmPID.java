@@ -7,14 +7,21 @@ package frc.robot.commands.arm;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
+/**
+ * This command uses closed-loop control to move the arm to the desired angle.
+ */
 public class ArmPID extends InstantCommand {
 
   private ArmSubsystem armSub;
   private double goalAngle;
 
+  /**
+   * Sets the reference value for the arm subsystem's closed-loop controller. It
+   * will automatically begin moving towards the desired angle.
+   * 
+   * @param armSub    The instance of the ArmSubsystem class to be used.
+   * @param goalAngle The goal angle for the arm to move to, in degrees.
+   */
   public ArmPID(ArmSubsystem armSub, double goalAngle) {
 
     this.armSub = armSub;

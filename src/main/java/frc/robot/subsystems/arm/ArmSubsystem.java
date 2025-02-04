@@ -18,6 +18,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
 
+/**
+ * The ArmSubsystem class represents the robot's arm subsystem. It uses PIDF to
+ * pivot the arm.
+ */
 public class ArmSubsystem extends SubsystemBase {
   private final SparkMax armSpark = new SparkMax(1, SparkMax.MotorType.kBrushless);
   private final RelativeEncoder armEncoder = armSpark.getEncoder();
@@ -25,7 +29,9 @@ public class ArmSubsystem extends SubsystemBase {
 
   private double m_armAngularOffset = 0;
 
-  /** Creates a new ArmSubsystem. */
+  /**
+   * The constructor for the ArmSubsystem class configures the arm motor.
+   */
   public ArmSubsystem() {
 
     // configures arm motor
@@ -41,22 +47,38 @@ public class ArmSubsystem extends SubsystemBase {
     // System.out.println(p);
   }
 
-  // sets the arm speed
+  /**
+   * Sets the speed of the arm.
+   * 
+   * @param speed Desired speed, in RPM.
+   */
   public void setArmSpeed(double speed) {
     armSpark.set(speed);
   }
 
-  // returns the arm's current position
+  /**
+   * Returns the current arm position.
+   * 
+   * @return double The current angle of the arm, in degrees.
+   */
   public double getArmPosition() {
     return armEncoder.getPosition() - m_armAngularOffset;
   }
 
-  // returns the arm's current velocity
+  /**
+   * Returns the current arm velocity.
+   * 
+   * @return double The current velocity of the arm, in RPM.
+   */
   public double getArmVelocity() {
     return armEncoder.getVelocity();
   }
 
-  // sets the reference value / setpoint for the arm controller
+  /**
+   * Sets the goal angle for the arm closed loop controller.
+   * 
+   * @param referenceAngle The reference angle, in degrees.
+   */
   public void setReferenceAngle(double referenceAngle) {
     armClosedLoopController.setReference(referenceAngle + m_armAngularOffset, ControlType.kPosition);
   }

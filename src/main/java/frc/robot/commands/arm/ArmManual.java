@@ -10,7 +10,9 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+/**
+ * This command moves the arm manually.
+ */
 public class ArmManual extends Command {
 
   private ArmSubsystem armSub;
@@ -18,15 +20,17 @@ public class ArmManual extends Command {
 
   SlewRateLimiter filter = new SlewRateLimiter(0.9);
 
-  /** Creates a new ArmManual. */
-  public ArmManual(ArmSubsystem armSub, DoubleSupplier d) {
-    // Use addRequirements() here to declare subsystem dependencies.
-
+  /**
+   * Moves the arm manually.
+   * 
+   * @param armSub The instance of the ArmSubsystem class to be used.
+   * @param speed  The desired speed of the arm, in RPM.
+   */
+  public ArmManual(ArmSubsystem armSub, DoubleSupplier speed) {
     this.armSub = armSub;
-    this.speed = d;
+    this.speed = speed;
 
     addRequirements(armSub);
-
   }
 
   // Called when the command is initially scheduled.
