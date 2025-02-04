@@ -114,6 +114,17 @@ public final class Constants {
     public static final int kMotorPort = 10;
     public static final MotorType kMotorType = MotorType.kBrushless;
 
+    /**
+     * Multiplier at which decides whether + or - inputs move the algae towards the
+     * shooter.
+     */
+    public static final double kDirectionConstant = 1.0;
+
+    public static final double kMotorReduction = 1.0;
+    public static final double kWheelDiameterMeters = 0.17;
+
+    public static final double kVelocityFF = 12.0 / 1000; // Max voltage / Max velocity
+
     // DIO Ports for sensors. TBD
     public static final int kIntakeSensorChannel = 0;
     public static final int kShooterSensorChannel = 1;

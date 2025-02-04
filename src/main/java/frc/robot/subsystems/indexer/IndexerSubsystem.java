@@ -6,8 +6,11 @@ package frc.robot.subsystems.indexer;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkSim;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -16,10 +19,13 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
+import frc.robot.Constants.IndexerConstants;
 
 public class IndexerSubsystem extends SubsystemBase {
   private final SparkMax indexerSpark;
   private final DigitalInput intakeSensor, shooterSensor;
+  private final SparkClosedLoopController controller;
+  private final RelativeEncoder encoder;
 
   private final SparkSim indexerSparkSim; // In case we ever need to simulate the motor
 
@@ -40,6 +46,8 @@ public class IndexerSubsystem extends SubsystemBase {
 
     indexerSpark.configure(Configs.IndexerSubsystem.indexerConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+    controller = indexerSpark.getClosedLoopController();
+    encoder = indexerSpark.getEncoder();
   }
 
   @Override
@@ -59,7 +67,7 @@ public class IndexerSubsystem extends SubsystemBase {
    * @see #setVoltage
    */
   public void setSpeed(double percent) {
-    indexerSpark.set(percent);
+    indexerSpark.set(percent * IndexerConstants.kDirectionConstant);
   };
 
   /**
@@ -79,7 +87,7 @@ public class IndexerSubsystem extends SubsystemBase {
    * @see #setSpeed
    */
   public void setVoltage(double voltage) {
-    indexerSpark.setVoltage(voltage);
+    indexerSpark.setVoltage(voltage * IndexerConstants.kDirectionConstant);
   };
 
   /**
@@ -90,6 +98,24 @@ public class IndexerSubsystem extends SubsystemBase {
    */
   public double getVoltage() {
     return indexerSpark.getAppliedOutput();
+  }
+
+  /**
+   * Set the velocity (RPM) of the indexer motors in meters
+   * 
+   * @param velocity RPM in meters
+   */
+  public void setVelocity(double velocity) {
+    controller.setReference(velocity, ControlType.kVelocity);
+  }
+
+  /**
+   * Get the velocity (RPM) of the indexer motors in meters.
+   * 
+   * @return RPM in meters
+   */
+  public double getVelocity() {
+    return encoder.getVelocity();
   }
 
   /**

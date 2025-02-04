@@ -4,6 +4,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.ModuleConstants;
 
 public final class Configs {
@@ -61,6 +62,15 @@ public final class Configs {
                 static {
                         indexerConfig.idleMode(IdleMode.kBrake);
                         indexerConfig.smartCurrentLimit(40);
+                        indexerConfig.closedLoop
+                                        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                                        .pid(1, 0, 0)
+                                        .velocityFF(IndexerConstants.kVelocityFF)
+                                        .outputRange(-1, 1);
+                        indexerConfig.encoder
+                                        .velocityConversionFactor(IndexerConstants.kWheelDiameterMeters * Math.PI
+                                                        / IndexerConstants.kMotorReduction / 60);
+
                 }
         }
 }
