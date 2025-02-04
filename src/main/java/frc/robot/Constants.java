@@ -130,7 +130,7 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final int kRollersMotorPort = 2;
+    public static final int kIntakeMotorPort = 2;
   }
 
   // PDP CAN IDs
