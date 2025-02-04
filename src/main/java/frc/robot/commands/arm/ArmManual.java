@@ -18,8 +18,6 @@ public class ArmManual extends Command {
   private ArmSubsystem armSub;
   private DoubleSupplier speed;
 
-  SlewRateLimiter filter = new SlewRateLimiter(0.9);
-
   /**
    * Moves the arm manually.
    * 
@@ -41,11 +39,7 @@ public class ArmManual extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (Math.abs(speed.getAsDouble()) < 0.3) {
-      armSub.setArmSpeed(speed.getAsDouble());
-    } else {
-      armSub.setArmSpeed(filter.calculate(speed.getAsDouble()) * 0.7);
-    }
+    armSub.setArmSpeed(speed.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
