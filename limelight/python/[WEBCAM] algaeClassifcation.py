@@ -5,7 +5,7 @@ import logging
 
 from network_tables import NetworkTable
 
-KNOWN_DIAMETER = 412.75  # Known diameter of algae ball (in mm)
+KNOWN_DIAMETER = 413.75  # Known diameter of algae ball (in mm)
 
 # Approximate algae color in HSV
 
