@@ -2,7 +2,7 @@
 # If you remove items from this file, intellisense might break.
 
 __pycache__
-.env
+.venv
 
 ### C++ ###
 # Prerequisites

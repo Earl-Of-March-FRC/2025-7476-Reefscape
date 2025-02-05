@@ -5,7 +5,7 @@ import logging
 
 from network_tables import NetworkTable
 
-KNOWN_DIAMETER = 476.00  # Known diameter of algae ball (in mm)
+KNOWN_DIAMETER = 475.00  # Known diameter of algae ball (in mm)
 
 
 # Approximate algae color in HSV
@@ -51,16 +51,16 @@ class ObjectDetection:
 
         # Apply morphological operations to reduce noise
         mask = cv2.erode(mask, None, iterations=2)
-        mask = cv2.dilate(mask, None, iterations=5)  # Increased dilation to cover partial objects
+        mask = cv2.dilate(mask, None, iterations=2)  # Increased dilation to cover partial objects
 
         # Use Canny edge detection to find edges
         edges = cv2.Canny(mask, 100, 300)
         
         # Dilate the edges to connect broken parts, especially for obstructions
-        dilated_edges = cv2.dilate(edges, None, iterations=5)
+        dilated_edges = cv2.dilate(edges, None, iterations=3)
 
         # Fill in the dilated edges (inpainting) to smooth out broken parts
-        filled_edges = cv2.dilate(dilated_edges, None, iterations=2)  # further dilation to fill the edges
+        filled_edges = cv2.dilate(dilated_edges, None, iterations=3)  # further dilation to fill the edges
 
         # Find contours in the filled edge-detected image
         contours, _ = cv2.findContours(filled_edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -85,15 +85,15 @@ class ObjectDetection:
                     # Check if this is the largest algae ball so far
                     if area > largest_area:
                         largest_area = area
-                        largest_ball = (x, y, 2 * radius) # returns diameter or obj width
+                        largest_ball = (x, y, radius, radius*2) # returns diameter or obj width
 
         if largest_ball:
             # Unpad the coordinates and draw the largest ball on the original image
-            x, y, radius = largest_ball
+            x, y, radius, diameter = largest_ball
             # Remove padding from coordinates (accounting for the added border)
             unpadded_x = int(x) - padding
             unpadded_y = int(y) - padding
-            cv2.circle(image, (unpadded_x, unpadded_y), int(radius/2), (255, 0, 255), 5)
+            cv2.circle(image, (unpadded_x, unpadded_y), int(radius), (255, 0, 255), 5)
 
         return image, mask, edges, filled_edges, largest_ball
 
@@ -104,7 +104,7 @@ class Computation:
         self.object_real_width = object_real_width
         
     def calculate_distance_with_offset(self, detection_width):
-        return (self.object_real_width * self.focal_length_x) / detection_width # returns in mm
+        return ((self.object_real_width * self.focal_length_x) / detection_width) - 20 # returns in mm
     
     def calculate_horizontal_angle(self, frame, object_center_x, camera_offset):
         
@@ -167,7 +167,7 @@ def main():
 
         if largest_ball:
             # If we found a valid ball, calculate distance and display it
-            x, y, diameter = largest_ball
+            x, y, radius,diameter = largest_ball
             distance = (computation.calculate_distance_with_offset(diameter)) / 10 # in cm
             angle = computation.calculate_horizontal_angle(processed_frame, x, 44)
             distance_in_inches = distance / 25.4
