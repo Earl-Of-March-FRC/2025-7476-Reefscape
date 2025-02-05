@@ -69,7 +69,7 @@ public class DriveCmd extends Command {
     // relative
     driveSub.runVelocity(new ChassisSpeeds(xVel, yVel, omega), driveSub.gyro.isConnected());
     SmartDashboard.putBoolean("gyroConnected", driveSub.gyro.isConnected());
-    Logger.recordOutput("Swerve/gyro/isConnected", driveSub.gyro.isConnected());
+    Logger.recordOutput("Gyro/isConnected", driveSub.gyro.isConnected());
   }
 
   /**
