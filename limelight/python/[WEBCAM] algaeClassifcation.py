@@ -5,7 +5,8 @@ import logging
 
 from network_tables import NetworkTable
 
-KNOWN_DIAMETER = 413.75  # Known diameter of algae ball (in mm)
+KNOWN_DIAMETER = 476.00  # Known diameter of algae ball (in mm)
+
 
 # Approximate algae color in HSV
 
@@ -92,7 +93,7 @@ class ObjectDetection:
             # Remove padding from coordinates (accounting for the added border)
             unpadded_x = int(x) - padding
             unpadded_y = int(y) - padding
-            cv2.circle(image, (unpadded_x, unpadded_y), int(radius / 2), (255, 0, 255), 5)
+            cv2.circle(image, (unpadded_x, unpadded_y), int(radius/2), (255, 0, 255), 5)
 
         return image, mask, edges, filled_edges, largest_ball
 
