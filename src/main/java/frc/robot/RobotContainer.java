@@ -21,7 +21,6 @@ public class RobotContainer {
         public RobotContainer() {
                 // Put default values for shooter speed on SmartDashboard
                 SmartDashboard.putNumber("ShooterGoalSpeed", 0.5); // Default speed value (can be adjusted)
-                System.out.println("SmartDashboard ShooterGoalSpeed initialized to 0.5");
 
                 configureAutos();
                 configureBindings(); // Register button bindings for shooter commands
