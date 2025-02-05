@@ -12,4 +12,8 @@ public interface Gyro {
 
   public default void calibrate() {
   }
+
+  public default boolean isConnected() {
+    return true;
+  }
 }
