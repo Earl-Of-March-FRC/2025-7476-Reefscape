@@ -6,7 +6,10 @@ package frc.robot.commands;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -65,6 +68,8 @@ public class DriveCmd extends Command {
     // If the gyro is connected, use field relative drive, otherwise, use robot
     // relative
     driveSub.runVelocity(new ChassisSpeeds(xVel, yVel, omega), driveSub.gyro.isConnected());
+    SmartDashboard.putBoolean("gyroConnected", driveSub.gyro.isConnected());
+    Logger.recordOutput("Swerve/gyro/isConnected", driveSub.gyro.isConnected());
   }
 
   /**
