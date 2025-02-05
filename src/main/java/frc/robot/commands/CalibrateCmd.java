@@ -27,6 +27,7 @@ public class CalibrateCmd extends Command {
     // Use addRequirements() here to declare subsystem dependencies.
     this.driveSub = driveSub;
     addRequirements(driveSub);
+
   }
 
   /**
@@ -36,6 +37,7 @@ public class CalibrateCmd extends Command {
   @Override
   public void initialize() {
     driveSub.gyro.calibrate();
+    driveSub.gyroDisconnected = false;
     driveSub.resetOdometry();
   }
 

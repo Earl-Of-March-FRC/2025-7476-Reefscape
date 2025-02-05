@@ -60,6 +60,7 @@ public class Drivetrain extends SubsystemBase {
 
   private final PhotonCamera camera1;
   private final PhotonCamera camera2;
+  public boolean gyroDisconnected;
 
   private final PhotonPoseEstimator photonPoseEstimator1;
   private final PhotonPoseEstimator photonPoseEstimator2;
@@ -148,14 +149,18 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     // Get the current angle from the gyro sensor
     var gyroAngle = gyro.getRotation2d();
+    if (!gyro.isConnected()) {
+      gyroDisconnected = true;
+    }
 
     // Update the robot's pose using the odometry class
-    pose = odometry.update(gyroAngle,
-        new SwerveModulePosition[] {
-            modules[0].getPosition(), modules[1].getPosition(),
-            modules[2].getPosition(), modules[3].getPosition()
-        });
-
+    if (!gyroDisconnected) {
+      pose = odometry.update(gyroAngle,
+          new SwerveModulePosition[] {
+              modules[0].getPosition(), modules[1].getPosition(),
+              modules[2].getPosition(), modules[3].getPosition()
+          });
+    }
     Optional<EstimatedRobotPose> estimatedPose1 = getEstimatedGlobalPose1(odometry.getEstimatedPosition());
     Optional<EstimatedRobotPose> estimatedPose2 = getEstimatedGlobalPose2(odometry.getEstimatedPosition());
 
