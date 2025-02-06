@@ -4,15 +4,21 @@
 
 package frc.robot.commands.indexer;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Configs.IndexerSubsystem;
+import frc.robot.subsystems.indexer.IndexerSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class IndexCmd extends Command {
+public class IndexRPM extends Command {
+  private final IndexerSubsystem indexSub;
+  private final DoubleSupplier RPM;
+
   /** Creates a new IndexCmd. */
-  public IndexCmd(
-      IndexerSubsystem indexerSub) {
-    // Use addRequirements() here to declare subsystem dependencies.
+  public IndexRPM(
+      IndexerSubsystem indexerSub, DoubleSupplier RPM) {
+    this.indexSub = indexerSub;
+    this.RPM = RPM;
   }
 
   // Called when the command is initially scheduled.
@@ -23,6 +29,7 @@ public class IndexCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    indexSub.setVelocity(RPM.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.

@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.indexer;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.RelativeEncoder;
@@ -17,6 +19,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.IndexerConstants;
@@ -138,5 +142,19 @@ public class IndexerSubsystem extends SubsystemBase {
    */
   public boolean getShooterSensor() {
     return shooterSensor.get();
+  }
+
+  public Command createIndexCommand(DoubleSupplier intakeVelocity, DoubleSupplier shooterVelocity,
+      double indexVelocity /* IntakeSubsystem intakeSub, ShooterSubsystem shooterSub */) {
+    return Commands.runEnd(() -> {
+      if (getIntakeSensor()) { // Algae is between the intake and the indexer. Indexer should match intake's
+                               // velocity.
+
+      } else if (getShooterSensor()) { // Algae is between indexer and shooter. Indexer should match shooter's velocity
+
+      } else {
+        setVelocity(indexVelocity); // Indexer will run on its own.
+      }
+    }, () -> setVelocity(0));
   }
 }
