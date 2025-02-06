@@ -9,8 +9,6 @@ KNOWN_DIAMETER = 475.00  # Known diameter of algae ball (in mm)
 
 
 # Approximate algae color in HSV
-
-
 LOWER_BALL = np.array([80, 50, 60])  # Lower bound for algae ball color
 UPPER_BALL = np.array([100, 255, 255])  # Upper bound for algae ball color
 
@@ -21,7 +19,7 @@ MIN_CIRCULARITY = 0.3  # Minimum circularity to consider as a valid algae ball
 
 # Define camera matrix for webcam
 CAM_MATRIX = np.array([[1413.70008, 0, 314.24724784], 
-                       [0, 817.48854915, 240.10474105], 
+                       [0, 1437.31, 240.10474105], 
                        [0, 0, 1]])
 
 STREAM_URL = "http://localhost:1181/stream.mjpg"
@@ -225,18 +223,18 @@ class Computation:
 # Main part of the code
 def main():
     
-    # Open the video stream (0 for default camera or replace with a video file path)
-    cap = cv2.VideoCapture(STREAM_URL)
-    # ntable = NetworkTable()
+    # Try to open the video stream and keep trying until it succeeds
+    cap = None
+    while cap is None or not cap.isOpened():
+        cap = cv2.VideoCapture(STREAM_URL)
+        if not cap.isOpened():
+            logging.error("Error: Could not open video stream. Retrying...")
+            cv2.waitKey(1000)  # Wait 1 second before retrying
 
-    # Check if the camera opened successfully
-    if not cap.isOpened():
-        logging.error("Error: Could not open video stream.")
-        return
 
     # Initialize ObjectDetection and Computation classes
     obj_detection = ObjectDetection(LOWER_BALL, UPPER_BALL, MIN_AREA, MIN_CIRCULARITY)
-    computation = Computation(CAM_MATRIX[0][0], KNOWN_DIAMETER) # Diameter in mm 
+    computation = Computation(CAM_MATRIX[0][0], KNOWN_DIAMETER,CAMERA_MATRIX[1][1]) # Diameter in mm 
     network_table = NetworkTable()
 
     while True:
