@@ -72,7 +72,7 @@ public class RobotContainer {
 
         indexerSub = new IndexerSubsystem(IndexerConstants.kMotorPort, IndexerConstants.kMotorType,
                 IndexerConstants.kIntakeSensorChannel, IndexerConstants.kShooterSensorChannel);
-        indexCommand = indexerSub.createIndexCommand(() -> 0, () -> 0, 0);
+        indexCommand = indexerSub.createIndexCommand(() -> 0, () -> 0, () -> 0);
 
         driveSub.setDefaultCommand(
                 new DriveCmd(

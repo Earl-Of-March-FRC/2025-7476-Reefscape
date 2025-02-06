@@ -145,15 +145,15 @@ public class IndexerSubsystem extends SubsystemBase {
   }
 
   public Command createIndexCommand(DoubleSupplier intakeVelocity, DoubleSupplier shooterVelocity,
-      double indexVelocity /* IntakeSubsystem intakeSub, ShooterSubsystem shooterSub */) {
+      DoubleSupplier indexVelocity) {
     return Commands.runEnd(() -> {
       if (getIntakeSensor()) { // Algae is between the intake and the indexer. Indexer should match intake's
                                // velocity.
-
+        setVelocity(intakeVelocity.getAsDouble());
       } else if (getShooterSensor()) { // Algae is between indexer and shooter. Indexer should match shooter's velocity
-
+        setVelocity(shooterVelocity.getAsDouble());
       } else {
-        setVelocity(indexVelocity); // Indexer will run on its own.
+        setVelocity(indexVelocity.getAsDouble()); // Indexer will run on its own.
       }
     }, () -> setVelocity(0));
   }
