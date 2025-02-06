@@ -37,15 +37,19 @@ class ObjectDetection:
         self._min_circularity = min_circularity
 
     # Getter methods
+    @property
     def get_lower_bound(self):
         return self._lower_bound
 
+    @property
     def get_upper_bound(self):
         return self._upper_bound
 
+    @property
     def get_min_area(self):
         return self._min_area
 
+    @property
     def get_min_circularity(self):
         return self._min_circularity
 
