@@ -3,22 +3,28 @@ import numpy as np
 import math
 import logging
 
-from network_tables import NetworkTable
+from limelight.python.network_tables import NetworkTable
 
-KNOWN_DIAMETER = 420  # Known diameter of algae ball (in mm)
+KNOWN_DIAMETER = 475.00  # Known diameter of algae ball (in mm)
+
 
 # Approximate algae color in HSV
+
+
 LOWER_BALL = np.array([80, 50, 60])  # Lower bound for algae ball color
 UPPER_BALL = np.array([100, 255, 255])  # Upper bound for algae ball color
+
 
 # Define minimum area and circularity for the contour filtering
 MIN_AREA = 3000  # Minimum area of the contour to be considered
 MIN_CIRCULARITY = 0.3  # Minimum circularity to consider as a valid algae ball
 
 # Define camera matrix for webcam
-CAM_MATRIX = np.array([[818.03555109, 0, 314.24724784], 
+CAM_MATRIX = np.array([[1413.70008, 0, 314.24724784], 
                        [0, 817.48854915, 240.10474105], 
                        [0, 0, 1]])
+
+STREAM_URL = "http://localhost:1181/stream.mjpg"
 
 
 # Class for Object Detection
@@ -45,16 +51,16 @@ class ObjectDetection:
 
         # Apply morphological operations to reduce noise
         mask = cv2.erode(mask, None, iterations=2)
-        mask = cv2.dilate(mask, None, iterations=5)  # Increased dilation to cover partial objects
+        mask = cv2.dilate(mask, None, iterations=2)  # Increased dilation to cover partial objects
 
         # Use Canny edge detection to find edges
-        edges = cv2.Canny(mask, 100, 200)
+        edges = cv2.Canny(mask, 100, 300)
         
         # Dilate the edges to connect broken parts, especially for obstructions
-        dilated_edges = cv2.dilate(edges, None, iterations=5)
+        dilated_edges = cv2.dilate(edges, None, iterations=3)
 
         # Fill in the dilated edges (inpainting) to smooth out broken parts
-        filled_edges = cv2.dilate(dilated_edges, None, iterations=2)  # further dilation to fill the edges
+        filled_edges = cv2.dilate(dilated_edges, None, iterations=3)  # further dilation to fill the edges
 
         # Find contours in the filled edge-detected image
         contours, _ = cv2.findContours(filled_edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -79,11 +85,11 @@ class ObjectDetection:
                     # Check if this is the largest algae ball so far
                     if area > largest_area:
                         largest_area = area
-                        largest_ball = (x, y, 2 * radius) # returns diameter or obj width
+                        largest_ball = (x, y, radius, radius*2) # returns diameter or obj width
 
         if largest_ball:
             # Unpad the coordinates and draw the largest ball on the original image
-            x, y, radius = largest_ball
+            x, y, radius, diameter = largest_ball
             # Remove padding from coordinates (accounting for the added border)
             unpadded_x = int(x) - padding
             unpadded_y = int(y) - padding
@@ -91,24 +97,61 @@ class ObjectDetection:
 
         return image, mask, edges, filled_edges, largest_ball
 
-# Class for Computation (distance and angle calculations)
+
 class Computation:
-    def __init__(self,focal_length_x, object_real_width):
-        self.focal_length_x = focal_length_x
-        self.object_real_width = object_real_width
-        
+    def __init__(self, focal_length_x, object_real_width, focal_length_y=None):
+        # Private variables
+        self._focal_length_x = focal_length_x
+        self._object_real_width = object_real_width
+        self._focal_length_y = focal_length_y if focal_length_y else focal_length_x  # Assume same for y if not provided
+
+    # Getter and setter for focal_length_x
+    @property
+    def focal_length_x(self):
+        return self._focal_length_x
+
+    @focal_length_x.setter
+    def focal_length_x(self, value):
+        if value > 0:  # Add validation if needed
+            self._focal_length_x = value
+        else:
+            raise ValueError("Focal length must be positive")
+
+    # Getter and setter for object_real_width
+    @property
+    def object_real_width(self):
+        return self._object_real_width
+
+    @object_real_width.setter
+    def object_real_width(self, value):
+        if value > 0:  # Add validation if needed
+            self._object_real_width = value
+        else:
+            raise ValueError("Object real width must be positive")
+
+    # Getter and setter for focal_length_y
+    @property
+    def focal_length_y(self):
+        return self._focal_length_y
+
+    @focal_length_y.setter
+    def focal_length_y(self, value):
+        if value > 0:  # Add validation if needed
+            self._focal_length_y = value
+        else:
+            raise ValueError("Focal length must be positive")
+
     def calculate_distance_with_offset(self, detection_width):
-        return (self.object_real_width * self.focal_length_x) / detection_width # returns in mm
-    
+        return ((self._object_real_width * self._focal_length_x) / detection_width) - 20  # returns in mm
+
     def calculate_horizontal_angle(self, frame, object_center_x, camera_offset):
-        
         # Calculate the horizontal angle between the camera and the object.
         try:
             screen_center_x = frame.shape[1] / 2
             screen_center_y = frame.shape[0] / 2
 
             # Adjust the object center x-coordinate based on camera offset
-            object_center_x -= camera_offset # offset in mm 
+            object_center_x -= camera_offset  # offset in mm 
 
             mat_inverted = np.linalg.inv(CAM_MATRIX)  # Invert camera matrix
             vector1 = mat_inverted.dot((object_center_x, screen_center_y, 1.0))  # Calculate vector 1
@@ -130,13 +173,42 @@ class Computation:
             logging.error("Error occurred while calculating horizontal angle: %s", e)
             return 0.0
 
+    def calculate_vertical_angle(self, frame, object_center_y, camera_offset):
+        # Calculate the vertical angle between the camera and the object.
+        try:
+            screen_center_x = frame.shape[1] / 2
+            screen_center_y = frame.shape[0] / 2
+
+            # Adjust the object center y-coordinate based on camera offset
+            object_center_y -= camera_offset  # offset in mm 
+
+            mat_inverted = np.linalg.inv(CAM_MATRIX)  # Invert camera matrix
+            vector1 = mat_inverted.dot((screen_center_x, object_center_y, 1.0))  # Calculate vector 1
+            vector2 = mat_inverted.dot((screen_center_x, screen_center_y, 1.0))  # Calculate vector 2
+
+            # Handle division by zero when both vectors are zero vectors (will not crash)
+            if np.all(vector1 == 0) and np.all(vector2 == 0):
+                return 0.0
+
+            cos_angle = vector1.dot(vector2) / (np.linalg.norm(vector1) * np.linalg.norm(vector2))
+            real_angle = math.degrees(math.acos(cos_angle))
+
+            if object_center_y < screen_center_y:
+                real_angle *= -1
+
+            return real_angle
+
+        except Exception as e:
+            logging.error("Error occurred while calculating vertical angle: %s", e)
+            return 0.0
 
 
 # Main part of the code
 def main():
+    
     # Open the video stream (0 for default camera or replace with a video file path)
-    cap = cv2.VideoCapture(1)
-    ntable = NetworkTable()
+    cap = cv2.VideoCapture(STREAM_URL)
+    # ntable = NetworkTable()
 
     # Check if the camera opened successfully
     if not cap.isOpened():
@@ -146,6 +218,7 @@ def main():
     # Initialize ObjectDetection and Computation classes
     obj_detection = ObjectDetection(LOWER_BALL, UPPER_BALL, MIN_AREA, MIN_CIRCULARITY)
     computation = Computation(CAM_MATRIX[0][0], KNOWN_DIAMETER) # Diameter in mm 
+    network_table = NetworkTable()
 
     while True:
         # Read a frame from the camera
@@ -160,21 +233,22 @@ def main():
 
         if largest_ball:
             # If we found a valid ball, calculate distance and display it
-            x, y, diameter = largest_ball
-            distance = computation.calculate_distance_with_offset(diameter)
-            angle = computation.calculate_horizontal_angle(processed_frame, x, 0)
-            distance_in_inches = distance / 25.4
+            x, y, radius,diameter = largest_ball
+            distance = (computation.calculate_distance_with_offset(diameter)) / 10 # in cm
+            x_angle = computation.calculate_horizontal_angle(processed_frame, x, 44)
+            y_angle = computation.calculate_vertical_angle(processed_frame, x, 44)
+            # distance_in_inches = distance / 25.4
 
-            ntable.send_data(distance_in_inches, angle)
+            network_table.send_data(distance, x_angle, y_angle)
 
-            # print(f"Distance to algae ball: {distance_in_inches:.2f} in")
+            print(f"Distance to algae ball: {distance:.2f} cm")
             # print(f"Angle to algae ball relative to camera: {angle:.2f} deg")
 
         # Display the processed frame
         cv2.imshow("Ball Detection", processed_frame)
         cv2.imshow("Contour", mask)
-        cv2.imshow("Edges", edges)
-        cv2.imshow("Filled Edges", filled_edges)
+        # cv2.imshow("Edges", edges)
+        # cv2.imshow("Filled Edges", filled_edges)
 
         # Check for a key press to exit the loop
         if cv2.waitKey(1) & 0xFF == ord('q'):  # Press 'q' to quit

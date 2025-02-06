@@ -10,8 +10,10 @@ class NetworkTable:
         """
         self._inst = ntcore.NetworkTableInstance.getDefault()
         self._table = self._inst.getTable("vision")
-        self._distance = self._table.getDoubleTopic("distance").publish()
-        self._angle = self._table.getDoubleTopic("angle").publish()
+        self._distance = self._table.getDoubleTopic("x_distance").publish()
+        self._horizontal_angle = self._table.getDoubleTopic("x_angle").publish()
+        self._vertical_angle = self._table.getDoubleTopic("y_angle").publish()
+        
 
         try:
             # Start the client and set the server IP
@@ -21,10 +23,11 @@ class NetworkTable:
         except Exception as e:
             logging.error(f"Failed to connect to the server: {e}")
 
-    def send_data(self, distance: float, angle: float) -> None:
+    def send_data(self, distance: float, horizontal_angle: float, vertical_angle: float) -> None:
         self._distance.set(distance)
-        self._angle.set(angle)
-        logging.debug("Angle: %.2f, Distance: %.2f", angle, distance)
+        self._horizontal_angle.set(horizontal_angle)
+        self._vertical_angle.set(vertical_angle)
+        logging.debug("x_angle: %.2f, y_angle: %.2f, distance: %.2f", horizontal_angle,vertical_angle, distance)
 
     def close(self):
         self._inst.stopClient()
@@ -38,8 +41,10 @@ def check_connection():
     try:
         # Attempt to ping or connect
         network_table = NetworkTable()
+        network_table.send_data(1,2,3)
         logging.info("Connection successful")
     except Exception as e:
         logging.error("Connection failed: %s", e)
 
-
+if __name__ == "__main__":
+    check_connection()
