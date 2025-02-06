@@ -30,10 +30,24 @@ STREAM_URL = "http://localhost:1181/stream.mjpg"
 # Class for Object Detection
 class ObjectDetection:
     def __init__(self, lower_bound, upper_bound, min_area, min_circularity):
-        self.lower_bound = lower_bound
-        self.upper_bound = upper_bound
-        self.min_area = min_area
-        self.min_circularity = min_circularity
+        # Encapsulated variables with private attributes
+        self._lower_bound = lower_bound
+        self._upper_bound = upper_bound
+        self._min_area = min_area
+        self._min_circularity = min_circularity
+
+    # Getter methods
+    def get_lower_bound(self):
+        return self._lower_bound
+
+    def get_upper_bound(self):
+        return self._upper_bound
+
+    def get_min_area(self):
+        return self._min_area
+
+    def get_min_circularity(self):
+        return self._min_circularity
 
     def find_largest_algae(self, image):
         # Create a padded version of the image to handle partial objects near the borders
@@ -47,11 +61,11 @@ class ObjectDetection:
         blurred = cv2.GaussianBlur(hsv, (9, 9), 0)
 
         # Create a mask for the ball color
-        mask = cv2.inRange(blurred, self.lower_bound, self.upper_bound)
+        mask = cv2.inRange(blurred, self._lower_bound, self._upper_bound)
 
         # Apply morphological operations to reduce noise
         mask = cv2.erode(mask, None, iterations=2)
-        mask = cv2.dilate(mask, None, iterations=2)  # Increased dilation to cover partial objects
+        mask = cv2.dilate(mask, None, iterations=2)
 
         # Use Canny edge detection to find edges
         edges = cv2.Canny(mask, 100, 300)
@@ -76,7 +90,7 @@ class ObjectDetection:
             circularity = 4 * np.pi * (area / (perimeter * perimeter)) if perimeter > 0 else 0
 
             # Check if the contour meets the criteria
-            if area > self.min_area and circularity > self.min_circularity:
+            if area > self._min_area and circularity > self._min_circularity:
                 # Approximate the contour to a circle
                 (x, y), radius = cv2.minEnclosingCircle(contour)
 
@@ -89,13 +103,14 @@ class ObjectDetection:
 
         if largest_ball:
             # Unpad the coordinates and draw the largest ball on the original image
-            x, y, radius, diameter = largest_ball
+            x, y, radius, _ = largest_ball
             # Remove padding from coordinates (accounting for the added border)
             unpadded_x = int(x) - padding
             unpadded_y = int(y) - padding
             cv2.circle(image, (unpadded_x, unpadded_y), int(radius), (255, 0, 255), 5)
 
         return image, mask, edges, filled_edges, largest_ball
+
 
 
 class Computation:
