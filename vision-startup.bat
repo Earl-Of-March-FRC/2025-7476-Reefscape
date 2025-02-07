@@ -3,12 +3,13 @@ set "USER=pi"
 set "REMOTE_DIR=/home/pi/2025_7476_reefscape"
 set "PY_SCRIPT=limelight"
 set "ADDRESS=pi@10.178.28.1"
+set "PASSWORD=raspberry"
 
 @REM Pull from GitHub (subject to change)
 git pull
 
-@REM @REM Install missing dependencies (subject to change)
-@REM pip install -r limelight\requirements.txt
+@REM Store credentials
+cmdkey /generic:%ADDRESS% /user:%USER% /pass:%PASSWORD%
 
 @REM Create directory on the pi
 ssh %ADDRESS% "rm -rf %REMOTE_DIR% && mkdir -p %REMOTE_DIR%"
