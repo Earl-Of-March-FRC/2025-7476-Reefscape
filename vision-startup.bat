@@ -1,9 +1,9 @@
 @REM Environment variables
 set "USER=pi"
-set "REMOTE_DIR=/home/pi/2025_7476_reefscape"
-set "PY_SCRIPT=limelight"
 set "ADDRESS=pi@10.178.28.1"
 set "PASSWORD=raspberry"
+set "REMOTE_DIR=/home/%USER%/2025_7476_reefscape"
+set "PY_SCRIPT=limelight"
 
 @REM Pull from GitHub (subject to change)
 git pull
