@@ -3,7 +3,7 @@ import numpy as np
 import math
 import logging
 
-from limelight.python.network_tables import NetworkTable
+from python.network_tables import NetworkTable
 
 KNOWN_DIAMETER = 475.00  # Known diameter of algae ball (in mm)
 
