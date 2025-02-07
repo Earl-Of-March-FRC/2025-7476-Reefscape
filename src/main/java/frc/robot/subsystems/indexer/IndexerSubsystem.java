@@ -27,7 +27,7 @@ import frc.robot.Constants.IndexerConstants;
 
 public class IndexerSubsystem extends SubsystemBase {
   private final SparkMax indexerSpark;
-  private final DigitalInput intakeSensor, shooterSensor;
+  private final DigitalInput intakeSensor, launcherSensor;
   private final SparkClosedLoopController controller;
   private final RelativeEncoder encoder;
 
@@ -36,15 +36,15 @@ public class IndexerSubsystem extends SubsystemBase {
   /**
    * Creates a new IndexerSubsystem
    * 
-   * @param motorPort            CAN ID of the indexer motor
-   * @param motorType            MotorType of the indexer motor
-   * @param intakeSensorChannel  DIO port of the digital sensor near the intake
-   * @param shooterSensorChannel DIO port of the digital sensor near the shooter
+   * @param motorPort             CAN ID of the indexer motor
+   * @param motorType             MotorType of the indexer motor
+   * @param intakeSensorChannel   DIO port of the digital sensor near the intake
+   * @param launcherSensorChannel DIO port of the digital sensor near the launcher
    */
-  public IndexerSubsystem(int motorPort, MotorType motorType, int intakeSensorChannel, int shooterSensorChannel) {
+  public IndexerSubsystem(int motorPort, MotorType motorType, int intakeSensorChannel, int launcherSensorChannel) {
     indexerSpark = new SparkMax(motorPort, motorType);
     intakeSensor = new DigitalInput(intakeSensorChannel);
-    shooterSensor = new DigitalInput(shooterSensorChannel);
+    launcherSensor = new DigitalInput(launcherSensorChannel);
 
     indexerSparkSim = new SparkSim(indexerSpark, DCMotor.getNeo550(1));
 
@@ -57,7 +57,7 @@ public class IndexerSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     Logger.recordOutput("indexerIntakeSensor", getIntakeSensor());
-    Logger.recordOutput("indexerShooterSensor", getShooterSensor());
+    Logger.recordOutput("indexerLauncherSensor", getLauncherSensor());
   }
 
   @Override
@@ -127,31 +127,32 @@ public class IndexerSubsystem extends SubsystemBase {
    * 
    * @return {@code true} if sensor is tripped or not connected, {@code false} if
    *         not tripped.
-   * @see #getShooterSensor
+   * @see #getLauncherSensor
    */
   public boolean getIntakeSensor() {
     return intakeSensor.get();
   }
 
   /**
-   * Get the value of the sensor near the shooter.
+   * Get the value of the sensor near the launcher.
    * 
    * @return {@code true} if sensor is tripped or not connected, {@code false} if
    *         not tripped.
    * @see #getIntakeSensor
    */
-  public boolean getShooterSensor() {
-    return shooterSensor.get();
+  public boolean getLauncherSensor() {
+    return launcherSensor.get();
   }
 
-  public Command createIndexCommand(DoubleSupplier intakeVelocity, DoubleSupplier shooterVelocity,
+  public Command createIndexCommand(DoubleSupplier intakeVelocity, DoubleSupplier launcherVelocity,
       DoubleSupplier indexVelocity) {
     return Commands.runEnd(() -> {
       if (getIntakeSensor()) { // Algae is between the intake and the indexer. Indexer should match intake's
                                // velocity.
         setVelocity(intakeVelocity.getAsDouble());
-      } else if (getShooterSensor()) { // Algae is between indexer and shooter. Indexer should match shooter's velocity
-        setVelocity(shooterVelocity.getAsDouble());
+      } else if (getLauncherSensor()) { // Algae is between indexer and launcher. Indexer should match launcher's
+                                        // velocity
+        setVelocity(launcherVelocity.getAsDouble());
       } else {
         setVelocity(indexVelocity.getAsDouble()); // Indexer will run on its own.
       }
