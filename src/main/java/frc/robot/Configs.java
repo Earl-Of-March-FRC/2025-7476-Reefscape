@@ -5,7 +5,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
-import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.LauncherConstants;
 
 public final class Configs {
         public static final class MAXSwerveModule {
@@ -55,7 +55,7 @@ public final class Configs {
                 }
         }
 
-        public static final class ShooterConfigs {
+        public static final class LauncherConfigs {
                 public static final SparkMaxConfig shooterConfig = new SparkMaxConfig();
 
                 static {
@@ -64,10 +64,10 @@ public final class Configs {
                                         .smartCurrentLimit(20);
                         shooterConfig.closedLoop
                                         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                                        .pidf(ShooterConstants.kPShooterController,
-                                                        ShooterConstants.kIShooterController,
-                                                        ShooterConstants.kDShooterController,
-                                                        ShooterConstants.kShooterVelocityFF)
+                                        .pidf(LauncherConstants.kPLauncherController,
+                                                        LauncherConstants.kILauncherController,
+                                                        LauncherConstants.kDLauncherController,
+                                                        LauncherConstants.kLauncherVelocityFF)
                                         .outputRange(-1, 1);
                 }
         }

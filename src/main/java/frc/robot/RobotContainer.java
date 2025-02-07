@@ -1,18 +1,14 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.shooter.SetShooterSpeed;
-import frc.robot.commands.shooter.ShooterPID;
-import frc.robot.subsystems.Shooter.ShooterSubsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.Launcher.LauncherPID;
+import frc.robot.subsystems.Launcher.LauncherSubsystem;
 
 public class RobotContainer {
-        final ShooterSubsystem shooter = new ShooterSubsystem();
+        final LauncherSubsystem shooter = new LauncherSubsystem();
         private final CommandXboxController controller = new CommandXboxController(0);
 
         // Use WPILib's SendableChooser to allow selection of autonomous routine
@@ -20,7 +16,7 @@ public class RobotContainer {
 
         public RobotContainer() {
                 // Put default values for shooter speed on SmartDashboard
-                SmartDashboard.putNumber("ShooterGoalSpeed", 0.5); // Default speed value (can be adjusted)
+                SmartDashboard.putNumber("LauncherGoalSpeed", 0.5); // Default speed value (can be adjusted)
 
                 configureAutos();
                 configureBindings(); // Register button bindings for shooter commands
@@ -28,7 +24,7 @@ public class RobotContainer {
 
         private void configureBindings() {
                 // Map button B to set a fixed shooter speed (e.g., 0.5)
-                controller.b().whileTrue(new ShooterPID(shooter, () -> 60.0));
+                controller.b().whileTrue(new LauncherPID(shooter, () -> 60.0));
         }
 
         private void configureAutos() {
@@ -53,9 +49,9 @@ public class RobotContainer {
 
         // Optional: Add a periodic method to update SmartDashboard values dynamically
         public void updateSmartDashboard() {
-                double currentSpeed = shooter.getShooterVelocity(); // Assuming you have a method to get the current
-                                                                    // shooter speed
-                SmartDashboard.putNumber("CurrentShooterSpeed", currentSpeed);
-                System.out.println("Current Shooter Speed: " + currentSpeed);
+                double currentSpeed = shooter.getLauncherVelocity(); // Assuming you have a method to get the current
+                                                                     // shooter speed
+                SmartDashboard.putNumber("CurrentLauncherSpeed", currentSpeed);
+                System.out.println("Current Launcher Speed: " + currentSpeed);
         }
 }

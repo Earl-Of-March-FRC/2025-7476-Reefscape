@@ -1,8 +1,9 @@
-package frc.robot.commands.shooter;
+package frc.robot.commands.Launcher;
 
 import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Shooter.ShooterSubsystem;
+import frc.robot.subsystems.Launcher.LauncherSubsystem;
 
 /**
  * Command to set the speed of the shooter subsystem.
@@ -11,26 +12,26 @@ import frc.robot.subsystems.Shooter.ShooterSubsystem;
  * indefinitely until interrupted, during which it continuously updates the
  * speed.
  */
-public class SetShooterSpeed extends Command {
+public class SetLauncherSpeed extends Command {
 
-  private final ShooterSubsystem shooterSub;
+  private final LauncherSubsystem shooterSub;
   private final DoubleSupplier speed;
 
   /**
-   * Constructs a new SetShooterSpeed command.
+   * Constructs a new SetLauncherSpeed command.
    * 
    * @param shooterSub The shooter subsystem that this command will control.
    * @param speed      A supplier that provides the speed value to set the shooter
    *                   to.
    */
-  public SetShooterSpeed(ShooterSubsystem shooterSub, DoubleSupplier speed) {
+  public SetLauncherSpeed(LauncherSubsystem shooterSub, DoubleSupplier speed) {
     this.shooterSub = shooterSub;
     this.speed = speed;
     addRequirements(shooterSub);
   }
 
   /**
-   * Initializes the SetShooterSpeed command.
+   * Initializes the SetLauncherSpeed command.
    * <p>
    * This method is called once when the command is first scheduled. In this case,
    * no special initialization is needed, so the method is empty.
@@ -40,7 +41,7 @@ public class SetShooterSpeed extends Command {
   }
 
   /**
-   * Executes the SetShooterSpeed command.
+   * Executes the SetLauncherSpeed command.
    * <p>
    * This method is called repeatedly while the command is scheduled.
    * It sets the speed of the shooter subsystem to the value provided by the speed
@@ -49,11 +50,11 @@ public class SetShooterSpeed extends Command {
   @Override
   public void execute() {
     double speedValue = speed.getAsDouble();
-    shooterSub.setShooterSpeed(speedValue);
+    shooterSub.setLauncherSpeed(speedValue);
   }
 
   /**
-   * Ends the SetShooterSpeed command.
+   * Ends the SetLauncherSpeed command.
    * <p>
    * This method is called once when the command ends or is interrupted.
    * It stops the shooter by setting its speed to 0.
@@ -63,11 +64,11 @@ public class SetShooterSpeed extends Command {
    */
   @Override
   public void end(boolean interrupted) {
-    shooterSub.setShooterSpeed(0);
+    shooterSub.setLauncherSpeed(0);
   }
 
   /**
-   * Determines if the SetShooterSpeed command is finished.
+   * Determines if the SetLauncherSpeed command is finished.
    * <p>
    * Since this command runs indefinitely, it always returns false.
    * 

@@ -8,8 +8,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import java.util.function.DoubleSupplier;
-import edu.wpi.first.math.util.Units;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -137,14 +135,14 @@ public final class Constants {
     public static final double pos_kd = 0.1;
   }
 
-  public static final class ShooterConstants {
-    public static final int kTopShooterMotorPort = 0;
-    public static final int kBottomShooterMotorPort = 0;
+  public static final class LauncherConstants {
+    public static final int kTopLauncherMotorPort = 0;
+    public static final int kBottomLauncherMotorPort = 0;
 
-    public static final double kPShooterController = 0.000002;
-    public static final double kIShooterController = 0.0;
-    public static final double kDShooterController = 0.0008;
-    public static final double kShooterVelocityFF = 0.0001695; // modify based on error on actual shooter testing
+    public static final double kPLauncherController = 0.000002;
+    public static final double kILauncherController = 0.0;
+    public static final double kDLauncherController = 0.0008;
+    public static final double kLauncherVelocityFF = 0.0001695; // modify based on error on actual shooter testing
   }
 
   // PDP CAN IDs
