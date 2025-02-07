@@ -213,7 +213,7 @@ class Computation:
             if object_center_y < screen_center_y:
                 real_angle *= -1
 
-            return real_angle
+            return -real_angle
 
         except Exception as e:
             logging.error("Error occurred while calculating vertical angle: %s", e)
@@ -252,13 +252,13 @@ def main():
             # If we found a valid ball, calculate distance and display it
             x, y, radius,diameter = largest_ball
             distance = (computation.calculate_distance_with_offset(diameter)) / 10 # in cm
-            x_angle = computation.calculate_horizontal_angle(processed_frame, x, 44)
-            y_angle = computation.calculate_vertical_angle(processed_frame, x, 44)
+            x_angle = computation.calculate_horizontal_angle(processed_frame, x, 45.7)
+            y_angle = computation.calculate_vertical_angle(processed_frame, y, 65)
             # distance_in_inches = distance / 25.4
 
             network_table.send_data(distance, x_angle, y_angle)
 
-            print(f"Distance to algae ball: {distance:.2f} cm")
+            # print(f"Distance to algae ball: {distance:.2f} cm")
             # print(f"Angle to algae ball relative to camera: {angle:.2f} deg")
 
         # Display the processed frame
