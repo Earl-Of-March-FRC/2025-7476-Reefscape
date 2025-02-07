@@ -12,7 +12,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 /**
  * This command moves the arm manually.
  */
-public class ArmSetSpeedManualCmd extends Command {
+public class ArmSetVelocityManualCmd extends Command {
 
   private ArmSubsystem armSub;
   private DoubleSupplier velocity;
@@ -23,7 +23,7 @@ public class ArmSetSpeedManualCmd extends Command {
    * @param armSub   The instance of the ArmSubsystem class to be used.
    * @param velocity The desired velocity of the arm, in RPM.
    */
-  public ArmSetSpeedManualCmd(ArmSubsystem armSub, DoubleSupplier velocity) {
+  public ArmSetVelocityManualCmd(ArmSubsystem armSub, DoubleSupplier velocity) {
     this.armSub = armSub;
     this.velocity = velocity;
 

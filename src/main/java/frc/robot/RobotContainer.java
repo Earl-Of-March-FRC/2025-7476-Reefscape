@@ -19,7 +19,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.arm.ArmSetSpeedManualCmd;
+import frc.robot.commands.arm.ArmSetVelocityManualCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.intake.SetIntakeVelocityCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
