@@ -2,33 +2,32 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.arm;
+package frc.robot.commands.intake;
 
-import java.util.function.DoubleSupplier;
-
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 
 /**
- * This command moves the arm manually.
+ * This command sets the speed of the intake rollers.
  */
-public class ArmManual extends Command {
+public class SetIntakeVelocityCmd extends Command {
 
-  private ArmSubsystem armSub;
-  private DoubleSupplier speed;
+  private IntakeSubsystem intakeSub;
+  private double speed;
 
   /**
-   * Moves the arm manually.
+   * Sets the speed of the intake rollers.
    * 
-   * @param armSub The instance of the ArmSubsystem class to be used.
-   * @param speed  The desired speed of the arm, in RPM.
+   * @param intakeSub The instance of the IntakeSubsystem class to be used.
+   * @param speed     Desired speed, from -1 to 1.
    */
-  public ArmManual(ArmSubsystem armSub, DoubleSupplier speed) {
-    this.armSub = armSub;
+  public SetIntakeVelocityCmd(IntakeSubsystem intakeSub, double speed) {
+
+    this.intakeSub = intakeSub;
     this.speed = speed;
 
-    addRequirements(armSub);
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(intakeSub);
   }
 
   // Called when the command is initially scheduled.
@@ -39,13 +38,13 @@ public class ArmManual extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    armSub.setArmSpeed(speed.getAsDouble());
+    intakeSub.setIntakeVelocity(speed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    armSub.setArmSpeed(0);
+    intakeSub.stopIntake();
   }
 
   // Returns true when the command should end.

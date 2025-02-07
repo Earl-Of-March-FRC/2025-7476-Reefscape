@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems.intake;
 
+import org.littletonrobotics.junction.Logger;
+
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
@@ -20,27 +23,46 @@ import frc.robot.Constants.IntakeConstants;
  */
 public class IntakeSubsystem extends SubsystemBase {
 
-  private final SparkMax intake = new SparkMax(IntakeConstants.kIntakeMotorPort, SparkMax.MotorType.kBrushless);
+  private final SparkMax intakeSpark = new SparkMax(IntakeConstants.kIntakeMotorCanId, SparkMax.MotorType.kBrushless);
+  private final RelativeEncoder intakeEncoder = intakeSpark.getEncoder();
 
   /**
    * The constructor for the IntakeSubsystem configures the intake motor.
    */
   public IntakeSubsystem() {
-    intake.configure(IntakeConfigs.intakeConfig, ResetMode.kResetSafeParameters,
+    intakeSpark.configure(IntakeConfigs.intakeConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    Logger.recordOutput("Intake/Rollers/Measured/Velocity", getIntakeVelocity());
   }
 
   /**
-   * Sets the speed of the intake motor.
+   * Gets the velocity of the intake motor.
    * 
-   * @param speed Desired speed, from -1 to 1.
+   * @return
    */
-  public void setIntakeSpeed(double speed) {
-    intake.set(speed);
+  public double getIntakeVelocity() {
+    return intakeEncoder.getVelocity();
+  }
+
+  /**
+   * Sets the velocity of the intake motor.
+   * 
+   * @param velocity Desired velocity, from -1 to 1.
+   */
+  public void setIntakeVelocity(double velocity) {
+    intakeSpark.set(velocity);
+    Logger.recordOutput("Intake/Rollers/Setpoint/Velocity", velocity);
+
+  }
+
+  /**
+   * Stops the intake motor.
+   */
+  public void stopIntake() {
+    setIntakeVelocity(0);
   }
 }

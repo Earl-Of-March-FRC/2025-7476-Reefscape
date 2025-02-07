@@ -6,7 +6,6 @@ package frc.robot;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.CalibrateCmd;
 import frc.robot.commands.DriveCmd;
 import frc.robot.commands.TimedAutoDrive;
@@ -20,9 +19,9 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.arm.ArmManual;
-import frc.robot.commands.arm.ArmPID;
-import frc.robot.commands.intake.SetIntakeSpeed;
+import frc.robot.commands.arm.ArmSetSpeedManualCmd;
+import frc.robot.commands.arm.ArmSetPositionPIDCmd;
+import frc.robot.commands.intake.SetIntakeVelocityCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -42,70 +41,71 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-        private final ArmSubsystem armSub = new ArmSubsystem();
-        private final IntakeSubsystem intakeSub = new IntakeSubsystem();
-        private final CommandXboxController oController = new CommandXboxController(0);
+  private final ArmSubsystem armSub = new ArmSubsystem();
+  private final IntakeSubsystem intakeSub = new IntakeSubsystem();
+  private final CommandXboxController oController = new CommandXboxController(
+      OIConstants.kOperatorControllerPort);
 
-        private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
+  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
 
-        /**
-         * The container for the robot. Contains subsystems, OI devices, and commands.
-         */
-        public RobotContainer() {
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
+  public RobotContainer() {
+    configureAutos();
+    configureBindings();
+  }
 
-                configureAutos();
-                configureBindings();
-        }
+  /**
+   * Use this method to define your trigger->command mappings. Triggers can be
+   * created via the
+   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+   * an arbitrary
+   * predicate, or via the named factories in {@link
+   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+   * {@link
+   * CommandXboxController
+   * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+   * PS4} controllers or
+   * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+   * joysticks}.
+   */
+  private void configureBindings() {
 
-        /**
-         * Use this method to define your trigger->command mappings. Triggers can be
-         * created via the
-         * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-         * an arbitrary
-         * predicate, or via the named factories in {@link
-         * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-         * {@link
-         * CommandXboxController
-         * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-         * PS4} controllers or
-         * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-         * joysticks}.
-         */
-        private void configureBindings() {
+    // oController.a().onTrue(new ArmSetSpeedManualCmd(armSub, () -> 0.5));
+    // oController.b().onTrue(new ArmSetSpeedManualCmd(armSub, () -> 0));
 
-                /*
-                 * // button A - start
-                 * oController.a().onTrue(new ArmPID(armSub, 0));
-                 * // button B - floor intake
-                 * oController.b().onTrue(new ArmPID(armSub, (180.0 / 360)));
-                 * // button X - L2
-                 * oController.x().onTrue(new ArmPID(armSub, (285.0 / 360)));
-                 * // button left bumper - L3
-                 * oController.leftBumper().onTrue(new ArmPID(armSub, 210));
-                 * // button right bumper - processor
-                 * oController.rightBumper().onTrue(new ArmPID(armSub, 150));
-                 * 
-                 */
-                oController.a().onTrue(new SetIntakeSpeed(intakeSub, 0.5));
-                oController.b().onTrue(new SetIntakeSpeed(intakeSub, 0));
-        }
+    // // button A - start
+    // oController.a().onTrue(new ArmSetPositionPIDCmd(armSub, 0));
+    // // button B - floor intake
+    // oController.b().onTrue(new ArmSetPositionPIDCmd(armSub, 180));
+    // // button X - L2
+    // oController.x().onTrue(new ArmSetPositionPIDCmd(armSub, 285));
+    // // button left bumper - L3
+    // oController.leftBumper().onTrue(new ArmSetPositionPIDCmd(armSub, 210));
+    // // button right bumper - processor
+    // oController.rightBumper().onTrue(new ArmSetPositionPIDCmd(armSub, 150));
 
-        /**
-         * Use this method to define the autonomous command.
-         */
-        private void configureAutos() {
-                // autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+    // oController.a().onTrue(new SetIntakeVelocityCmd(intakeSub, 0.5));
+    // oController.b().onTrue(new SetIntakeVelocityCmd(intakeSub, 0));
+  }
 
-                // SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
-        }
+  /**
+   * Use this method to define the autonomous command.
+   */
+  private void configureAutos() {
+    // autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
 
-        /**
-         * Use this to pass the autonomous command to the main {@link Robot} class.
-         *
-         * @return the command to run in autonomous
-         */
-        public Command getAutonomousCommand() {
-                return autoChooser.get();
-        }
+    // SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
+  }
+
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    return autoChooser.get();
+  }
 
 }

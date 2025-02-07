@@ -4,11 +4,11 @@
 
 package frc.robot.subsystems.arm;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -23,7 +23,7 @@ import frc.robot.Constants.ArmConstants;
  * pivot the arm.
  */
 public class ArmSubsystem extends SubsystemBase {
-  private final SparkMax armSpark = new SparkMax(1, SparkMax.MotorType.kBrushless);
+  private final SparkMax armSpark = new SparkMax(ArmConstants.kArmMotorCanId, SparkMax.MotorType.kBrushless);
   private final RelativeEncoder armEncoder = armSpark.getEncoder();
   private final SparkClosedLoopController armClosedLoopController = armSpark.getClosedLoopController();
 
@@ -42,27 +42,17 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    double p = armEncoder.getPosition() * 360;
-    SmartDashboard.putNumber("position", p);
-    // System.out.println(p);
-  }
-
-  /**
-   * Sets the speed of the arm.
-   * 
-   * @param speed Desired speed, in RPM.
-   */
-  public void setArmSpeed(double speed) {
-    armSpark.set(speed);
+    Logger.recordOutput("Intake/Arm/Measured/Position", getArmPosition());
+    Logger.recordOutput("Intake/Arm/Measured/Velocity", getArmVelocity());
   }
 
   /**
    * Returns the current arm position.
    * 
-   * @return double The current angle of the arm, in degrees.
+   * @return double The current angle of the arm, in radians.
    */
   public double getArmPosition() {
-    return armEncoder.getPosition() - m_armAngularOffset;
+    return (armEncoder.getPosition() - m_armAngularOffset) * ArmConstants.kArmPositionReductionFactor;
   }
 
   /**
@@ -75,11 +65,24 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   /**
+   * Sets the velocity of the arm.
+   * 
+   * @param velocity Desired velocity, in RPM.
+   */
+  public void setArmVelocity(double velocity) {
+    armSpark.set(velocity);
+    Logger.recordOutput("Intake/Arm/Setpoint/Velocity", velocity);
+  }
+
+  /**
    * Sets the goal angle for the arm closed loop controller.
    * 
-   * @param referenceAngle The reference angle, in degrees.
+   * @param referenceAngle The reference angle, in radians.
    */
   public void setReferenceAngle(double referenceAngle) {
-    armClosedLoopController.setReference(referenceAngle + m_armAngularOffset, ControlType.kPosition);
+    double refAngleWithOffset = (referenceAngle + m_armAngularOffset) / ArmConstants.kArmPositionReductionFactor;
+
+    armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition);
+    Logger.recordOutput("Intake/Arm/Setpoint/Position", refAngleWithOffset);
   }
 }

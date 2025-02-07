@@ -80,6 +80,7 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
     public static final double kDriveDeadband = 0.05;
     public static final int kDriverControllerXAxis = 0;
     public static final int kDriverControllerYAxis = 1;
@@ -109,28 +110,20 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
-  public static final class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-  }
-
   public static final class ArmConstants {
-    public static final int kArmMotorPort = 0;
+    public static final int kArmMotorCanId = 2;
 
-    public static final double kPArmController = 0.565;
+    public static final double kPArmController = 0.001;
     public static final double kIArmController = 0;
     public static final double kDArmController = 0;
     public static final double kArmVelocityFF = 0;
 
-    public static final double kArmMaxVelocity = 0;
-    public static final double kArmMaxAcceleration = 0;
-
-    // constraints for the shoulder profiled PID controller
-    public static final TrapezoidProfile.Constraints kArmControllerConstraints = new TrapezoidProfile.Constraints(
-        kArmMaxVelocity, kArmMaxAcceleration);
+    public static final double kArmPositionReductionFactor = 2 * Math.PI;
+    public static final double kArmPositionZeroOffset = 0; // Adjust based on the encoder's home position
   }
 
   public static final class IntakeConstants {
-    public static final int kIntakeMotorPort = 2;
+    public static final int kIntakeMotorCanId = 1;
   }
 
   // PDP CAN IDs

@@ -10,7 +10,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 /**
  * This command uses closed-loop control to move the arm to the desired angle.
  */
-public class ArmPID extends InstantCommand {
+public class ArmSetPositionPIDCmd extends InstantCommand {
 
   private ArmSubsystem armSub;
   private double goalAngle;
@@ -22,7 +22,7 @@ public class ArmPID extends InstantCommand {
    * @param armSub    The instance of the ArmSubsystem class to be used.
    * @param goalAngle The goal angle for the arm to move to, in degrees.
    */
-  public ArmPID(ArmSubsystem armSub, double goalAngle) {
+  public ArmSetPositionPIDCmd(ArmSubsystem armSub, double goalAngle) {
 
     this.armSub = armSub;
     this.goalAngle = goalAngle;
