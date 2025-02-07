@@ -41,6 +41,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
+  public final Drivetrain driveSub;
+  public final Gyro gyro;
+
+  private final CommandXboxController driverController = new CommandXboxController(
+      OIConstants.kDriverControllerPort);
+
   private final ArmSubsystem armSub = new ArmSubsystem();
   private final IntakeSubsystem intakeSub = new IntakeSubsystem();
   private final CommandXboxController oController = new CommandXboxController(
@@ -52,6 +58,40 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    gyro = new GyroNavX();
+    gyro.calibrate();
+
+    driveSub = new Drivetrain(
+        new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
+            DriveConstants.kFrontLeftTurningCanId,
+            DriveConstants.kFrontLeftChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
+            DriveConstants.kFrontRightTurningCanId,
+            DriveConstants.kFrontRightChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
+            DriveConstants.kRearLeftTurningCanId,
+            DriveConstants.kBackLeftChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
+            DriveConstants.kRearRightTurningCanId,
+            DriveConstants.kBackRightChassisAngularOffset),
+        gyro);
+
+    driveSub.setDefaultCommand(
+        new DriveCmd(
+            driveSub,
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerYAxis),
+                OIConstants.kDriveDeadband),
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerXAxis),
+                OIConstants.kDriveDeadband),
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerRotAxis),
+                OIConstants.kDriveDeadband)));
+
     configureAutos();
     configureBindings();
   }
@@ -71,6 +111,8 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+
+    driverController.b().onTrue(new CalibrateCmd(driveSub));
 
     // oController.a().onTrue(new ArmSetSpeedManualCmd(armSub, () -> 0.5));
     // oController.b().onTrue(new ArmSetSpeedManualCmd(armSub, () -> 0));
@@ -94,9 +136,9 @@ public class RobotContainer {
    * Use this method to define the autonomous command.
    */
   private void configureAutos() {
-    // autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
-
-    // SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
+    autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+    autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
+    SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
   }
 
   /**
