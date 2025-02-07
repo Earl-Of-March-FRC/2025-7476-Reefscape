@@ -234,7 +234,7 @@ def main():
 
     # Initialize ObjectDetection and Computation classes
     obj_detection = ObjectDetection(LOWER_BALL, UPPER_BALL, MIN_AREA, MIN_CIRCULARITY)
-    computation = Computation(CAM_MATRIX[0][0], KNOWN_DIAMETER,CAMERA_MATRIX[1][1]) # Diameter in mm 
+    computation = Computation(CAM_MATRIX[0][0], KNOWN_DIAMETER,CAM_MATRIX[1][1]) # Diameter in mm 
     network_table = NetworkTable()
 
     while True:
