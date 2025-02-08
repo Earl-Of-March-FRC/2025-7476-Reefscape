@@ -19,17 +19,25 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.IndexerConstants;
+import edu.wpi.first.wpilibj.AnalogInput;
 
 public class IndexerSubsystem extends SubsystemBase {
   private final SparkMax indexerSpark;
-  private final DigitalInput intakeSensor, launcherSensor;
   private final SparkClosedLoopController controller;
   private final RelativeEncoder encoder;
+
+  public DigitalOutput ultrasonicTriggerPinOne = new DigitalOutput(0);
+  public DigitalOutput ultrasonicTriggerPinTwo = new DigitalOutput(1);
+  public AnalogInput ultrasonicSensorOne = new AnalogInput(0);
+  public AnalogInput ultrasonicSensorTwo = new AnalogInput(1);
+  public double voltageScaleFactor = 1;
 
   private final SparkSim indexerSparkSim; // In case we ever need to simulate the motor
 
@@ -43,8 +51,6 @@ public class IndexerSubsystem extends SubsystemBase {
    */
   public IndexerSubsystem(int motorPort, MotorType motorType, int intakeSensorChannel, int launcherSensorChannel) {
     indexerSpark = new SparkMax(motorPort, motorType);
-    intakeSensor = new DigitalInput(intakeSensorChannel);
-    launcherSensor = new DigitalInput(launcherSensorChannel);
 
     indexerSparkSim = new SparkSim(indexerSpark, DCMotor.getNeo550(1));
 
@@ -52,12 +58,14 @@ public class IndexerSubsystem extends SubsystemBase {
         PersistMode.kPersistParameters);
     controller = indexerSpark.getClosedLoopController();
     encoder = indexerSpark.getEncoder();
+    turnOnSensorOne();
   }
 
   @Override
   public void periodic() {
-    Logger.recordOutput("indexerIntakeSensor", getIntakeSensor());
-    Logger.recordOutput("indexerLauncherSensor", getLauncherSensor());
+    Logger.recordOutput("Indexer/Intake", getIntakeSensor());
+    Logger.recordOutput("Indexer/Launcher", getLauncherSensor());
+    voltageScaleFactor = 5 / RobotController.getVoltage5V();
   }
 
   @Override
@@ -130,7 +138,10 @@ public class IndexerSubsystem extends SubsystemBase {
    * @see #getLauncherSensor
    */
   public boolean getIntakeSensor() {
-    return intakeSensor.get();
+    turnOnSensorOne();
+    double range = ultrasonicSensorOne.getValue() * voltageScaleFactor * 0.125;
+    Logger.recordOutput("Indexer/IntakeRange", range);
+    return range < 32;
   }
 
   /**
@@ -141,7 +152,10 @@ public class IndexerSubsystem extends SubsystemBase {
    * @see #getIntakeSensor
    */
   public boolean getLauncherSensor() {
-    return launcherSensor.get();
+    // turnOnSensorTwo();
+    double range = ultrasonicSensorTwo.getValue() * voltageScaleFactor * 0.125;
+    Logger.recordOutput("Indexer/LauncherRange", range);
+    return range < 32;
   }
 
   public Command createIndexCommand(DoubleSupplier intakeVelocity, DoubleSupplier launcherVelocity,
@@ -157,5 +171,20 @@ public class IndexerSubsystem extends SubsystemBase {
         setVelocity(indexVelocity.getAsDouble()); // Indexer will run on its own.
       }
     }, () -> setVelocity(0));
+  }
+
+  public void turnOnSensorOne() {
+    ultrasonicTriggerPinOne.set(true);
+    ultrasonicTriggerPinTwo.set(false);
+  }
+
+  public void turnOnSensorTwo() {
+    ultrasonicTriggerPinOne.set(false);
+    ultrasonicTriggerPinTwo.set(true);
+  }
+
+  public void turnOffBothSensors() {
+    ultrasonicTriggerPinOne.set(false);
+    ultrasonicTriggerPinTwo.set(false);
   }
 }
