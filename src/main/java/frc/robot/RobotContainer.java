@@ -72,8 +72,10 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
-                // Map button B to set a fixed shooter speed (e.g., 0.5)
-                controller.b().whileTrue(new LauncherSetVelocityPIDCmd(shooter, () -> 60.0));
+                controller.rightTrigger().onTrue(new LauncherSetVelocityPIDCmd(shooter, () -> 60.0));
+                controller.rightBumper().onTrue(new LauncherSetVelocityPIDCmd(shooter, () -> 200.0));
+                controller.leftTrigger().onTrue(new LauncherSetVelocityPIDCmd(shooter, () -> 0.0));
+                controller.leftBumper().onTrue(new LauncherSetVelocityPIDCmd(shooter, () -> 100.0));
         }
 
         private void configureAutos() {

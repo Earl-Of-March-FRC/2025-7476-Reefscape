@@ -17,13 +17,13 @@ import frc.robot.Constants.LauncherConstants;
  * It manages motor speed, velocity, and PID control for the shooter.
  */
 public class LauncherSubsystem extends SubsystemBase {
-    private final SparkMax frontLauncherSpark = new SparkMax(LauncherConstants.kFrontLauncherMotorPort,
+    private final SparkMax frontLauncherSpark = new SparkMax(LauncherConstants.kFrontLauncherCanId,
             SparkMax.MotorType.kBrushless);
     private final RelativeEncoder frontLauncherEncoder = frontLauncherSpark.getEncoder();
     private final SparkClosedLoopController frontLauncherClosedLoopController = frontLauncherSpark
             .getClosedLoopController();
 
-    private final SparkMax backLauncherSpark = new SparkMax(LauncherConstants.kBackLauncherMotorPort,
+    private final SparkMax backLauncherSpark = new SparkMax(LauncherConstants.kBackLauncherCanId,
             SparkMax.MotorType.kBrushless);
     private final RelativeEncoder backLauncherEncoder = backLauncherSpark.getEncoder();
     private final SparkClosedLoopController backLauncherClosedLoopController = backLauncherSpark
