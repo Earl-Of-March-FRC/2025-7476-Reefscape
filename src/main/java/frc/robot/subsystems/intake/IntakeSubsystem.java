@@ -54,9 +54,8 @@ public class IntakeSubsystem extends SubsystemBase {
    * @param velocity Desired velocity, from -1 to 1.
    */
   public void setIntakeVelocity(double velocity) {
-    intakeSpark.set(velocity);
     Logger.recordOutput("Intake/Rollers/Setpoint/Velocity", velocity);
-
+    intakeSpark.set(velocity);
   }
 
   /**

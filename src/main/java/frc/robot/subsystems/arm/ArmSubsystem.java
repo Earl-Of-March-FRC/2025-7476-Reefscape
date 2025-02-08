@@ -70,8 +70,8 @@ public class ArmSubsystem extends SubsystemBase {
    * @param velocity Desired velocity, in RPM.
    */
   public void setArmVelocity(double velocity) {
-    armSpark.set(velocity);
     Logger.recordOutput("Intake/Arm/Setpoint/Velocity", velocity);
+    armSpark.set(velocity);
   }
 
   /**
@@ -82,7 +82,7 @@ public class ArmSubsystem extends SubsystemBase {
   public void setReferenceAngle(double referenceAngle) {
     double refAngleWithOffset = (referenceAngle + m_armAngularOffset) / ArmConstants.kArmPositionReductionFactor;
 
-    armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition);
     Logger.recordOutput("Intake/Arm/Setpoint/Position", refAngleWithOffset);
+    armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition);
   }
 }
