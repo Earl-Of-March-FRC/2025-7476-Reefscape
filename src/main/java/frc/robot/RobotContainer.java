@@ -1,57 +1,96 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.Launcher.LauncherPID;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.DriveCmd;
+import frc.robot.commands.TimedAutoDrive;
+import frc.robot.commands.Launcher.LauncherPIDCmd;
 import frc.robot.subsystems.Launcher.LauncherSubsystem;
+import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Gyro;
+import frc.robot.subsystems.drivetrain.GyroNavX;
+import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 
 public class RobotContainer {
+
+        public final Drivetrain driveSub;
+        public final Gyro gyro;
+
+        private final CommandXboxController driverController = new CommandXboxController(
+                        OperatorConstants.kDriverControllerPort);
+
+        private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
         final LauncherSubsystem shooter = new LauncherSubsystem();
         private final CommandXboxController controller = new CommandXboxController(0);
 
-        // Use WPILib's SendableChooser to allow selection of autonomous routine
-        private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-
         public RobotContainer() {
-                // Put default values for shooter speed on SmartDashboard
-                SmartDashboard.putNumber("LauncherGoalSpeed", 0.5); // Default speed value (can be adjusted)
 
+                gyro = new GyroNavX();
+                gyro.calibrate();
+
+                driveSub = new Drivetrain(
+                                new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
+                                                DriveConstants.kFrontLeftTurningCanId,
+                                                DriveConstants.kFrontLeftChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
+                                                DriveConstants.kFrontRightTurningCanId,
+                                                DriveConstants.kFrontRightChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
+                                                DriveConstants.kRearLeftTurningCanId,
+                                                DriveConstants.kBackLeftChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
+                                                DriveConstants.kRearRightTurningCanId,
+                                                DriveConstants.kBackRightChassisAngularOffset),
+                                gyro);
+
+                driveSub.setDefaultCommand(
+                                new DriveCmd(
+                                                driveSub,
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerYAxis),
+                                                                OIConstants.kDriveDeadband),
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerXAxis),
+                                                                OIConstants.kDriveDeadband),
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerRotAxis),
+                                                                OIConstants.kDriveDeadband)));
                 configureAutos();
-                configureBindings(); // Register button bindings for shooter commands
+                configureBindings();
         }
 
         private void configureBindings() {
                 // Map button B to set a fixed shooter speed (e.g., 0.5)
-                controller.b().whileTrue(new LauncherPID(shooter, () -> 60.0));
+                controller.b().whileTrue(new LauncherPIDCmd(shooter, () -> 60.0));
         }
 
         private void configureAutos() {
-                // Add autonomous options to the chooser
-                // autoChooser.setDefaultOption("Do Nothing", new InstantCommand()); // Default
-                // option
-                // autoChooser.addOption("My Custom Auto Command", new InstantCommand()); // Add
-                // your custom autonomous
-                // commands here
-
-                // Update the SmartDashboard with the options
-                SmartDashboard.putData("Auto Routine", autoChooser);
-                System.out.println("Auto Chooser initialized with options");
+                autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+                autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
+                SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
         }
 
         public Command getAutonomousCommand() {
-                // Get the selected autonomous command from the chooser
-                Command selectedCommand = autoChooser.getSelected();
-                System.out.println("Selected Auto Command: " + selectedCommand.getName());
-                return selectedCommand;
+                return autoChooser.get();
         }
 
         // Optional: Add a periodic method to update SmartDashboard values dynamically
         public void updateSmartDashboard() {
-                double currentSpeed = shooter.getLauncherVelocity(); // Assuming you have a method to get the current
+                double currentVelocity = shooter.getFrontVelocity(); // Assuming you have a method to get the current
                                                                      // shooter speed
-                SmartDashboard.putNumber("CurrentLauncherSpeed", currentSpeed);
-                System.out.println("Current Launcher Speed: " + currentSpeed);
+                SmartDashboard.putNumber("CurrentLauncherSpeed", currentVelocity);
+                System.out.println("Current Launcher Speed: " + currentVelocity);
         }
 }

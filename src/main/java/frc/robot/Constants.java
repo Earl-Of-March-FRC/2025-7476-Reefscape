@@ -115,30 +115,10 @@ public final class Constants {
     public static int kOperatorControllerPort;
   }
 
-  public static final class MotorConstants {
-    public static final int motorID = 6;
-    public static final double maxSpeed = 0.5;
-    public static final double autoSpeed = 0.2;
-    public static final double autoTimeout = 5;
-  }
-
-  public static final class EncoderConstants {
-    public static final double wheelRadius = 3;
-    public static final double gearRatio = 8.46;
-    public static final double ticksPerRevolution = 4096;
-    public static final double encoderCountsToMeters = Units.inchesToMeters((2 * Math.PI * wheelRadius) / gearRatio);
-  }
-
-  public static final class PIDConstants {
-    public static final double pos_kp = 0.1;
-    public static final double pos_ki = 0.1;
-    public static final double pos_kd = 0.1;
-  }
-
   public static final class LauncherConstants {
-    public static final int kTopLauncherMotorPort = 0;
-    public static final int kBottomLauncherMotorPort = 0;
 
+    public static final int kFrontLauncherMotorPort = 1;
+    public static final int kBackLauncherMotorPort = 2;
     public static final double kPLauncherController = 0.000002;
     public static final double kILauncherController = 0.0;
     public static final double kDLauncherController = 0.0008;

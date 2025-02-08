@@ -31,7 +31,14 @@ public class Robot extends LoggedRobot {
    */
   @SuppressWarnings("resource")
   public Robot() {
+    Logger.recordMetadata("ProjectName", "2025-7576-reefscape");
 
+    if (isReal()) {
+      Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+    }
+
+    Logger.start();
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.
@@ -65,7 +72,7 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     // Logger.recordOutput("Gyro/Rotation", robotContainer.gyro.getRotation2d());
-    Logger.recordOutput("shooter", robotContainer.shooter.getLauncherVelocity());
+
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

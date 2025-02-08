@@ -12,22 +12,23 @@ import frc.robot.subsystems.Launcher.LauncherSubsystem;
  * indefinitely until interrupted, during which it continuously updates the
  * speed.
  */
-public class SetLauncherSpeed extends Command {
+public class SetLauncherSpeedCmd extends Command {
 
-  private final LauncherSubsystem shooterSub;
-  private final DoubleSupplier speed;
+  private final LauncherSubsystem launcherSub;
+  private final DoubleSupplier velocity;
 
   /**
    * Constructs a new SetLauncherSpeed command.
    * 
-   * @param shooterSub The shooter subsystem that this command will control.
-   * @param speed      A supplier that provides the speed value to set the shooter
-   *                   to.
+   * @param launcherSub The shooter subsystem that this command will control.
+   * @param speed       A supplier that provides the speed value to set the
+   *                    shooter
+   *                    to.
    */
-  public SetLauncherSpeed(LauncherSubsystem shooterSub, DoubleSupplier speed) {
-    this.shooterSub = shooterSub;
-    this.speed = speed;
-    addRequirements(shooterSub);
+  public SetLauncherSpeedCmd(LauncherSubsystem launcherSub, DoubleSupplier velocity) {
+    this.launcherSub = launcherSub;
+    this.velocity = velocity;
+    addRequirements(launcherSub);
   }
 
   /**
@@ -49,8 +50,8 @@ public class SetLauncherSpeed extends Command {
    */
   @Override
   public void execute() {
-    double speedValue = speed.getAsDouble();
-    shooterSub.setLauncherSpeed(speedValue);
+    double velocityValue = velocity.getAsDouble();
+    launcherSub.setVelocity(velocityValue);
   }
 
   /**
@@ -64,7 +65,7 @@ public class SetLauncherSpeed extends Command {
    */
   @Override
   public void end(boolean interrupted) {
-    shooterSub.setLauncherSpeed(0);
+    launcherSub.stopLauncher();
   }
 
   /**

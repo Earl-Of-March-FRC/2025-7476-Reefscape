@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Launcher;
 
+import org.littletonrobotics.junction.Logger;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -9,20 +10,23 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.LauncherConfigs;
+import frc.robot.Constants.LauncherConstants;
 
 /**
  * LauncherSubsystem controls the shooter mechanism of the robot.
  * It manages motor speed, velocity, and PID control for the shooter.
  */
 public class LauncherSubsystem extends SubsystemBase {
-    private final SparkMax topLauncherSpark = new SparkMax(2, SparkMax.MotorType.kBrushless);
-    private final RelativeEncoder topLauncherEncoder = topLauncherSpark.getEncoder();
-    private final SparkClosedLoopController topLauncherClosedLoopController = topLauncherSpark
+    private final SparkMax frontLauncherSpark = new SparkMax(LauncherConstants.kFrontLauncherMotorPort,
+            SparkMax.MotorType.kBrushless);
+    private final RelativeEncoder frontLauncherEncoder = frontLauncherSpark.getEncoder();
+    private final SparkClosedLoopController frontLauncherClosedLoopController = frontLauncherSpark
             .getClosedLoopController();
 
-    private final SparkMax bottomLauncherSpark = new SparkMax(1, SparkMax.MotorType.kBrushless);
-    private final RelativeEncoder bottomLauncherEncoder = bottomLauncherSpark.getEncoder();
-    private final SparkClosedLoopController bottomLauncherClosedLoopController = bottomLauncherSpark
+    private final SparkMax backLauncherSpark = new SparkMax(LauncherConstants.kBackLauncherMotorPort,
+            SparkMax.MotorType.kBrushless);
+    private final RelativeEncoder backLauncherEncoder = backLauncherSpark.getEncoder();
+    private final SparkClosedLoopController backLauncherClosedLoopController = backLauncherSpark
             .getClosedLoopController();
 
     /**
@@ -30,9 +34,9 @@ public class LauncherSubsystem extends SubsystemBase {
      */
     public LauncherSubsystem() {
         // Configure motors
-        topLauncherSpark.configure(LauncherConfigs.shooterConfig, ResetMode.kResetSafeParameters,
+        frontLauncherSpark.configure(LauncherConfigs.shooterConfig, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
-        bottomLauncherSpark.configure(LauncherConfigs.shooterConfig.inverted(true), ResetMode.kResetSafeParameters,
+        backLauncherSpark.configure(LauncherConfigs.shooterConfig.inverted(true), ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
     }
 
@@ -42,8 +46,8 @@ public class LauncherSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("TopLauncherVelocity", topLauncherEncoder.getVelocity());
-        SmartDashboard.putNumber("BottomLauncherVelocity", bottomLauncherEncoder.getVelocity());
+        Logger.recordOutput("Shooter/Front/Measured/Velocity", getFrontVelocity());
+        Logger.recordOutput("Shooter/Back/Measured/Velocity", getBackVelocity());
     }
 
     /**
@@ -52,9 +56,9 @@ public class LauncherSubsystem extends SubsystemBase {
      * @param speed The speed to set the motors to, typically in the range [-1.0,
      *              1.0].
      */
-    public void setLauncherSpeed(double speed) {
-        topLauncherSpark.set(speed);
-        bottomLauncherSpark.set(speed);
+    public void setVelocity(double speed) {
+        frontLauncherSpark.set(speed);
+        backLauncherSpark.set(speed);
     }
 
     /**
@@ -62,8 +66,16 @@ public class LauncherSubsystem extends SubsystemBase {
      *
      * @return The velocity of the top shooter motor in RPM.
      */
-    public double getLauncherVelocity() {
-        return topLauncherEncoder.getVelocity();
+    public double getFrontVelocity() {
+        return frontLauncherEncoder.getVelocity();
+    }
+
+    public double getBackVelocity() {
+        return backLauncherEncoder.getVelocity();
+    }
+
+    public void stopLauncher() {
+        setReferenceVelocity(0);
     }
 
     /**
@@ -72,8 +84,8 @@ public class LauncherSubsystem extends SubsystemBase {
      *
      * @param referenceSpeed The target speed in RPM.
      */
-    public void setReferenceSpeed(double referenceSpeed) {
-        topLauncherClosedLoopController.setReference(referenceSpeed, ControlType.kVelocity);
-        bottomLauncherClosedLoopController.setReference(referenceSpeed, ControlType.kVelocity);
+    public void setReferenceVelocity(double referenceSpeed) {
+        frontLauncherClosedLoopController.setReference(referenceSpeed, ControlType.kVelocity);
+        backLauncherClosedLoopController.setReference(referenceSpeed, ControlType.kVelocity);
     }
 }

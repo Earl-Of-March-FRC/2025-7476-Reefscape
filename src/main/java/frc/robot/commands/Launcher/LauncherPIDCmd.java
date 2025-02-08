@@ -13,21 +13,22 @@ import frc.robot.subsystems.Launcher.LauncherSubsystem;
  * the current speed of the shooter subsystem. It runs until explicitly
  * interrupted.
  */
-public class LauncherPID extends Command {
+public class LauncherPIDCmd extends Command {
 
-  private final LauncherSubsystem shooterSub;
-  private final DoubleSupplier goalSpeed;
+  private final LauncherSubsystem launcherSub;
+  private final DoubleSupplier goalVelocity;
 
   /**
    * Constructs a new LauncherPID command.
    * 
-   * @param shooterSub The shooter subsystem that this command will control.
-   * @param goalSpeed  A supplier that provides the target speed for the shooter.
+   * @param launcherSub  The shooter subsystem that this command will control.
+   * @param goalVelocity A supplier that provides the target speed for the
+   *                     shooter.
    */
-  public LauncherPID(LauncherSubsystem shooterSub, DoubleSupplier goalSpeed) {
-    this.shooterSub = shooterSub;
-    this.goalSpeed = goalSpeed;
-    addRequirements(shooterSub);
+  public LauncherPIDCmd(LauncherSubsystem launcherSub, DoubleSupplier goalVelocity) {
+    this.launcherSub = launcherSub;
+    this.goalVelocity = goalVelocity;
+    addRequirements(launcherSub);
   }
 
   /**
@@ -38,8 +39,8 @@ public class LauncherPID extends Command {
    */
   @Override
   public void initialize() {
-    double speed = goalSpeed.getAsDouble();
-    shooterSub.setReferenceSpeed(speed); // Set the goal speed for the shooter
+    double velocity = goalVelocity.getAsDouble();
+    launcherSub.setReferenceVelocity(velocity); // Set the goal speed for the shooter
   }
 
   /**
@@ -50,8 +51,8 @@ public class LauncherPID extends Command {
    */
   @Override
   public void execute() {
-    double currentSpeed = shooterSub.getLauncherVelocity();
-    SmartDashboard.putNumber("Launcher/CurrentSpeed", currentSpeed);
+    double currentVelocity = launcherSub.getFrontVelocity();
+    SmartDashboard.putNumber("Launcher/CurrentSpeed", currentVelocity);
   }
 
   /**
@@ -64,7 +65,7 @@ public class LauncherPID extends Command {
    */
   @Override
   public void end(boolean interrupted) {
-    shooterSub.setReferenceSpeed(0); // Stop the shooter when the command ends
+    launcherSub.stopLauncher(); // Stop the shooter when the command ends
     // System.out.println("LauncherPID ended. Interrupted: " + interrupted);
   }
 

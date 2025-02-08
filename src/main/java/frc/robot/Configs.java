@@ -60,8 +60,8 @@ public final class Configs {
 
                 static {
                         shooterConfig
-                                        .idleMode(IdleMode.kBrake)
-                                        .smartCurrentLimit(20);
+                                        .idleMode(IdleMode.kCoast)
+                                        .smartCurrentLimit(50);
                         shooterConfig.closedLoop
                                         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                                         .pidf(LauncherConstants.kPLauncherController,
