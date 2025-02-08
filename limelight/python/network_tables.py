@@ -15,6 +15,7 @@ class NetworkTable:
         self._horizontal_angle = self._table.getDoubleTopic("x_angle").publish()
         self._vertical_angle = self._table.getDoubleTopic("y_angle").publish()
         
+        self._distance.set(-1)
 
         try:
             # Start the client and set the server IP

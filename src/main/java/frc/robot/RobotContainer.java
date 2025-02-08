@@ -17,6 +17,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.vision.AlgaeSubsystem;
 import frc.robot.subsystems.vision.LimelightSubsystem;
 import frc.robot.commands.SetPipelineCommand;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,6 +35,8 @@ public class RobotContainer {
                         OperatorConstants.kDriverControllerPort);
         private final LoggedDashboardChooser<Command> autoChooser;
 
+        private final AlgaeSubsystem algaeSubsystem;
+
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
          */
@@ -42,6 +45,7 @@ public class RobotContainer {
                 gyro.calibrate();
 
                 this.limelightSubsystem = new LimelightSubsystem();
+                this.algaeSubsystem = new AlgaeSubsystem();
 
                 driveSub = new Drivetrain(
                                 new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,

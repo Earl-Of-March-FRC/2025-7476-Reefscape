@@ -1,6 +1,6 @@
 @REM Environment variables
 @set "USER=pi"
-@set "ADDRESS=pi@10.178.28.1"
+@set "ADDRESS=pi@10.74.76.22"
 @set "PASSWORD=raspberry"
 @set "REMOTE_DIR=/home/%USER%/2025_7476_reefscape"
 @set "PY_DIRECTORY=limelight"

@@ -60,5 +60,6 @@
   "files.autoSave": "onFocusChange",
   "editor.defaultFormatter": "redhat.java",
   "editor.formatOnSave": true,
-  "editor.indentSize": 2
+  "editor.indentSize": 2,
+  "wpilib.deployOffline": false
 }

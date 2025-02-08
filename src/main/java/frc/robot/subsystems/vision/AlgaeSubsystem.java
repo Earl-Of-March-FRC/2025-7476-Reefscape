@@ -31,16 +31,6 @@ public class AlgaeSubsystem extends SubsystemBase {
     x_angle = networkTable.getEntry("x_angle").getDouble(0); // Ball left of camera = -, Ball right of camera = +
     y_angle = networkTable.getEntry("y_angle").getDouble(0); // Ball below camera = -, Ball above camera = +
 
-    Logger.recordOutput("Vision/AlgaeRelativeRobot", relativeToRobot);
-  }
-
-  /**
-   * Get the position of the algae (in centimeters) relative to the robot
-   * 
-   * @return {@code Pose2d} storing the x and y coordinates of a detected algae in
-   *         centimeters
-   */
-  public Pose2d getRelativeToRobot() {
     /*
      * Math for the x parameter of the Pose2d
      * O/A = tan(theta)
@@ -51,7 +41,19 @@ public class AlgaeSubsystem extends SubsystemBase {
      * 
      * O = tan(x_angle) * x_distance
      */
-    return new Pose2d(Math.tan(x_angle) * x_distance, x_distance, new Rotation2d());
+    relativeToRobot = new Pose2d(Math.tan(x_angle) * x_distance, x_distance, new Rotation2d());
+    System.out.println(relativeToRobot.getX() + ", " + relativeToRobot.getY());
+    Logger.recordOutput("Vision/AlgaeRelativeRobot", relativeToRobot);
+  }
+
+  /**
+   * Get the position of the algae (in centimeters) relative to the robot
+   * 
+   * @return {@code Pose2d} storing the x and y coordinates of a detected algae in
+   *         centimeters
+   */
+  public Pose2d getRelativeToRobot() {
+    return relativeToRobot;
   }
 
 }
