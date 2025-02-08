@@ -5,9 +5,9 @@
 @set "REMOTE_DIR=/home/%USER%/2025_7476_reefscape"
 @set "PY_SCRIPT=limelight"
 
-@REM Pull from GitHub (subject to change)
-@echo Attempt to pull from GitHub (if possible)
-@git pull
+@REM @REM Pull from GitHub (subject to change)
+@REM @echo Attempt to pull from GitHub (if possible)
+@REM @git pull
 
 @REM Store credentials
 @echo Store SSH credentials
@@ -21,9 +21,9 @@
 @echo Clone python module through SSH
 @scp -r %PY_SCRIPT% %ADDRESS%:%REMOTE_DIR% || goto end
 
-@REM Install requirements and run code
-@echo Install PIP requirements and run module
-@ssh %ADDRESS% "cd %REMOTE_DIR%/%PY_SCRIPT% && pip install -r requirements.txt && python3 -m python.algae.algaeClassifcation" || goto end
+@REM Run algaeClassification
+@echo Run algaeClassification module
+@ssh %ADDRESS% "cd %REMOTE_DIR%/%PY_SCRIPT% && python3 -m python.algae.algaeClassifcation" || goto end
 
 :end
 
