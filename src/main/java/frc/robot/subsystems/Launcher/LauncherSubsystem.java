@@ -46,8 +46,11 @@ public class LauncherSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        Logger.recordOutput("Shooter/Front/Measured/Velocity", getFrontVelocity());
-        Logger.recordOutput("Shooter/Back/Measured/Velocity", getBackVelocity());
+
+        Logger.recordOutput("Launcher/Front/Measured/Velocity",
+                getFrontVelocity() / LauncherConstants.kVelocityConversionFactor);
+        Logger.recordOutput("Launcher/Back/Measured/Velocity",
+                getBackVelocity() / LauncherConstants.kVelocityConversionFactor);
     }
 
     /**
@@ -84,8 +87,9 @@ public class LauncherSubsystem extends SubsystemBase {
      *
      * @param referenceSpeed The target speed in RPM.
      */
-    public void setReferenceVelocity(double referenceSpeed) {
-        frontLauncherClosedLoopController.setReference(referenceSpeed, ControlType.kVelocity);
-        backLauncherClosedLoopController.setReference(referenceSpeed, ControlType.kVelocity);
+    public void setReferenceVelocity(double referenceVelocity) {
+
+        frontLauncherClosedLoopController.setReference(referenceVelocity, ControlType.kVelocity);
+        backLauncherClosedLoopController.setReference(referenceVelocity, ControlType.kVelocity);
     }
 }

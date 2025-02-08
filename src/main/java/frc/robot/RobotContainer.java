@@ -13,7 +13,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveCmd;
 import frc.robot.commands.TimedAutoDrive;
-import frc.robot.commands.Launcher.LauncherPIDCmd;
+import frc.robot.commands.Launcher.LauncherSetVelocityPIDCmd;
 import frc.robot.subsystems.Launcher.LauncherSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
@@ -73,7 +73,7 @@ public class RobotContainer {
 
         private void configureBindings() {
                 // Map button B to set a fixed shooter speed (e.g., 0.5)
-                controller.b().whileTrue(new LauncherPIDCmd(shooter, () -> 60.0));
+                controller.b().whileTrue(new LauncherSetVelocityPIDCmd(shooter, () -> 60.0));
         }
 
         private void configureAutos() {

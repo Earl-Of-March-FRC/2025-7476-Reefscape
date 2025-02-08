@@ -116,13 +116,14 @@ public final class Constants {
   }
 
   public static final class LauncherConstants {
-
-    public static final int kFrontLauncherMotorPort = 1;
-    public static final int kBackLauncherMotorPort = 2;
+    public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0;
+    public static final int kFrontLauncherMotorPort = 2;
+    public static final int kBackLauncherMotorPort = 1;
     public static final double kPLauncherController = 0.000002;
     public static final double kILauncherController = 0.0;
     public static final double kDLauncherController = 0.0008;
     public static final double kLauncherVelocityFF = 0.0001695; // modify based on error on actual shooter testing
+
   }
 
   // PDP CAN IDs

@@ -13,7 +13,7 @@ import frc.robot.subsystems.Launcher.LauncherSubsystem;
  * the current speed of the shooter subsystem. It runs until explicitly
  * interrupted.
  */
-public class LauncherPIDCmd extends Command {
+public class LauncherSetVelocityPIDCmd extends Command {
 
   private final LauncherSubsystem launcherSub;
   private final DoubleSupplier goalVelocity;
@@ -25,7 +25,7 @@ public class LauncherPIDCmd extends Command {
    * @param goalVelocity A supplier that provides the target speed for the
    *                     shooter.
    */
-  public LauncherPIDCmd(LauncherSubsystem launcherSub, DoubleSupplier goalVelocity) {
+  public LauncherSetVelocityPIDCmd(LauncherSubsystem launcherSub, DoubleSupplier goalVelocity) {
     this.launcherSub = launcherSub;
     this.goalVelocity = goalVelocity;
     addRequirements(launcherSub);
