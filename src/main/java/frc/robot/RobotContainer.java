@@ -21,13 +21,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
-import frc.robot.commands.intake.SetIntakeVelocityCmd;
+import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -44,12 +42,12 @@ public class RobotContainer {
   public final Drivetrain driveSub;
   public final Gyro gyro;
 
-  private final CommandXboxController driverController = new CommandXboxController(
-      OIConstants.kDriverControllerPort);
-
   private final ArmSubsystem armSub = new ArmSubsystem();
   private final IntakeSubsystem intakeSub = new IntakeSubsystem();
-  private final CommandXboxController oController = new CommandXboxController(
+
+  private final CommandXboxController driverController = new CommandXboxController(
+      OIConstants.kDriverControllerPort);
+  private final CommandXboxController operatorController = new CommandXboxController(
       OIConstants.kOperatorControllerPort);
 
   private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
@@ -114,22 +112,24 @@ public class RobotContainer {
 
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
-    // oController.a().onTrue(new ArmSetSpeedManualCmd(armSub, () -> 0.5));
-    // oController.b().onTrue(new ArmSetSpeedManualCmd(armSub, () -> 0));
+    // operatorController.a().onTrue(new ArmSetSpeedManualCmd(armSub, () -> 0.5));
+    // operatorController.b().onTrue(new ArmSetSpeedManualCmd(armSub, () -> 0));
 
     // // button A - start
-    // oController.a().onTrue(new ArmSetPositionPIDCmd(armSub, 0));
+    // operatorController.a().onTrue(new ArmSetPositionPIDCmd(armSub, 0));
     // // button B - floor intake
-    // oController.b().onTrue(new ArmSetPositionPIDCmd(armSub, 180));
+    // operatorController.b().onTrue(new ArmSetPositionPIDCmd(armSub, 180));
     // // button X - L2
-    // oController.x().onTrue(new ArmSetPositionPIDCmd(armSub, 285));
+    // operatorController.x().onTrue(new ArmSetPositionPIDCmd(armSub, 285));
     // // button left bumper - L3
-    // oController.leftBumper().onTrue(new ArmSetPositionPIDCmd(armSub, 210));
+    // operatorController.leftBumper().onTrue(new ArmSetPositionPIDCmd(armSub,
+    // 210));
     // // button right bumper - processor
-    // oController.rightBumper().onTrue(new ArmSetPositionPIDCmd(armSub, 150));
+    // operatorController.rightBumper().onTrue(new ArmSetPositionPIDCmd(armSub,
+    // 150));
 
-    // oController.a().onTrue(new SetIntakeVelocityCmd(intakeSub, 0.5));
-    // oController.b().onTrue(new SetIntakeVelocityCmd(intakeSub, 0));
+    // operatorController.a().onTrue(new SetIntakeVelocityCmd(intakeSub, 0.5));
+    // operatorController.b().onTrue(new SetIntakeVelocityCmd(intakeSub, 0));
   }
 
   /**

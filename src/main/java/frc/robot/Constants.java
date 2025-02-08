@@ -124,6 +124,11 @@ public final class Constants {
 
   public static final class IntakeConstants {
     public static final int kIntakeMotorCanId = 1;
+
+    public static final double kPIntakeController = 0;
+    public static final double kIIntakeController = 0;
+    public static final double kDIntakeController = 0;
+    public static final double kIntakeVelocityFF = 0;
   }
 
   // PDP CAN IDs

@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
 /**
- * This command sets the speed of the intake rollers.
+ * This command sets the speed of the intake rollers using percent output.
  */
-public class SetIntakeVelocityCmd extends Command {
+public class IntakeSetVelocityManualCmd extends Command {
 
   private IntakeSubsystem intakeSub;
   private double speed;
@@ -21,7 +21,7 @@ public class SetIntakeVelocityCmd extends Command {
    * @param intakeSub The instance of the IntakeSubsystem class to be used.
    * @param speed     Desired speed, from -1 to 1.
    */
-  public SetIntakeVelocityCmd(IntakeSubsystem intakeSub, double speed) {
+  public IntakeSetVelocityManualCmd(IntakeSubsystem intakeSub, double speed) {
 
     this.intakeSub = intakeSub;
     this.speed = speed;

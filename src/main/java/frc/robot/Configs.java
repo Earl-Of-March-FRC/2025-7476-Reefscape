@@ -5,6 +5,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ModuleConstants;
 
 public final class Configs {
@@ -65,7 +66,7 @@ public final class Configs {
 
       // Configure closed-loop control
       armConfig.closedLoop
-          .feedbackSensor(FeedbackSensor.kPrimaryEncoder) // Use absolute encoder
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           .pidf(ArmConstants.kPArmController, ArmConstants.kIArmController,
               ArmConstants.kDArmController, ArmConstants.kArmVelocityFF)
           .outputRange(-1, 1); // Set output range for the controller
@@ -77,8 +78,15 @@ public final class Configs {
 
     static {
       intakeConfig
-          .idleMode(IdleMode.kBrake)
-          .smartCurrentLimit(30);
+          .idleMode(IdleMode.kBrake) // Set to kBrake to hold position when not moving
+          .smartCurrentLimit(30); // Adjust current limit as needed
+
+      // Configure closed-loop control
+      intakeConfig.closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .pidf(IntakeConstants.kPIntakeController, IntakeConstants.kIIntakeController,
+              IntakeConstants.kDIntakeController, IntakeConstants.kIntakeVelocityFF)
+          .outputRange(-1, 1); // Set output range for the controller
     }
   }
 }

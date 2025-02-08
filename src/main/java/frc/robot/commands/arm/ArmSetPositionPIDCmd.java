@@ -13,19 +13,19 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 public class ArmSetPositionPIDCmd extends InstantCommand {
 
   private ArmSubsystem armSub;
-  private double goalAngle;
+  private double referenceAngle;
 
   /**
    * Sets the reference value for the arm subsystem's closed-loop controller. It
    * will automatically begin moving towards the desired angle.
    * 
-   * @param armSub    The instance of the ArmSubsystem class to be used.
-   * @param goalAngle The goal angle for the arm to move to, in degrees.
+   * @param armSub         The instance of the ArmSubsystem class to be used.
+   * @param referenceAngle The goal angle for the arm to move to, in degrees.
    */
-  public ArmSetPositionPIDCmd(ArmSubsystem armSub, double goalAngle) {
+  public ArmSetPositionPIDCmd(ArmSubsystem armSub, double referenceAngle) {
 
     this.armSub = armSub;
-    this.goalAngle = goalAngle;
+    this.referenceAngle = referenceAngle;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(armSub);
@@ -34,6 +34,6 @@ public class ArmSetPositionPIDCmd extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSub.setReferenceAngle(goalAngle);
+    armSub.setReferenceAngle(referenceAngle);
   }
 }
