@@ -231,7 +231,7 @@ def main():
             logging.error("Error: Could not open video stream. Retrying...")
             cv2.waitKey(1000)  # Wait 1 second before retrying
 
-
+    logging.info("Running detection")
     # Initialize ObjectDetection and Computation classes
     obj_detection = ObjectDetection(LOWER_BALL, UPPER_BALL, MIN_AREA, MIN_CIRCULARITY)
     computation = Computation(CAM_MATRIX[0][0], KNOWN_DIAMETER,CAM_MATRIX[1][1]) # Diameter in mm 
@@ -262,8 +262,8 @@ def main():
             # print(f"Angle to algae ball relative to camera: {angle:.2f} deg")
 
         # Display the processed frame
-        cv2.imshow("Ball Detection", processed_frame)
-        cv2.imshow("Contour", mask)
+        # cv2.imshow("Ball Detection", processed_frame)
+        # cv2.imshow("Contour", mask)
         # cv2.imshow("Edges", edges)
         # cv2.imshow("Filled Edges", filled_edges)
 
