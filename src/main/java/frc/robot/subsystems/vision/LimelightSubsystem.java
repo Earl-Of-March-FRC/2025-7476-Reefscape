@@ -25,12 +25,12 @@ import frc.robot.Constants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.LimelightHelpers;
 
-public class VisionSubsystem extends SubsystemBase {
+public class LimelightSubsystem extends SubsystemBase {
   private final NetworkTable networkTable;
   private double[] pythonEntry = {};
 
   /** Creates a new VisionSubsystem. */
-  public VisionSubsystem() {
+  public LimelightSubsystem() {
     // Send data to Python
     double[] dataToSend = { ((Constants.LimelightConstants.hasBorders) ? 2 : 1) }; // 2 is true 1 is false
     LimelightHelpers.setPythonScriptData("", dataToSend);

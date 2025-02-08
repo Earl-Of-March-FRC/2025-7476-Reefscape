@@ -17,7 +17,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.vision.LimelightSubsystem;
 import frc.robot.commands.SetPipelineCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -28,7 +28,7 @@ public class RobotContainer {
 
         public final Gyro gyro;
         public final Drivetrain driveSub;
-        private final VisionSubsystem limelightSubsystem;
+        private final LimelightSubsystem limelightSubsystem;
 
         private final CommandXboxController driverController = new CommandXboxController(
                         OperatorConstants.kDriverControllerPort);
@@ -41,7 +41,7 @@ public class RobotContainer {
                 gyro = new GyroNavX();
                 gyro.calibrate();
 
-                this.limelightSubsystem = new VisionSubsystem();
+                this.limelightSubsystem = new LimelightSubsystem();
 
                 driveSub = new Drivetrain(
                                 new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,

@@ -119,6 +119,10 @@ public final class Constants {
     public static final boolean hasBorders = true;
   }
 
+  public static final class AlgaeConstants {
+    public static final String kNetworkTableKey = "algae_vision";
+  }
+
   public static final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }

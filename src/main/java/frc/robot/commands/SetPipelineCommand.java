@@ -2,19 +2,19 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.vision.LimelightSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class SetPipelineCommand extends Command {
-  private final VisionSubsystem limelightSubsystem;
+  private final LimelightSubsystem limelightSubsystem;
   private final Trigger buttonTrigger;
   private boolean wasButtonPressedLast = false;
 
   // Constructor takes the VisionSubsystem and Trigger (button)
-  public SetPipelineCommand(VisionSubsystem visionSubsystem, Trigger buttonTrigger) {
-    this.limelightSubsystem = visionSubsystem;
+  public SetPipelineCommand(LimelightSubsystem limelightSubsystem, Trigger buttonTrigger) {
+    this.limelightSubsystem = limelightSubsystem;
     this.buttonTrigger = buttonTrigger;
-    addRequirements(visionSubsystem);
+    addRequirements(limelightSubsystem);
   }
 
   @Override
