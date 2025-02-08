@@ -19,8 +19,8 @@ class NetworkTable:
         try:
             # Start the client and set the server IP
             self._inst.startClient4("vision client")
-            self._inst.setServer("10.74.76.227", self._inst.kDefaultPort4)
-            logging.info("Connected to server at 10.74.76.227")
+            self._inst.setServer("10.74.76.2", self._inst.kDefaultPort4)
+            logging.info("Connected to server at 10.74.76.2")
         except Exception as e:
             logging.error(f"Failed to connect to the server: {e}")
 
