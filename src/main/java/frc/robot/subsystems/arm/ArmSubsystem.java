@@ -75,6 +75,13 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   /**
+   * Stops the arm motor.
+   */
+  public void stopArm() {
+    setArmVelocity(0);
+  }
+
+  /**
    * Sets the goal angle for the arm closed loop controller.
    * 
    * @param referenceAngle The reference angle, in radians.

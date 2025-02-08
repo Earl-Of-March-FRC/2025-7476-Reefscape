@@ -44,7 +44,7 @@ public class ArmSetVelocityManualCmd extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    armSub.setArmVelocity(0);
+    armSub.stopArm();
   }
 
   // Returns true when the command should end.
