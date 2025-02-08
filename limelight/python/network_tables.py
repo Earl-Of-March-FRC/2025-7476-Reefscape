@@ -10,7 +10,7 @@ class NetworkTable:
         Set up the connection to the robot and its NetworkTable.
         """
         self._inst = ntcore.NetworkTableInstance.getDefault()
-        self._table = self._inst.getTable("vision")
+        self._table = self._inst.getTable("algae_vision")
         self._distance = self._table.getDoubleTopic("x_distance").publish()
         self._horizontal_angle = self._table.getDoubleTopic("x_angle").publish()
         self._vertical_angle = self._table.getDoubleTopic("y_angle").publish()
