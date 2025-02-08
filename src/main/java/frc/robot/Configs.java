@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -60,16 +61,30 @@ public final class Configs {
     public static final SparkMaxConfig armConfig = new SparkMaxConfig();
 
     static {
+      double positionFactor = 2 * Math.PI; // Convert rotations to radians
+      double velocityFactor = positionFactor / 60; // Convert RPM to radians per second
+
       armConfig
           .idleMode(IdleMode.kBrake) // Set to kBrake to hold position when not moving
           .smartCurrentLimit(30); // Adjust current limit as needed
 
+      armConfig.encoder
+          .positionConversionFactor(positionFactor) // Radians
+          .velocityConversionFactor(velocityFactor); // Radians per second
+
       // Configure closed-loop control
       armConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .pidf(ArmConstants.kPArmController, ArmConstants.kIArmController,
-              ArmConstants.kDArmController, ArmConstants.kArmVelocityFF)
-          .outputRange(-1, 1); // Set output range for the controller
+          // Position PID controller is slot 0
+          .pidf(ArmConstants.kPPositionController, ArmConstants.kIPositionController,
+              ArmConstants.kDPositionController, ArmConstants.kPositionFF, ClosedLoopSlot.kSlot0)
+          // Velocity PID controller is slot 1
+          .pidf(ArmConstants.kPVelocityController, ArmConstants.kIVelocityController,
+              ArmConstants.kDVelocityController,
+              ArmConstants.kVelocityFF, ClosedLoopSlot.kSlot1)
+          .outputRange(-1, 1) // Set output range for the controller
+          .positionWrappingEnabled(true)
+          .positionWrappingInputRange(0, positionFactor); // 0 to 2 pi radians
     }
   }
 
@@ -77,15 +92,22 @@ public final class Configs {
     public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();
 
     static {
+      double positionFactor = 2 * Math.PI; // Convert rotations to radians
+      double velocityFactor = positionFactor / 60; // Convert RPM to radians per second
+
       intakeConfig
           .idleMode(IdleMode.kBrake) // Set to kBrake to hold position when not moving
           .smartCurrentLimit(30); // Adjust current limit as needed
 
+      intakeConfig.encoder
+          .positionConversionFactor(positionFactor)
+          .velocityConversionFactor(velocityFactor);
+
       // Configure closed-loop control
       intakeConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .pidf(IntakeConstants.kPIntakeController, IntakeConstants.kIIntakeController,
-              IntakeConstants.kDIntakeController, IntakeConstants.kIntakeVelocityFF)
+          .pidf(IntakeConstants.kPVelocityController, IntakeConstants.kIVelocityController,
+              IntakeConstants.kDVelocityController, IntakeConstants.kVelocityFF)
           .outputRange(-1, 1); // Set output range for the controller
     }
   }

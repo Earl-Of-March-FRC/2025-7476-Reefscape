@@ -13,18 +13,18 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 public class IntakeSetVelocityManualCmd extends Command {
 
   private IntakeSubsystem intakeSub;
-  private double speed;
+  private double percent;
 
   /**
-   * Sets the speed of the intake rollers.
+   * Sets the velocity of the intake rollers.
    * 
    * @param intakeSub The instance of the IntakeSubsystem class to be used.
-   * @param speed     Desired speed, from -1 to 1.
+   * @param percent   Percent output, from -1 to 1.
    */
-  public IntakeSetVelocityManualCmd(IntakeSubsystem intakeSub, double speed) {
+  public IntakeSetVelocityManualCmd(IntakeSubsystem intakeSub, double percent) {
 
     this.intakeSub = intakeSub;
-    this.speed = speed;
+    this.percent = percent;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(intakeSub);
@@ -38,7 +38,7 @@ public class IntakeSetVelocityManualCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intakeSub.setIntakeVelocity(speed);
+    intakeSub.setVelocity(percent);
   }
 
   // Called once the command ends or is interrupted.

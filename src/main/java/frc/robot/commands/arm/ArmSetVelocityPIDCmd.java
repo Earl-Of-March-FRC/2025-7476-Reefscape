@@ -7,25 +7,26 @@ package frc.robot.commands.arm;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
 /**
- * This command moves the arm manually.
+ * This command moves the arm using velocity PID.
  */
-public class ArmSetVelocityManualCmd extends Command {
+public class ArmSetVelocityPIDCmd extends Command {
 
   private ArmSubsystem armSub;
-  private DoubleSupplier percent;
+  private DoubleSupplier input;
 
   /**
-   * Moves the arm manually.
+   * Moves the arm using velocity PID.
    * 
-   * @param armSub  The instance of the ArmSubsystem class to be used.
-   * @param percent Percent output, from -1 to 1.
+   * @param armSub The instance of the ArmSubsystem class to be used.
+   * @param input  The desired velocity of the arm, between -1 and 1.
    */
-  public ArmSetVelocityManualCmd(ArmSubsystem armSub, DoubleSupplier percent) {
+  public ArmSetVelocityPIDCmd(ArmSubsystem armSub, DoubleSupplier input) {
     this.armSub = armSub;
-    this.percent = percent;
+    this.input = input;
 
     addRequirements(armSub);
   }
@@ -33,12 +34,14 @@ public class ArmSetVelocityManualCmd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    armSub.setVelocity(percent.getAsDouble());
+    // Multiplies joystick input by maximum arm velocity
+    armSub.setReferenceVelocity(input.getAsDouble() * ArmConstants.kMaxVelocity);
   }
 
   // Called once the command ends or is interrupted.

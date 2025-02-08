@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.CalibrateCmd;
 import frc.robot.commands.DriveCmd;
@@ -20,8 +22,12 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
+import frc.robot.commands.arm.ArmSetVelocityPIDCmd;
+import frc.robot.commands.arm.ArmResetEncoderCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
+import frc.robot.commands.intake.IntakeSetVelocityPIDCmd;
+import frc.robot.commands.intake.IntakeStopCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -74,21 +80,11 @@ public class RobotContainer {
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
 
-    driveSub.setDefaultCommand(
-        new DriveCmd(
-            driveSub,
-            () -> MathUtil.applyDeadband(
-                -driverController.getRawAxis(
-                    OIConstants.kDriverControllerYAxis),
-                OIConstants.kDriveDeadband),
-            () -> MathUtil.applyDeadband(
-                -driverController.getRawAxis(
-                    OIConstants.kDriverControllerXAxis),
-                OIConstants.kDriveDeadband),
-            () -> MathUtil.applyDeadband(
-                -driverController.getRawAxis(
-                    OIConstants.kDriverControllerRotAxis),
-                OIConstants.kDriveDeadband)));
+    armSub.setDefaultCommand(
+        new ArmSetVelocityPIDCmd(armSub, () -> MathUtil.applyDeadband(
+            -operatorController.getRawAxis(
+                OIConstants.kOperatorControllerYAxis),
+            OIConstants.kArmDeadband)));
 
     configureAutos();
     configureBindings();
@@ -112,24 +108,15 @@ public class RobotContainer {
 
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
-    // operatorController.a().onTrue(new ArmSetSpeedManualCmd(armSub, () -> 0.5));
-    // operatorController.b().onTrue(new ArmSetSpeedManualCmd(armSub, () -> 0));
+    operatorController.povCenter().onTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleStart));
+    operatorController.povDown().onTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleFloor));
+    operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleProcessor));
+    operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL2));
+    operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL3));
 
-    // // button A - start
-    // operatorController.a().onTrue(new ArmSetPositionPIDCmd(armSub, 0));
-    // // button B - floor intake
-    // operatorController.b().onTrue(new ArmSetPositionPIDCmd(armSub, 180));
-    // // button X - L2
-    // operatorController.x().onTrue(new ArmSetPositionPIDCmd(armSub, 285));
-    // // button left bumper - L3
-    // operatorController.leftBumper().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // 210));
-    // // button right bumper - processor
-    // operatorController.rightBumper().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // 150));
-
-    // operatorController.a().onTrue(new SetIntakeVelocityCmd(intakeSub, 0.5));
-    // operatorController.b().onTrue(new SetIntakeVelocityCmd(intakeSub, 0));
+    operatorController.a().onTrue(new IntakeSetVelocityPIDCmd(intakeSub, IntakeConstants.kMaxVelocity));
+    operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
+    operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
   }
 
   /**

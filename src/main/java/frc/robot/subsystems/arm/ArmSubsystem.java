@@ -7,6 +7,7 @@ package frc.robot.subsystems.arm;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -26,6 +27,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final RelativeEncoder armEncoder = armSpark.getEncoder();
   private final SparkClosedLoopController armClosedLoopController = armSpark.getClosedLoopController();
 
+  // Starting angle of the arm, in radians
+  // Ex: arm starting position is 1 radian, then m_armAngularOffset is 1
   private double m_armAngularOffset = 0;
 
   /**
@@ -33,16 +36,20 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public ArmSubsystem() {
 
-    // configures arm motor
+    // Configures arm motor
     armSpark.configure(ArmConfigs.armConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
+    resetPosition();
   }
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Intake/Arm/Measured/Position", getArmPosition());
-    Logger.recordOutput("Intake/Arm/Measured/Velocity", getArmVelocity());
+    // Convert radians to degrees
+    Logger.recordOutput("Intake/Arm/Measured/Position", getPosition() / ArmConstants.kPositionConversionFactor);
+
+    // Convert radians per second to RPM
+    Logger.recordOutput("Intake/Arm/Measured/Velocity", getVelocity() / ArmConstants.kVelocityConversionFactor);
   }
 
   /**
@@ -50,45 +57,68 @@ public class ArmSubsystem extends SubsystemBase {
    * 
    * @return double The current angle of the arm, in radians.
    */
-  public double getArmPosition() {
-    return (armEncoder.getPosition() - m_armAngularOffset) * ArmConstants.kArmPositionReductionFactor;
+  public double getPosition() {
+    // Adds the angular offset
+    return armEncoder.getPosition() + m_armAngularOffset;
   }
 
   /**
    * Returns the current arm velocity.
    * 
-   * @return double The current velocity of the arm, in RPM.
+   * @return double The current velocity of the arm, in radians per second.
    */
-  public double getArmVelocity() {
+  public double getVelocity() {
     return armEncoder.getVelocity();
   }
 
   /**
    * Sets the velocity of the arm.
    * 
-   * @param velocity Desired velocity, in RPM.
+   * @param velocity Percent output, from -1 to 1.
    */
-  public void setArmVelocity(double velocity) {
+  public void setVelocity(double velocity) {
     Logger.recordOutput("Intake/Arm/Setpoint/Velocity", velocity);
     armSpark.set(velocity);
+  }
+
+  /**
+   * Sets the reference position for the arm closed loop controller.
+   * 
+   * @param referenceAngle The reference angle, in degrees.
+   */
+  public void setReferencePosition(double referenceAngle) {
+    // Convert to radians, then subtract angular offset
+    double refAngleWithOffset = referenceAngle * ArmConstants.kPositionConversionFactor - m_armAngularOffset;
+
+    Logger.recordOutput("Intake/Arm/Setpoint/Position", referenceAngle);
+    armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+  }
+
+  /**
+   * Sets the reference velocity for the arm closed loop controller.
+   *
+   * @param referenceVelocity The reference velocity, in RPM.
+   */
+  public void setReferenceVelocity(double referenceVelocity) {
+    // Convert RPM to radians per second
+    double refVelocityConverted = referenceVelocity * ArmConstants.kVelocityConversionFactor;
+
+    Logger.recordOutput("Intake/Arm/Setpoint/Velocity", referenceVelocity);
+    armClosedLoopController.setReference(refVelocityConverted,
+        ControlType.kVelocity, ClosedLoopSlot.kSlot1);
   }
 
   /**
    * Stops the arm motor.
    */
   public void stopArm() {
-    setArmVelocity(0);
+    setVelocity(0);
   }
 
   /**
-   * Sets the goal angle for the arm closed loop controller.
-   * 
-   * @param referenceAngle The reference angle, in radians.
+   * Resets the arm encoder to 0.
    */
-  public void setReferenceAngle(double referenceAngle) {
-    double refAngleWithOffset = (referenceAngle + m_armAngularOffset) / ArmConstants.kArmPositionReductionFactor;
-
-    Logger.recordOutput("Intake/Arm/Setpoint/Position", refAngleWithOffset);
-    armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition);
+  public void resetPosition() {
+    armEncoder.setPosition(0);
   }
 }

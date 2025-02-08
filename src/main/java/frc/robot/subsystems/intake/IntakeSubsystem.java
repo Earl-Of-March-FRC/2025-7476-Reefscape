@@ -37,24 +37,25 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Intake/Rollers/Measured/Velocity", getIntakeVelocity());
+    // Convert radians per second to RPM
+    Logger.recordOutput("Intake/Rollers/Measured/Velocity", getVelocity() / IntakeConstants.kVelocityConversionFactor);
   }
 
   /**
    * Gets the velocity of the intake motor.
    * 
-   * @return The current velocity of the intake, in RPM.
+   * @return The current velocity of the intake, in radians per second.
    */
-  public double getIntakeVelocity() {
+  public double getVelocity() {
     return intakeEncoder.getVelocity();
   }
 
   /**
    * Sets the velocity of the intake motor using percent output.
    * 
-   * @param velocity Desired velocity, from -1 to 1.
+   * @param velocity Percent output, from -1 to 1.
    */
-  public void setIntakeVelocity(double velocity) {
+  public void setVelocity(double velocity) {
     Logger.recordOutput("Intake/Rollers/Setpoint/Velocity", velocity);
     intakeSpark.set(velocity);
   }
@@ -63,7 +64,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * Stops the intake motor.
    */
   public void stopIntake() {
-    setIntakeVelocity(0);
+    setReferenceVelocity(0);
   }
 
   /**
@@ -72,7 +73,10 @@ public class IntakeSubsystem extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setReferenceVelocity(double referenceVelocity) {
+    // Convert RPM to radians per second
+    double refVelocityConverted = referenceVelocity * IntakeConstants.kVelocityConversionFactor;
+
     Logger.recordOutput("Intake/Rollers/Setpoint/Velocity", referenceVelocity);
-    intakeClosedLoopController.setReference(referenceVelocity, ControlType.kVelocity);
+    intakeClosedLoopController.setReference(refVelocityConverted, ControlType.kVelocity);
   }
 }

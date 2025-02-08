@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -80,12 +79,15 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-    public static final int kOperatorControllerPort = 1;
     public static final double kDriveDeadband = 0.05;
     public static final int kDriverControllerXAxis = 0;
     public static final int kDriverControllerYAxis = 1;
     public static final int kDriverControllerRotAxis = 4;
     public static final int kDriverControllerCalibrateButton = 1;
+
+    public static final int kOperatorControllerPort = 1;
+    public static final double kArmDeadband = 0.5;
+    public static final int kOperatorControllerYAxis = 1;
   }
 
   public static final class AutoConstants {
@@ -113,22 +115,41 @@ public final class Constants {
   public static final class ArmConstants {
     public static final int kArmMotorCanId = 2;
 
-    public static final double kPArmController = 0.001;
-    public static final double kIArmController = 0;
-    public static final double kDArmController = 0;
-    public static final double kArmVelocityFF = 0;
+    public static final double kPPositionController = 0.1;
+    public static final double kIPositionController = 0;
+    public static final double kDPositionController = 0;
+    public static final double kPositionFF = 0;
 
-    public static final double kArmPositionReductionFactor = 2 * Math.PI;
-    public static final double kArmPositionZeroOffset = 0; // Adjust based on the encoder's home position
+    public static final double kPVelocityController = 0.0002;
+    public static final double kIVelocityController = 0;
+    public static final double kDVelocityController = 0.0008;
+    public static final double kVelocityFF = 0.001;
+
+    public static final double kPositionConversionFactor = 2 * Math.PI / 360; // Degrees to radians
+    public static final double kVelocityConversionFactor = 2 * Math.PI / 60; // RPM to radians/sec
+
+    public static final double kMaxVelocity = 500; // Max velocity of arm in RPM
+
+    // Angles need to be set in degrees
+    public static final double kAngleStart = 0;
+    public static final double kAngleFloor = 0;
+    public static final double kAngleL2 = 0;
+    public static final double kAngleL3 = 0;
+    public static final double kAngleProcessor = 0;
   }
 
   public static final class IntakeConstants {
-    public static final int kIntakeMotorCanId = 1;
+    public static final int kIntakeMotorCanId = 80;
 
-    public static final double kPIntakeController = 0;
-    public static final double kIIntakeController = 0;
-    public static final double kDIntakeController = 0;
-    public static final double kIntakeVelocityFF = 0;
+    public static final double kPVelocityController = 0.000002;
+    public static final double kIVelocityController = 0;
+    public static final double kDVelocityController = 0.0008;
+    public static final double kVelocityFF = 0.0001695;
+
+    public static final double kPositionConversionFactor = 2 * Math.PI / 360; // Degrees to radians
+    public static final double kVelocityConversionFactor = 2 * Math.PI / 60; // RPM to radians/sec
+
+    public static final double kMaxVelocity = 60; // Max velocity of intake in RPM
   }
 
   // PDP CAN IDs

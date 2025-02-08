@@ -34,6 +34,6 @@ public class ArmSetPositionPIDCmd extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSub.setReferenceAngle(referenceAngle);
+    armSub.setReferencePosition(referenceAngle);
   }
 }
