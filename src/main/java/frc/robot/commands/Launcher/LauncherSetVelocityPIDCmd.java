@@ -1,83 +1,54 @@
-package frc.robot.commands.Launcher;
+package frc.robot.commands.launcher;
 
-import java.util.function.DoubleSupplier;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Launcher.LauncherSubsystem;
+import frc.robot.subsystems.launcher.LauncherSubsystem;
 
 /**
- * Command for controlling the shooter using a PID loop.
+ * Command for controlling the launcher using a PID loop.
  * <p>
- * This command sets a target speed for the shooter and continuously monitors
- * the current speed of the shooter subsystem. It runs until explicitly
- * interrupted.
+ * This command sets a target speed for the launcher and continuously monitors
+ * the current speed of the launcher subsystem.
  */
 public class LauncherSetVelocityPIDCmd extends Command {
 
   private final LauncherSubsystem launcherSub;
-  private final DoubleSupplier goalVelocity;
+  private final double referenceVelocity;
 
   /**
-   * Constructs a new LauncherPID command.
+   * Constructs a new LauncherSetVelocityPID.
    * 
-   * @param launcherSub  The shooter subsystem that this command will control.
-   * @param goalVelocity A supplier that provides the target speed for the
-   *                     shooter.
+   * @param launcherSub       The launcher subsystem that this command will
+   *                          control.
+   * @param referenceVelocity A supplier that provides the target speed for the
+   *                          launcher, in RPM.
    */
-  public LauncherSetVelocityPIDCmd(LauncherSubsystem launcherSub, DoubleSupplier goalVelocity) {
+  public LauncherSetVelocityPIDCmd(LauncherSubsystem launcherSub, double referenceVelocity) {
     this.launcherSub = launcherSub;
-    this.goalVelocity = goalVelocity;
+    this.referenceVelocity = referenceVelocity;
+
     addRequirements(launcherSub);
   }
 
-  /**
-   * Initializes the LauncherPID command by setting the reference speed for the
-   * shooter.
-   * <p>
-   * This method is called once when the command is first scheduled.
-   */
+  // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double velocity = goalVelocity.getAsDouble();
-    launcherSub.setReferenceVelocity(velocity); // Set the goal speed for the shooter
   }
 
-  /**
-   * Executes the LauncherPID command.
-   * <p>
-   * This method is called repeatedly while the command is scheduled.
-   * It reports the current speed of the shooter to the SmartDashboard.
-   */
+  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double currentVelocity = launcherSub.getFrontVelocity();
-    SmartDashboard.putNumber("Launcher/CurrentSpeed", currentVelocity);
+    launcherSub.setReferenceVelocity(referenceVelocity);
   }
 
-  /**
-   * Ends the LauncherPID command by stopping the shooter.
-   * <p>
-   * This method is called once when the command ends or is interrupted.
-   * 
-   * @param interrupted True if the command was interrupted, false if it completed
-   *                    normally.
-   */
+  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    launcherSub.stopLauncher(); // Stop the shooter when the command ends
-    // System.out.println("LauncherPID ended. Interrupted: " + interrupted);
+    launcherSub.stopLauncher();
   }
 
-  /**
-   * Determines if the LauncherPID command is finished.
-   * <p>
-   * Since this command runs indefinitely, it always returns false.
-   * 
-   * @return False, as the command does not finish on its own.
-   */
+  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false; // Run indefinitely until interrupted
+    return false;
   }
 }

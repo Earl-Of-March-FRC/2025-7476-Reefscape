@@ -84,6 +84,8 @@ public final class Constants {
     public static final int kDriverControllerYAxis = 1;
     public static final int kDriverControllerRotAxis = 4;
     public static final int kDriverControllerCalibrateButton = 1;
+
+    public static final int kOperatorControllerPort = 1;
   }
 
   public static final class AutoConstants {
@@ -108,25 +110,21 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
-  public static final class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-    public static final int leftJoystickAxis = 1;
-    public static final double joystickDeadband = 0.08;
-    public static int kOperatorControllerPort;
-  }
-
   public static final class LauncherConstants {
-    public static final double KLauncherVelocity = 60.0;
-
     public static final int kFrontLauncherCanId = 2;
     public static final int kBackLauncherCanId = 1;
 
-    public static final double kPLauncherController = 0.000002;
-    public static final double kILauncherController = 0.0;
-    public static final double kDLauncherController = 0.0008;
-    public static final double kLauncherVelocityFF = 0.0001695; // modify based on error on actual shooter testing
+    public static final double kPVelocityController = 0.000002;
+    public static final double kIVelocityController = 0.0;
+    public static final double kDVelocityController = 0.0008;
+    public static final double kVelocityFF = 0.0001695;
 
-    public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0;
+    public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
+
+    // Sample velocities, need to be changed
+    public static final double kVelocity1 = 60;
+    public static final double kVelocity2 = 100;
+    public static final double kVelocity3 = 200;
   }
 
   // PDP CAN IDs

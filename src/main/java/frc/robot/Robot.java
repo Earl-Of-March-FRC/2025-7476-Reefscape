@@ -71,7 +71,7 @@ public class Robot extends LoggedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    // Logger.recordOutput("Gyro/Rotation", robotContainer.gyro.getRotation2d());
+    Logger.recordOutput("Gyro/Rotation", robotContainer.gyro.getRotation2d());
 
   }
 
@@ -90,7 +90,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void autonomousInit() {
-    // autonomousCommand = robotContainer.getAutonomousCommand();
+    autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
