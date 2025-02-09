@@ -44,8 +44,7 @@ public class RobotContainer {
                 gyro = new GyroNavX();
                 gyro.calibrate();
 
-                this.limelightSubsystem = new LimelightSubsystem();
-                this.algaeSubsystem = new AlgaeSubsystem();
+                limelightSubsystem = new LimelightSubsystem();
 
                 driveSub = new Drivetrain(
                                 new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
@@ -61,6 +60,8 @@ public class RobotContainer {
                                                 DriveConstants.kRearRightTurningCanId,
                                                 DriveConstants.kBackRightChassisAngularOffset),
                                 gyro);
+
+                algaeSubsystem = new AlgaeSubsystem(() -> driveSub.getPose());
 
                 driveSub.setDefaultCommand(
                                 new DriveCmd(

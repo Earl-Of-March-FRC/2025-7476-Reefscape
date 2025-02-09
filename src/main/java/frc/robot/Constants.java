@@ -121,6 +121,8 @@ public final class Constants {
 
   public static final class AlgaeConstants {
     public static final String kNetworkTableKey = "algae_vision";
+    public static final double camera1X = 0.0;
+    public static final double camera1Z = 0.0;
   }
 
   public static final class OperatorConstants {
