@@ -24,7 +24,7 @@ goto step_1
 @REM --------------------------------------------------------------------------------------------
 @REM Create directory on the Pi
 :step_1
-echo [STEP 1] Creating directory '%PY_DIRECTORY%' on the Pi...
+echo [STEP 1] Creating remote directory '%REMOTE_DIR%'...
 echo.
 
 :putty_create_dir
@@ -41,7 +41,7 @@ goto step_2
 @REM --------------------------------------------------------------------------------------------
 @REM Clone the Python module onto the Pi
 :step_2
-echo [STEP 2] Cloning Python module through SSH...
+echo [STEP 2] Copying Python folder '%PY_DIRECTORY%' into '%REMOTE_DIR%'...
 echo.
 
 :putty_clone_py
