@@ -8,15 +8,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
 /**
- * This command stops the intake rollers.
+ * This command stops the intake rollers using percent output.
  */
 public class IntakeStopCmd extends InstantCommand {
 
   private IntakeSubsystem intakeSub;
 
   /**
-   * Sets the reference value for the intake subsystem's closed-loop controller.
-   * It will slow down to a stop.
+   * Constructs a new IntakeStopCmd.
    * 
    * @param intakeSub The instance of the IntakeSubsystem class to be
    *                  used.
@@ -31,6 +30,6 @@ public class IntakeStopCmd extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intakeSub.setReferenceVelocity(0);
+    intakeSub.setVelocity(0);
   }
 }
