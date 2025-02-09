@@ -15,10 +15,8 @@ import com.revrobotics.spark.SparkSim;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,24 +31,19 @@ public class IndexerSubsystem extends SubsystemBase {
   private final SparkClosedLoopController controller;
   private final RelativeEncoder encoder;
 
-  public DigitalOutput ultrasonicTriggerPinOne = new DigitalOutput(0);
-  public DigitalOutput ultrasonicTriggerPinTwo = new DigitalOutput(1);
-  public AnalogInput ultrasonicSensorOne = new AnalogInput(0);
-  public AnalogInput ultrasonicSensorTwo = new AnalogInput(1);
+  public final DigitalOutput intakeSensorTrigger;
+  public final DigitalOutput launcherSensorTrigger;
+  public final AnalogInput intakeSensor;
+  public final AnalogInput launcherSensor;
   public double voltageScaleFactor = 1;
 
   private final SparkSim indexerSparkSim; // In case we ever need to simulate the motor
 
   /**
    * Creates a new IndexerSubsystem
-   * 
-   * @param motorPort             CAN ID of the indexer motor
-   * @param motorType             MotorType of the indexer motor
-   * @param intakeSensorChannel   DIO port of the digital sensor near the intake
-   * @param launcherSensorChannel DIO port of the digital sensor near the launcher
    */
-  public IndexerSubsystem(int motorPort, MotorType motorType, int intakeSensorChannel, int launcherSensorChannel) {
-    indexerSpark = new SparkMax(motorPort, motorType);
+  public IndexerSubsystem() {
+    indexerSpark = new SparkMax(IndexerConstants.kMotorPort, IndexerConstants.kMotorType);
 
     indexerSparkSim = new SparkSim(indexerSpark, DCMotor.getNeo550(1));
 
@@ -58,7 +51,13 @@ public class IndexerSubsystem extends SubsystemBase {
         PersistMode.kPersistParameters);
     controller = indexerSpark.getClosedLoopController();
     encoder = indexerSpark.getEncoder();
-    turnOnSensorOne();
+
+    intakeSensorTrigger = new DigitalOutput(IndexerConstants.kIntakeSensorTriggerPin);
+    launcherSensorTrigger = new DigitalOutput(IndexerConstants.kLauncherSensorTriggerPin);
+    intakeSensor = new AnalogInput(IndexerConstants.kIntakeSensorChannel);
+    launcherSensor = new AnalogInput(IndexerConstants.kLauncherSensorChannel);
+
+    turnOnIntakeSensor();
   }
 
   @Override
@@ -138,8 +137,8 @@ public class IndexerSubsystem extends SubsystemBase {
    * @see #getLauncherSensor
    */
   public boolean getIntakeSensor() {
-    turnOnSensorOne();
-    double range = ultrasonicSensorOne.getValue() * voltageScaleFactor * 0.125;
+    turnOnIntakeSensor();
+    double range = intakeSensor.getValue() * voltageScaleFactor * 0.125;
     Logger.recordOutput("Indexer/IntakeRange", range);
     return range < 32;
   }
@@ -153,11 +152,19 @@ public class IndexerSubsystem extends SubsystemBase {
    */
   public boolean getLauncherSensor() {
     // turnOnSensorTwo();
-    double range = ultrasonicSensorTwo.getValue() * voltageScaleFactor * 0.125;
+    double range = launcherSensor.getValue() * voltageScaleFactor * 0.125;
     Logger.recordOutput("Indexer/LauncherRange", range);
     return range < 32;
   }
 
+  /**
+   * Creates an indexing command. TBD
+   * 
+   * @param intakeVelocity
+   * @param launcherVelocity
+   * @param indexVelocity
+   * @return
+   */
   public Command createIndexCommand(DoubleSupplier intakeVelocity, DoubleSupplier launcherVelocity,
       DoubleSupplier indexVelocity) {
     return Commands.runEnd(() -> {
@@ -170,21 +177,21 @@ public class IndexerSubsystem extends SubsystemBase {
       } else {
         setVelocity(indexVelocity.getAsDouble()); // Indexer will run on its own.
       }
-    }, () -> setVelocity(0));
+    }, () -> setVelocity(0), this);
   }
 
-  public void turnOnSensorOne() {
-    ultrasonicTriggerPinOne.set(true);
-    ultrasonicTriggerPinTwo.set(false);
+  public void turnOnIntakeSensor() {
+    intakeSensorTrigger.set(true);
+    launcherSensorTrigger.set(false);
   }
 
-  public void turnOnSensorTwo() {
-    ultrasonicTriggerPinOne.set(false);
-    ultrasonicTriggerPinTwo.set(true);
+  public void turnOnLauncherSensor() {
+    intakeSensorTrigger.set(false);
+    launcherSensorTrigger.set(true);
   }
 
   public void turnOffBothSensors() {
-    ultrasonicTriggerPinOne.set(false);
-    ultrasonicTriggerPinTwo.set(false);
+    intakeSensorTrigger.set(false);
+    launcherSensorTrigger.set(false);
   }
 }

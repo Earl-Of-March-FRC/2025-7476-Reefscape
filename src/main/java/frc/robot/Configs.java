@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -64,7 +65,9 @@ public final class Configs {
                         indexerConfig.smartCurrentLimit(40);
                         indexerConfig.closedLoop
                                         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                                        .pid(1, 0, 0)
+                                        // Velocity is stored in slot 1 to match
+                                        // the other subsystems.
+                                        .pid(1, 0, 0, ClosedLoopSlot.kSlot1)
                                         .velocityFF(IndexerConstants.kVelocityFF)
                                         .outputRange(-1, 1);
                         indexerConfig.encoder
