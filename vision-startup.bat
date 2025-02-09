@@ -1,12 +1,10 @@
-@REM To run, double click in file explorer or use the following command:
+@REM Note: For best results, please install the PuTTY packages here: https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
 @REM
+@REM To run, double click in file explorer or use the following command:
 @REM .\vision-startup.bat
 @REM
 @REM To toggle verbose mode, append the -v flag
-@REM
 @REM .\vision-startup.bat -v
-@REM
-@REM
 @REM
 
 @IF not "%1"=="-v" @echo off
@@ -17,6 +15,7 @@ set "ADDRESS=%USER%@10.74.76.22"
 set "PASSWORD=raspberry"
 set "REMOTE_DIR=/home/%USER%/2025_7476_reefscape"
 set "PY_DIRECTORY=limelight"
+set "PY_MODULE=python.algae.orange_algae_classification"
 
 @REM Jump to a certain step (for debugging purposes)
 goto step_1
@@ -58,18 +57,18 @@ goto step_3
 @REM --------------------------------------------------------------------------------------------
 @REM Setup the Pi to run the script on startup using cron
 :step_3
-echo [STEP 3] Setting up the script to run on startup...
+echo [STEP 3] Setting up the module '%PY_MODULE%' to run on startup...
 echo.
 
 :putty_setup_startup
-plink -v -ssh %ADDRESS% -pw %PASSWORD% "cd %REMOTE_DIR%/%PY_DIRECTORY% && echo '@reboot python3 -m python.algae.orange_algae_classification' | crontab -" || (
+plink -v -ssh %ADDRESS% -pw %PASSWORD% "cd %REMOTE_DIR%/%PY_DIRECTORY% && echo '@reboot python3 -m %PY_MODULE%' | crontab -" || (
     call :putty_fail 
     goto ssh_setup_startup
 )
 goto job_complete
 
 :ssh_setup_startup
-ssh -v %ADDRESS% "cd %REMOTE_DIR%/%PY_DIRECTORY% && echo '@reboot python3 -m python.algae.orange_algae_classification' | crontab -" || goto default_fail
+ssh -v %ADDRESS% "cd %REMOTE_DIR%/%PY_DIRECTORY% && echo '@reboot python3 -m %PY_MODULE%' | crontab -" || goto default_fail
 goto job_complete
 
 @REM --------------------------------------------------------------------------------------------
