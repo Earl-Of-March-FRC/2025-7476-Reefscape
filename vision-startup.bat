@@ -27,7 +27,7 @@
 
 @REM Setup the Pi to run the script on startup using cron
 @echo Setting up the script to run on startup
-@ssh %ADDRESS% "echo '@reboot python3 -m python.algae.orange_algae_classification' | crontab -" || goto end
+@ssh %ADDRESS% "cd %REMOTE_DIR%/%PY_DIRECTORY% && echo '@reboot python3 -m python.algae.orange_algae_classification' | crontab -" || goto end
 
 :end
 pause
