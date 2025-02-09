@@ -56,7 +56,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * @param velocity Percent output, from -1 to 1.
    */
   public void setVelocity(double velocity) {
-    Logger.recordOutput("Intake/Rollers/Setpoint/Velocity", velocity);
+    Logger.recordOutput("Intake/Rollers/Setpoint/PercentVelocity", velocity);
     intakeSpark.set(velocity);
   }
 

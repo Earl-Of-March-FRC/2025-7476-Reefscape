@@ -14,6 +14,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
@@ -45,8 +46,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Convert radians to degrees
-    Logger.recordOutput("Intake/Arm/Measured/Position", getPosition() / ArmConstants.kPositionConversionFactor);
+    Logger.recordOutput("Intake/Arm/Measured/Position", new Rotation2d(getPosition()));
 
     // Convert radians per second to RPM
     Logger.recordOutput("Intake/Arm/Measured/Velocity", getVelocity() / ArmConstants.kVelocityConversionFactor);
@@ -77,7 +77,7 @@ public class ArmSubsystem extends SubsystemBase {
    * @param velocity Percent output, from -1 to 1.
    */
   public void setVelocity(double velocity) {
-    Logger.recordOutput("Intake/Arm/Setpoint/Velocity", velocity);
+    Logger.recordOutput("Intake/Arm/Setpoint/PercentVelocity", velocity);
     armSpark.set(velocity);
   }
 
@@ -88,9 +88,10 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public void setReferencePosition(double referenceAngle) {
     // Convert to radians, then subtract angular offset
-    double refAngleWithOffset = referenceAngle * ArmConstants.kPositionConversionFactor - m_armAngularOffset;
+    double refAngleWithOffset = referenceAngle * ArmConstants.kAngleConversionFactor - m_armAngularOffset;
 
-    Logger.recordOutput("Intake/Arm/Setpoint/Position", referenceAngle);
+    Logger.recordOutput("Intake/Arm/Setpoint/Position",
+        new Rotation2d(referenceAngle * ArmConstants.kAngleConversionFactor));
     armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 

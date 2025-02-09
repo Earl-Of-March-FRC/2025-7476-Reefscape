@@ -125,10 +125,12 @@ public final class Constants {
     public static final double kDVelocityController = 0.0008;
     public static final double kVelocityFF = 0.001;
 
-    public static final double kPositionConversionFactor = 2 * Math.PI / 360; // Degrees to radians
+    public static final double kAngleConversionFactor = 2 * Math.PI / 360; // Degrees to radians
+    public static final double kPositionConversionFactor = 2 * Math.PI; // Rotations to radians
     public static final double kVelocityConversionFactor = 2 * Math.PI / 60; // RPM to radians/sec
 
-    public static final double kMaxVelocity = 500; // Max velocity of arm in RPM
+    // Max velocity of arm in RPM
+    public static final double kMaxVelocity = 60;
 
     // Angles need to be set in degrees
     public static final double kAngleStart = 0;
@@ -146,7 +148,7 @@ public final class Constants {
     public static final double kDVelocityController = 0.0008;
     public static final double kVelocityFF = 0.0001695;
 
-    public static final double kPositionConversionFactor = 2 * Math.PI / 360; // Degrees to radians
+    public static final double kPositionConversionFactor = 2 * Math.PI; // Rotations to radians
     public static final double kVelocityConversionFactor = 2 * Math.PI / 60; // RPM to radians/sec
 
     public static final double kMaxVelocity = 60; // Max velocity of intake in RPM

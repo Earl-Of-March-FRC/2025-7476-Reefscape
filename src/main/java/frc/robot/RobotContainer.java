@@ -80,6 +80,22 @@ public class RobotContainer {
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
 
+    driveSub.setDefaultCommand(
+        new DriveCmd(
+            driveSub,
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerYAxis),
+                OIConstants.kDriveDeadband),
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerXAxis),
+                OIConstants.kDriveDeadband),
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerRotAxis),
+                OIConstants.kDriveDeadband)));
+
     armSub.setDefaultCommand(
         new ArmSetVelocityPIDCmd(armSub, () -> MathUtil.applyDeadband(
             -operatorController.getRawAxis(
