@@ -132,6 +132,9 @@ public final class Constants {
     // Max velocity of arm in RPM
     public static final double kMaxVelocity = 60;
 
+    // Tolerance of arm position PID in degrees
+    public static final double kAngleTolerance = 15;
+
     // Angles need to be set in degrees
     public static final double kAngleStart = 0;
     public static final double kAngleFloor = 0;

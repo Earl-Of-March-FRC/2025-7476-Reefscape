@@ -4,13 +4,14 @@
 
 package frc.robot.commands.arm;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
 /**
  * This command uses closed-loop control to move the arm to the desired angle.
  */
-public class ArmSetPositionPIDCmd extends InstantCommand {
+public class ArmSetPositionPIDCmd extends Command {
 
   private ArmSubsystem armSub;
   private double referenceAngle;
@@ -35,5 +36,32 @@ public class ArmSetPositionPIDCmd extends InstantCommand {
   @Override
   public void initialize() {
     armSub.setReferencePosition(referenceAngle);
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+
+    // If the command has been interrupted before the arm has reached its setpoint,
+    // then set the current arm angle as the new reference angle using position PID
+    // If it has already reached the setpoint, it should continue holding its
+    // current position
+    if (Math.abs(
+        referenceAngle - armSub.getPosition() / ArmConstants.kAngleConversionFactor) > ArmConstants.kAngleTolerance) {
+
+      // Convert the current position to degrees
+      armSub.setReferencePosition(armSub.getPosition() / ArmConstants.kAngleConversionFactor);
+    }
+  }
+
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
   }
 }
