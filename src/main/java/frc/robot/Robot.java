@@ -39,6 +39,7 @@ public class Robot extends LoggedRobot {
     }
 
     Logger.start();
+
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.
@@ -72,7 +73,6 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     Logger.recordOutput("Gyro/Rotation", robotContainer.gyro.getRotation2d());
-
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

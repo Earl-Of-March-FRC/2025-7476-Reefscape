@@ -129,5 +129,4 @@ public final class Constants {
 
   // PDP CAN IDs
   public static final int kPDPCanId = 0;
-
 }
