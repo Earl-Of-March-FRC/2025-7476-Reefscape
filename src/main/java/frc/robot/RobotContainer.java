@@ -71,7 +71,7 @@ public class RobotContainer {
                                 gyro);
 
                 indexerSub = new IndexerSubsystem();
-                indexCommand = indexerSub.createIndexCommand(() -> 0, () -> 0, () -> 0);
+                indexCommand = indexerSub.createIndexCommand(() -> 0);
 
                 driveSub.setDefaultCommand(
                                 new DriveCmd(
