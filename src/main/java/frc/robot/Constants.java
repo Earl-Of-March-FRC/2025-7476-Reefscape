@@ -120,7 +120,7 @@ public final class Constants {
 
     /**
      * Multiplier at which decides whether + or - inputs move the algae towards the
-     * shooter.
+     * launcher.
      */
     public static final double kDirectionConstant = 1.0;
 

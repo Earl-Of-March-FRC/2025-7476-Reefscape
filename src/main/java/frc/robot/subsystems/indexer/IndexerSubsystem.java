@@ -24,18 +24,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.IndexerConstants;
-import edu.wpi.first.wpilibj.AnalogInput;
 
 public class IndexerSubsystem extends SubsystemBase {
   private final SparkMax indexerSpark;
   private final SparkClosedLoopController controller;
   private final RelativeEncoder encoder;
 
-  public final DigitalOutput intakeSensorTrigger;
-  public final DigitalOutput launcherSensorTrigger;
-  public final AnalogInput intakeSensor;
-  public final AnalogInput launcherSensor;
-  public double voltageScaleFactor = 1;
+  public final DigitalOutput intakeSensorTrigger, launcherSensorTrigger;
+  public final IndexerSensor intakeSensor, launcherSensor;
 
   private final SparkSim indexerSparkSim; // In case we ever need to simulate the motor
 
@@ -54,8 +50,11 @@ public class IndexerSubsystem extends SubsystemBase {
 
     intakeSensorTrigger = new DigitalOutput(IndexerConstants.kIntakeSensorTriggerPin);
     launcherSensorTrigger = new DigitalOutput(IndexerConstants.kLauncherSensorTriggerPin);
-    intakeSensor = new AnalogInput(IndexerConstants.kIntakeSensorChannel);
-    launcherSensor = new AnalogInput(IndexerConstants.kLauncherSensorChannel);
+
+    intakeSensor = new UltrasonicSensor(IndexerConstants.kIntakeSensorChannel,
+        () -> (5 / RobotController.getVoltage5V()) * 0.125);
+    launcherSensor = new UltrasonicSensor(IndexerConstants.kLauncherSensorChannel,
+        () -> (5 / RobotController.getVoltage5V()) * 0.125);
 
     turnOnIntakeSensor();
   }
@@ -64,7 +63,6 @@ public class IndexerSubsystem extends SubsystemBase {
   public void periodic() {
     Logger.recordOutput("Indexer/Intake", getIntakeSensor());
     Logger.recordOutput("Indexer/Launcher", getLauncherSensor());
-    voltageScaleFactor = 5 / RobotController.getVoltage5V();
   }
 
   @Override
@@ -137,10 +135,7 @@ public class IndexerSubsystem extends SubsystemBase {
    * @see #getLauncherSensor
    */
   public boolean getIntakeSensor() {
-    turnOnIntakeSensor();
-    double range = intakeSensor.getValue() * voltageScaleFactor * 0.125;
-    Logger.recordOutput("Indexer/IntakeRange", range);
-    return range < 32;
+    return intakeSensor.triggered();
   }
 
   /**
@@ -151,36 +146,41 @@ public class IndexerSubsystem extends SubsystemBase {
    * @see #getIntakeSensor
    */
   public boolean getLauncherSensor() {
-    // turnOnSensorTwo();
-    double range = launcherSensor.getValue() * voltageScaleFactor * 0.125;
-    Logger.recordOutput("Indexer/LauncherRange", range);
-    return range < 32;
+    return launcherSensor.triggered();
   }
 
   /**
    * Creates an indexing command. TBD
    * 
-   * @param intakeVelocity
-   * @param launcherVelocity
    * @param indexVelocity
+   * 
    * @return
    */
-  public Command createIndexCommand(DoubleSupplier indexVelocity) {
+  public Command indexToSubsystem(DoubleSupplier indexVelocity) {
     return Commands.runEnd(() -> {
+      if (Math.signum(indexVelocity.getAsDouble()) == Math.signum(IndexerConstants.kDirectionConstant)) {
+        // Move towards the launcher
+        if (getLauncherSensor()) {
+          setVelocity(0);
+          return;
+        }
+      } else {
+        // Move towards the intake
+        if (getIntakeSensor()) {
+          setVelocity(0);
+          return;
+        }
+      }
       setVelocity(indexVelocity.getAsDouble());
-
-      // if (getIntakeSensor()) { // Algae is between the intake and the indexer.
-      // Indexer should match intake's
-      // // velocity.
-      // setVelocity(intakeVelocity.getAsDouble());
-      // } else if (getLauncherSensor()) { // Algae is between indexer and launcher.
-      // Indexer should match launcher's
-      // // velocity
-      // setVelocity(launcherVelocity.getAsDouble());
-      // } else {
-      // setVelocity(indexVelocity.getAsDouble()); // Indexer will run on its own.
-      // }
     }, () -> setVelocity(0), this);
+  }
+
+  public Command followVelocity(DoubleSupplier velocity) {
+    return Commands.runEnd(() -> setVelocity(velocity.getAsDouble()), () -> setVelocity(0), this);
+  }
+
+  public Command manualSpeed(DoubleSupplier input) {
+    return Commands.run(() -> setSpeed(input.getAsDouble()), this);
   }
 
   public void turnOnIntakeSensor() {
