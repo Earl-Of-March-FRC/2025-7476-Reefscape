@@ -7,7 +7,6 @@ from python.network_tables import NetworkTable
 
 KNOWN_DIAMETER = 475.00  # Known diameter of algae ball (in mm)
 
-
 # Approximate algae color in HSV
 LOWER_BALL = np.array([80, 50, 60])  # Lower bound for algae ball color
 UPPER_BALL = np.array([100, 255, 255])  # Upper bound for algae ball color
@@ -23,7 +22,6 @@ CAM_MATRIX = np.array([[1413.70008, 0, 314.24724784],
                        [0, 0, 1]])
 
 STREAM_URL = "http://photonvision.local:1181/stream.mjpg"
-
 
 # Class for Object Detection
 class ObjectDetection:
@@ -56,10 +54,13 @@ class ObjectDetection:
         padding = 50
         padded_image = cv2.copyMakeBorder(image, padding, padding, padding, padding, cv2.BORDER_CONSTANT, value=(0, 0, 0))
 
-        # Convert the padded image to HSV
-        hsv = cv2.cvtColor(padded_image, cv2.COLOR_BGR2HSV)
+        # Apply denoising to reduce compression artifacts (MJPEG)
+        denoised_image = cv2.fastNlMeansDenoisingColored(padded_image, None, 10, 10, 7, 21)
 
-        # Apply Gaussian Blur to reduce noise
+        # Convert the denoised image to HSV
+        hsv = cv2.cvtColor(denoised_image, cv2.COLOR_BGR2HSV)
+
+        # Apply Gaussian Blur to reduce noise further
         blurred = cv2.GaussianBlur(hsv, (9, 9), 0)
 
         # Create a mask for the ball color
@@ -71,7 +72,7 @@ class ObjectDetection:
 
         # Use Canny edge detection to find edges
         edges = cv2.Canny(mask, 100, 300)
-        
+
         # Dilate the edges to connect broken parts, especially for obstructions
         dilated_edges = cv2.dilate(edges, None, iterations=3)
 
@@ -106,13 +107,12 @@ class ObjectDetection:
         if largest_ball:
             # Unpad the coordinates and draw the largest ball on the original image
             x, y, radius, _ = largest_ball
-            # Remove padding from coordinates (accounting for the added border)
+            # Remove padding from coorsdinates (accounting for the added border)
             unpadded_x = int(x) - padding
             unpadded_y = int(y) - padding
             cv2.circle(image, (unpadded_x, unpadded_y), int(radius), (255, 0, 255), 5)
 
         return image, mask, edges, filled_edges, largest_ball
-
 
 
 class Computation:
@@ -229,7 +229,7 @@ def main():
         cap = cv2.VideoCapture(STREAM_URL)
         if not cap.isOpened():
             logging.error("Error: Could not open video stream. Retrying...")
-            cv2.waitKey(1000)  # Wait 1 second before retrying
+            cv2.waitKey(100)  # Wait 1 second before retrying
 
 
     # Initialize ObjectDetection and Computation classes
@@ -263,7 +263,7 @@ def main():
 
         # Display the processed frame
         cv2.imshow("Ball Detection", processed_frame)
-        cv2.imshow("Contour", mask)
+        # cv2.imshow("Contour", mask)
         # cv2.imshow("Edges", edges)
         # cv2.imshow("Filled Edges", filled_edges)
 
