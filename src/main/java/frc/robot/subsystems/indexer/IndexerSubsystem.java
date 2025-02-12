@@ -150,11 +150,13 @@ public class IndexerSubsystem extends SubsystemBase {
   }
 
   /**
-   * Creates an indexing command. TBD
+   * Runs the indexer towards a subsystem.
    * 
-   * @param indexVelocity
+   * @param indexVelocity The velocity to run the indexer. Will determine the
+   *                      direction to run at, therefore which subsystem to run
+   *                      to.
    * 
-   * @return
+   * @return A command requiring the indexer.
    */
   public Command indexToSubsystem(DoubleSupplier indexVelocity) {
     return Commands.runEnd(() -> {
@@ -175,10 +177,22 @@ public class IndexerSubsystem extends SubsystemBase {
     }, () -> setVelocity(0), this);
   }
 
+  /**
+   * Runs the indexer at the same velocity as another subsystem.
+   * 
+   * @param velocity The velocity to run at
+   * @return A command requiring the indexer.
+   */
   public Command followVelocity(DoubleSupplier velocity) {
-    return Commands.runEnd(() -> setVelocity(velocity.getAsDouble()), () -> setVelocity(0), this);
+    return Commands.run(() -> setVelocity(velocity.getAsDouble()), this);
   }
 
+  /**
+   * Manually control the speed of the indexer
+   * 
+   * @param input A joystick input between -1.0 and +1.0
+   * @return A command requiring the indexer.
+   */
   public Command manualSpeed(DoubleSupplier input) {
     return Commands.run(() -> setSpeed(input.getAsDouble()), this);
   }
