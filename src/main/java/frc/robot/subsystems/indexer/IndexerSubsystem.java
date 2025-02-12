@@ -184,7 +184,7 @@ public class IndexerSubsystem extends SubsystemBase {
    * @return A command requiring the indexer.
    */
   public Command followVelocity(DoubleSupplier velocity) {
-    return Commands.run(() -> setVelocity(velocity.getAsDouble()), this);
+    return Commands.runEnd(() -> setVelocity(velocity.getAsDouble()), () -> setVelocity(0), this);
   }
 
   /**
