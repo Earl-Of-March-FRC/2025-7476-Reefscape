@@ -38,7 +38,13 @@ public class ArmSetVelocityManualCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    armSub.setVelocity(percent.getAsDouble());
+    double percentDouble = percent.getAsDouble();
+
+    // If joystick has not been moved, then don't do anything
+    // Prevents this from interrupting the arm from holding its position with PID
+    if (percentDouble != 0) {
+      armSub.setVelocity(percentDouble);
+    }
   }
 
   // Called once the command ends or is interrupted.
