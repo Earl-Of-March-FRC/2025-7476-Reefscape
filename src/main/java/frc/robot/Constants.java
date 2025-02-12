@@ -113,7 +113,7 @@ public final class Constants {
   }
 
   public static final class ArmConstants {
-    public static final int kArmMotorCanId = 2;
+    public static final int kArmMotorCanId = 12;
 
     public static final double kPPositionController = 0.1;
     public static final double kIPositionController = 0;
@@ -125,9 +125,11 @@ public final class Constants {
     public static final double kDVelocityController = 0.0008;
     public static final double kVelocityFF = 0.001;
 
+    public static final double kGearReduction = 1 / 50; // Gear ratio
+
     public static final double kAngleConversionFactor = 2 * Math.PI / 360; // Degrees to radians
-    public static final double kPositionConversionFactor = 2 * Math.PI; // Rotations to radians
-    public static final double kVelocityConversionFactor = 2 * Math.PI / 60; // RPM to radians/sec
+    public static final double kPositionConversionFactor = 2 * Math.PI * kGearReduction; // Rotations to radians
+    public static final double kVelocityConversionFactor = 2 * Math.PI / 60 * kGearReduction; // RPM to radians/sec
 
     // Max velocity of arm in RPM
     public static final double kMaxVelocity = 60;
