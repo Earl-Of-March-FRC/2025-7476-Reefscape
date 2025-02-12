@@ -1,5 +1,6 @@
 import cv2 as cv
 import time
+import math
 
 """
 USER INPUT:
@@ -15,6 +16,13 @@ mouseX = 0
 mouseY = 0
 mousePressed = False
 
+# Cal
+originX = 0
+originY = 0
+
+outerX = 0
+outerY = 0
+
 def mouse_callback(event, x, y, flags, param):
     global mouseX
     global mouseY
@@ -26,25 +34,46 @@ def mouse_callback(event, x, y, flags, param):
         mouseX = x
         mouseY = y
 
+def lookForPoint():
+    return [0, 0]
+
 cv.namedWindow("snapshot")
 cv.setMouseCallback("snapshot", mouse_callback)
 
 capture = cv.VideoCapture(0) 
 isTrue, frame = capture.read()
-#cv.imshow('snapshot', frame)
+
 while True:
     if cv.waitKey(1) & 0xFF == ord('a'):
         isTrue, frame = capture.read()
         cv.imshow('snapshot', frame)
-        print("I've (allegedly) updated the frame!")
+        cv.waitKey(1)
+
         while True:
-            print("hi")
+            
+            cv.imshow('snapshot', frame)
+            cv.waitKey(1)
+
             if mousePressed == True:
+                
                 print(str(mouseX) + ", " + str(mouseY))
-print("broken out?")
-#while True:
- #   if mousePressed == True:
-  #      print(str(mouseX) + ", " + str(mouseY))
+                originX = mouseX
+                originY = mouseY
+
+                mousePressed = False
+                while True:
+                    cv.imshow('snapshot', frame)
+                    cv.waitKey(1)
+                    if mousePressed == True:
+                        print(str(mouseX) + ", " + str(mouseY))
+                        outerX = mouseX
+                        outerY = mouseY 
+                        mousePressed = False    
+                        radius = math.sqrt(math.pow(abs(originX-outerX ), 2)+math.pow(abs(originY-outerY ), 2))
+                        cv.circle(frame, (originX, originY), int(radius), (0, 0, 255), thickness= 3)
+                        cv.imshow("snapshot", frame)
+                        cv.waitKey(0)
+              
 
 
 
