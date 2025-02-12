@@ -65,10 +65,10 @@ public final class Configs {
                         indexerConfig.smartCurrentLimit(40);
                         indexerConfig.closedLoop
                                         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                                        // Velocity is stored in slot 1 to match
-                                        // the other subsystems.
-                                        .pid(1, 0, 0, ClosedLoopSlot.kSlot1)
-                                        .velocityFF(IndexerConstants.kVelocityFF)
+                                        // // Velocity is stored in slot 1 to match
+                                        // // the other subsystems.
+                                        // .pid(1, 0, 0, ClosedLoopSlot.kSlot1)
+                                        // .velocityFF(IndexerConstants.kVelocityFF)
                                         .outputRange(-1, 1);
                         indexerConfig.encoder
                                         .velocityConversionFactor(IndexerConstants.kWheelDiameterMeters * Math.PI
