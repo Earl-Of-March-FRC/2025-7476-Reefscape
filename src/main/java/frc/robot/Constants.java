@@ -113,7 +113,7 @@ public final class Constants {
   }
 
   public static final class ArmConstants {
-    public static final int kArmMotorCanId = 12;
+    public static final int kArmMotorCanId = 10;
 
     public static final double kPPositionController = 0.1;
     public static final double kIPositionController = 0;
