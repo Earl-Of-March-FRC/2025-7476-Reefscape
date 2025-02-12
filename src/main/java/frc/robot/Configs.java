@@ -79,9 +79,7 @@ public final class Configs {
           .pidf(ArmConstants.kPVelocityController, ArmConstants.kIVelocityController,
               ArmConstants.kDVelocityController,
               ArmConstants.kVelocityFF, ClosedLoopSlot.kSlot1)
-          .outputRange(-1, 1)
-          .positionWrappingEnabled(true)
-          .positionWrappingInputRange(0, ArmConstants.kPositionConversionFactor); // 0 to 2 pi radians
+          .outputRange(-1, 1);
     }
   }
 
