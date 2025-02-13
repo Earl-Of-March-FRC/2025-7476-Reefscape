@@ -92,8 +92,8 @@ public final class Configs {
           .smartCurrentLimit(30); // Adjust current limit as needed
 
       intakeConfig.encoder
-          .positionConversionFactor(IntakeConstants.kPositionConversionFactor)
-          .velocityConversionFactor(IntakeConstants.kVelocityConversionFactor);
+          .positionConversionFactor(IntakeConstants.kPositionConversionFactor * IntakeConstants.kMotorReduction)
+          .velocityConversionFactor(IntakeConstants.kVelocityConversionFactor * IntakeConstants.kMotorReduction);
 
       // Configure closed-loop control
       intakeConfig.closedLoop

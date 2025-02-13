@@ -4,6 +4,9 @@
 
 package frc.robot.commands.intake;
 
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
@@ -11,7 +14,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
  * This command uses closed-loop control to set the intake rollers to the
  * desired velocity.
  */
-public class IntakeSetVelocityPIDCmd extends InstantCommand {
+public class IntakeSetVelocityPIDCmd extends Command {
 
   private IntakeSubsystem intakeSub;
   private double referenceVelocity;
@@ -36,6 +39,10 @@ public class IntakeSetVelocityPIDCmd extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+  }
+
+  @Override
+  public void execute() {
     intakeSub.setReferenceVelocity(referenceVelocity);
   }
 }

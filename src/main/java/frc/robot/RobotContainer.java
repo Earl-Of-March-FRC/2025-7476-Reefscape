@@ -30,6 +30,7 @@ import frc.robot.commands.intake.IntakeSetVelocityPIDCmd;
 import frc.robot.commands.intake.IntakeStopCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -101,6 +102,11 @@ public class RobotContainer {
             -operatorController.getRawAxis(
                 OIConstants.kOperatorControllerYAxis),
             OIConstants.kArmDeadband)));
+
+    intakeSub.setDefaultCommand(
+        Commands.run(() -> intakeSub.setVelocity(MathUtil.applyDeadband(operatorController.getLeftY(),
+            0.08) * 0.05),
+            intakeSub));
 
     configureAutos();
     configureBindings();

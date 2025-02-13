@@ -37,8 +37,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Convert radians per second to RPM
-    Logger.recordOutput("Intake/Rollers/Measured/Velocity", getVelocity() / IntakeConstants.kVelocityConversionFactor);
+    // Convert radians per second to Rot per Minute
+    Logger.recordOutput("Intake/Rollers/Measured/Velocity",
+        getVelocity() / IntakeConstants.kVelocityConversionFactor);
+    // Logger.recordOutput("Intake/Rollers/Measured/VelocityRad",
+    // getVelocity());
   }
 
   /**

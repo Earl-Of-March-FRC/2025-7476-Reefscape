@@ -146,17 +146,19 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final int kIntakeMotorCanId = 80;
+    public static final int kIntakeMotorCanId = 9;
 
-    public static final double kPVelocityController = 0.000002;
-    public static final double kIVelocityController = 0;
-    public static final double kDVelocityController = 0.0008;
+    public static final double kMotorReduction = 1 / 10.0;
+
+    public static final double kPVelocityController = 0.03;// 0.000002;
+    public static final double kIVelocityController = 0; // 0.0;
+    public static final double kDVelocityController = 0.03;// 0.0008;
     public static final double kVelocityFF = 0.0001695;
 
-    public static final double kPositionConversionFactor = 2 * Math.PI; // Rotations to radians
-    public static final double kVelocityConversionFactor = 2 * Math.PI / 60; // RPM to radians/sec
+    public static final double kPositionConversionFactor = (2 * Math.PI); // Rotations to radians
+    public static final double kVelocityConversionFactor = (2 * Math.PI / 60); // RPM to radians/sec
 
-    public static final double kMaxVelocity = 60; // Max velocity of intake in RPM
+    public static final double kMaxVelocity = 180; // 60; // Max velocity of intake in RPM
   }
 
   // PDP CAN IDs
