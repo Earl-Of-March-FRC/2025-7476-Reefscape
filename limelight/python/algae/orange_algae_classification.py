@@ -8,10 +8,13 @@ from python.network_tables import NetworkTable
 KNOWN_DIAMETER = 475.00  # Known diameter of algae ball (in mm)
 
 
+# # Approximate algae color in HSV
+# LOWER_BALL = np.array([80, 50, 60])  # Lower bound for algae ball color
+# UPPER_BALL = np.array([100, 255, 255])  # Upper bound for algae ball color
+
 # Approximate algae color in HSV
 LOWER_BALL = np.array([80, 50, 60])  # Lower bound for algae ball color
-UPPER_BALL = np.array([100, 255, 255])  # Upper bound for algae ball color
-
+UPPER_BALL = np.array([100, 255, 255])
 
 # Define minimum area and circularity for the contour filtering
 MIN_AREA = 3000  # Minimum area of the contour to be considered
@@ -22,8 +25,9 @@ CAM_MATRIX = np.array([[1413.70008, 0, 314.24724784],
                        [0, 1437.31, 240.10474105], 
                        [0, 0, 1]])
 
-STREAM_URL = "http://photonvision.local:1181/stream.mjpg"
+# STREAM_URL = "http://photonvision.local:1181/stream.mjpg"
 
+STREAM_URL = 0
 
 # Class for Object Detection
 class ObjectDetection:
@@ -33,23 +37,6 @@ class ObjectDetection:
         self._upper_bound = upper_bound
         self._min_area = min_area
         self._min_circularity = min_circularity
-
-    # Getter methods
-    @property
-    def get_lower_bound(self):
-        return self._lower_bound
-
-    @property
-    def get_upper_bound(self):
-        return self._upper_bound
-
-    @property
-    def get_min_area(self):
-        return self._min_area
-
-    @property
-    def get_min_circularity(self):
-        return self._min_circularity
 
     def find_largest_algae(self, image):
         # Create a padded version of the image to handle partial objects near the borders
@@ -122,41 +109,6 @@ class Computation:
         self._object_real_width = object_real_width
         self._focal_length_y = focal_length_y if focal_length_y else focal_length_x  # Assume same for y if not provided
 
-    # Getter and setter for focal_length_x
-    @property
-    def focal_length_x(self):
-        return self._focal_length_x
-
-    @focal_length_x.setter
-    def focal_length_x(self, value):
-        if value > 0:  # Add validation if needed
-            self._focal_length_x = value
-        else:
-            raise ValueError("Focal length must be positive")
-
-    # Getter and setter for object_real_width
-    @property
-    def object_real_width(self):
-        return self._object_real_width
-
-    @object_real_width.setter
-    def object_real_width(self, value):
-        if value > 0:  # Add validation if needed
-            self._object_real_width = value
-        else:
-            raise ValueError("Object real width must be positive")
-
-    # Getter and setter for focal_length_y
-    @property
-    def focal_length_y(self):
-        return self._focal_length_y
-
-    @focal_length_y.setter
-    def focal_length_y(self, value):
-        if value > 0:  # Add validation if needed
-            self._focal_length_y = value
-        else:
-            raise ValueError("Focal length must be positive")
 
     def calculate_distance_with_offset(self, detection_width):
         return ((self._object_real_width * self._focal_length_x) / detection_width) - 20  # returns in mm

@@ -1,62 +1,65 @@
-import glob
-import cv2 as cv
+import cv2
 import numpy as np
-from numpy.typing import NDArray
 
-MatLike = NDArray[np.uint8]
-
-# Checkerboard dimensions: 9x6 (9 columns, 6 rows)
-board_width = 9
-board_height = 6
-square_size = 25  # You can adjust this to the real square size (in mm or cm)
-
-# Termination criteria for corner refinement
-criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-
-# Prepare object points (3D points in real-world space)
-objp = np.zeros((board_width * board_height, 3), np.float32)
-objp[:, :2] = np.mgrid[0:board_width, 0:board_height].T.reshape(-1, 2)
-
-# Arrays to store object points and image points from all images
-objpoints = []  # 3D points in real-world space
-imgpoints = []  # 2D points in image plane
-
-# Load all the images containing the checkerboard pattern
-images = glob.glob(r"C:\Users\fence\Desktop\FRC\2025-7476-Reefscape\limelight\python\camera-calibration\images\*.png")  # Adjust the path
-
-for fname in images:
-    img = cv.imread(fname)
-    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+# Function to detect the algae game object in an image
+def detect_algae(image):
+    # Convert the image to HSV color space
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
-    # Find the chessboard corners
-    success, corners = cv.findChessboardCorners(gray, (board_width, board_height), None)
+    # Approximate algae color in HSV -- might need some playing around with in person 
+    lower_ball = np.array([80, 50, 60])     # Lower bound for algae ball color
+    upper_ball = np.array([100, 255, 255])
+ # Upper bound for algae ball color
 
-    if not success:
-        print(f"Could not find corners in {fname}")
-        continue
+    # Apply Gaussian Blur to reduce noise
+    blurred = cv2.GaussianBlur(hsv, (9, 9), 0)
 
-    # Refine the corner positions
-    corners2 = cv.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
-    
-    # Append object points and image points
-    objpoints.append(objp)
-    imgpoints.append(corners2)
+    # Create a mask for the ball color
+    mask = cv2.inRange(blurred, lower_ball, upper_ball)
 
-    # Draw and display the corners
-    cv.drawChessboardCorners(img, (board_width, board_height), corners2, success)
-    cv.imshow('Chessboard', img)
-    # cv.waitKey(500)
+    # Apply morphological operations to reduce noise
+    mask = cv2.erode(mask, None, iterations=2)
+    mask = cv2.dilate(mask, None, iterations=2)
 
-cv.destroyAllWindows()
+    # Find contours in the mask
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-# Camera calibration to get the camera matrix and distortion coefficients
-ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+    algae_count = 1  # Initialize the algae count
+    for contour in contours:
 
-if ret:
-    print("Camera calibration successful!")
-    print("Camera Matrix (Intrinsic parameters):")
-    print(mtx)
-    print("Distortion Coefficients:")
-    print(dist)
+        # Calculate the area and circularity of the largest contour
+        area = cv2.contourArea(contour)
+        perimeter = cv2.arcLength(contour, True)
+        circularity = 4 * np.pi * (area / (perimeter * perimeter)) if perimeter > 0 else 0
+        print(f"Circularity: {circularity}\nArea: {area}\nAlgae: {algae_count}\n")
+        # Ignore small contours or those that are not circular
+        if area > 500 and circularity > 0.3:
+            # Approximate the contour to a circle
+            ((x, y), radius) = cv2.minEnclosingCircle(contour)
+
+            if radius > 10:
+                # Draw the circle on the original image
+                cv2.circle(image, (int(x), int(y)), int(radius), (255, 0, 255), 2)
+                cv2.putText(image, f"{algae_count}", (int(x) - 20, int(y) - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+                algae_count += 1
+
+    return image, mask
+
+# Load the image
+image_path = r"C:\Users\fence\Desktop\FRC\2025-7476-Reefscape\limelight\python\ball-imgs\images (4).jpg" # change img (#) to test different images
+image = cv2.imread(image_path)
+
+# Check if image was successfully loaded
+if image is None:
+    print("Error: Could not load image.")
 else:
-    print("Camera calibration failed.")
+    # Detect the ball in the image
+    processed_image, mask = detect_algae(image)
+
+    # Display the processed image
+    cv2.imshow("Ball Detection", processed_image)
+    cv2.imshow("Mask", mask)
+
+    # Wait until a key is pressed, then close the windows
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
