@@ -111,8 +111,8 @@ public final class Constants {
   }
 
   public static final class LauncherConstants {
-    public static final int kFrontLauncherCanId = 2;
-    public static final int kBackLauncherCanId = 1;
+    public static final int kFrontLauncherCanId = 13;
+    public static final int kBackLauncherCanId = 12;
 
     public static final double kPVelocityController = 0.000002;
     public static final double kIVelocityController = 0.0;
