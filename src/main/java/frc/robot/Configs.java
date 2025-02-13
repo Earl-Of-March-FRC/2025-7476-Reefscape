@@ -63,6 +63,7 @@ public final class Configs {
           .idleMode(IdleMode.kCoast)
           .smartCurrentLimit(50);
       launcherConfig.encoder
+          .positionConversionFactor(1)
           .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
       launcherConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)

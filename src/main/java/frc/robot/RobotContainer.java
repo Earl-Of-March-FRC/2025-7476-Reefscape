@@ -115,9 +115,12 @@ public class RobotContainer {
   private void configureBindings() {
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
-    operatorController.rightTrigger().onTrue(new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocity1));
-    operatorController.rightBumper().onTrue(new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocity2));
-    operatorController.leftTrigger().onTrue(new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocity3));
+    operatorController.rightBumper().onTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
+    // operatorController.rightBumper().onTrue(new
+    // LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocity2));
+    // operatorController.leftTrigger().onTrue(new
+    // LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocity3));
     operatorController.leftBumper().onTrue(new LauncherStopCmd(launcherSub));
   }
 

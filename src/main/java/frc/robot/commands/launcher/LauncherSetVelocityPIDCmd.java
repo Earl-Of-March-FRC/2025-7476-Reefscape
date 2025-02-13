@@ -16,19 +16,23 @@ import frc.robot.subsystems.launcher.LauncherSubsystem;
 public class LauncherSetVelocityPIDCmd extends Command {
 
   private final LauncherSubsystem launcherSub;
-  private final double referenceVelocity;
+  private final double frontReferenceVelocity;
+  private final double backReferenceVelocity;
 
   /**
    * Constructs a new LauncherSetVelocityPID.
    * 
-   * @param launcherSub       The launcher subsystem that this command will
-   *                          control.
-   * @param referenceVelocity A supplier that provides the target speed for the
-   *                          launcher, in RPM.
+   * @param launcherSub            The launcher subsystem that this command will
+   *                               control.
+   * @param frontReferenceVelocity The target speed for the front launcher, in
+   *                               RPM.
+   * @param backReferenceVelocity  The target speed for the back launcher, in RPM.
    */
-  public LauncherSetVelocityPIDCmd(LauncherSubsystem launcherSub, double referenceVelocity) {
+  public LauncherSetVelocityPIDCmd(LauncherSubsystem launcherSub, double frontReferenceVelocity,
+      double backReferenceVelocity) {
     this.launcherSub = launcherSub;
-    this.referenceVelocity = referenceVelocity;
+    this.frontReferenceVelocity = frontReferenceVelocity;
+    this.backReferenceVelocity = backReferenceVelocity;
 
     addRequirements(launcherSub);
   }
@@ -41,7 +45,8 @@ public class LauncherSetVelocityPIDCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    launcherSub.setReferenceVelocity(referenceVelocity);
+    launcherSub.setFrontReferenceVelocity(frontReferenceVelocity);
+    launcherSub.setBackReferenceVelocity(backReferenceVelocity);
   }
 
   // Called once the command ends or is interrupted.

@@ -88,17 +88,37 @@ public class LauncherSubsystem extends SubsystemBase {
   }
 
   /**
-   * Sets the reference velocity for the launcher closed loop controller.
-   *
+   * Sets the reference velocity for both launcher closed loop controllers.
+   * 
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setReferenceVelocity(double referenceVelocity) {
+    setFrontReferenceVelocity(referenceVelocity);
+    setBackReferenceVelocity(referenceVelocity);
+  }
+
+  /**
+   * Sets the reference velocity for the front launcher closed loop controller.
+   *
+   * @param referenceVelocity The reference velocity, in RPM.
+   */
+  public void setFrontReferenceVelocity(double referenceVelocity) {
     Logger.recordOutput("Launcher/Front/Setpoint/Velocity", referenceVelocity);
-    Logger.recordOutput("Launcher/Back/Setpoint/Velocity", referenceVelocity);
 
     // Converts RPM to radians per second
     frontLauncherClosedLoopController.setReference(referenceVelocity * LauncherConstants.kVelocityConversionFactor,
         ControlType.kVelocity);
+  }
+
+  /**
+   * Sets the reference velocity for the back launcher closed loop controller.
+   *
+   * @param referenceVelocity The reference velocity, in RPM.
+   */
+  public void setBackReferenceVelocity(double referenceVelocity) {
+    Logger.recordOutput("Launcher/Back/Setpoint/Velocity", referenceVelocity);
+
+    // Converts RPM to radians per second
     backLauncherClosedLoopController.setReference(referenceVelocity * LauncherConstants.kVelocityConversionFactor,
         ControlType.kVelocity);
   }
