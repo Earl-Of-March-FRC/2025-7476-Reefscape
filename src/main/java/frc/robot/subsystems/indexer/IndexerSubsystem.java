@@ -19,8 +19,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.IndexerConstants;
@@ -114,7 +112,7 @@ public class IndexerSubsystem extends SubsystemBase {
    * 
    * @param velocity RPM in meters
    */
-  public void setVelocity(double velocity) {
+  public void setReferenceVelocity(double velocity) {
     controller.setReference(velocity, ControlType.kVelocity);
   }
 
@@ -147,54 +145,6 @@ public class IndexerSubsystem extends SubsystemBase {
    */
   public boolean getLauncherSensor() {
     return launcherSensor.triggered();
-  }
-
-  /**
-   * Runs the indexer towards a subsystem.
-   * 
-   * @param indexVelocity The velocity to run the indexer. Will determine the
-   *                      direction to run at, therefore which subsystem to run
-   *                      to.
-   * 
-   * @return A command requiring the indexer.
-   */
-  public Command indexToSubsystem(DoubleSupplier indexVelocity) {
-    return Commands.runEnd(() -> {
-      if (Math.signum(indexVelocity.getAsDouble()) == Math.signum(IndexerConstants.kDirectionConstant)) {
-        // Move towards the launcher
-        if (getLauncherSensor()) {
-          setVelocity(0);
-          return;
-        }
-      } else {
-        // Move towards the intake
-        if (getIntakeSensor()) {
-          setVelocity(0);
-          return;
-        }
-      }
-      setVelocity(indexVelocity.getAsDouble());
-    }, () -> setVelocity(0), this);
-  }
-
-  /**
-   * Runs the indexer at the same velocity as another subsystem.
-   * 
-   * @param velocity The velocity to run at
-   * @return A command requiring the indexer.
-   */
-  public Command followVelocity(DoubleSupplier velocity) {
-    return Commands.runEnd(() -> setVelocity(velocity.getAsDouble()), () -> setVelocity(0), this);
-  }
-
-  /**
-   * Manually control the speed of the indexer
-   * 
-   * @param input A joystick input between -1.0 and +1.0
-   * @return A command requiring the indexer.
-   */
-  public Command manualSpeed(DoubleSupplier input) {
-    return Commands.run(() -> setSpeed(input.getAsDouble()), this);
   }
 
   public void turnOnIntakeSensor() {

@@ -127,7 +127,10 @@ public final class Constants {
     public static final double kMotorReduction = 1.0;
     public static final double kWheelDiameterMeters = 0.17;
 
-    public static final double kVelocityFF = 12.0 / 1000; // Max voltage / Max velocity
+    public static final double kVelocityP = 0;
+    public static final double kVelocityI = 0;
+    public static final double kVelocityD = 0;
+    public static final double kVelocityFF = 12.0 / 1000.0;
 
     // Analogue Ports for sensors. TBD
     public static final int kIntakeSensorTriggerPin = 0;
