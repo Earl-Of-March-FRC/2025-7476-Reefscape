@@ -72,13 +72,16 @@ public final class Configs {
 
       armConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          // Position PID controller is slot 0
-          .pidf(ArmConstants.kPPositionController, ArmConstants.kIPositionController,
-              ArmConstants.kDPositionController, ArmConstants.kPositionFF, ClosedLoopSlot.kSlot0)
-          // Velocity PID controller is slot 1
+          // Upward position PID controller is slot 0
+          .pidf(ArmConstants.kPUpPositionController, ArmConstants.kIUpPositionController,
+              ArmConstants.kDUpPositionController, ArmConstants.kUpPositionFF, ClosedLoopSlot.kSlot0)
+          // Downward position PID controller is slot 1
+          .pidf(ArmConstants.kPDownPositionController, ArmConstants.kIDownPositionController,
+              ArmConstants.kDDownPositionController, ArmConstants.kDownPositionFF, ClosedLoopSlot.kSlot1)
+          // Velocity PID controller is slot 2
           .pidf(ArmConstants.kPVelocityController, ArmConstants.kIVelocityController,
               ArmConstants.kDVelocityController,
-              ArmConstants.kVelocityFF, ClosedLoopSlot.kSlot1)
+              ArmConstants.kVelocityFF, ClosedLoopSlot.kSlot2)
           .outputRange(-1, 1);
     }
   }

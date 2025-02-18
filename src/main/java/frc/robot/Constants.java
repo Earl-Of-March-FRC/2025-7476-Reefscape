@@ -115,10 +115,15 @@ public final class Constants {
   public static final class ArmConstants {
     public static final int kArmMotorCanId = 10;
 
-    public static final double kPPositionController = 0.1;
-    public static final double kIPositionController = 0;
-    public static final double kDPositionController = 0;
-    public static final double kPositionFF = 0;
+    public static final double kPUpPositionController = 0.1;
+    public static final double kIUpPositionController = 0;
+    public static final double kDUpPositionController = 0;
+    public static final double kUpPositionFF = 0;
+
+    public static final double kPDownPositionController = 0.05;
+    public static final double kIDownPositionController = 0;
+    public static final double kDDownPositionController = 0;
+    public static final double kDownPositionFF = 0;
 
     public static final double kPVelocityController = 0.0002;
     public static final double kIVelocityController = 0;

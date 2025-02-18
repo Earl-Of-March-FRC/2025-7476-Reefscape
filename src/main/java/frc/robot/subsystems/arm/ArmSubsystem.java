@@ -90,9 +90,20 @@ public class ArmSubsystem extends SubsystemBase {
     // Convert to radians, then subtract angular offset
     double refAngleWithOffset = referenceAngle * ArmConstants.kAngleConversionFactor - m_armAngularOffset;
 
+    // Determine whether arm needs to move up or down
+    ClosedLoopSlot closedLoopSlot;
+
+    // If arm needs to move up to reach reference position, use the upward
+    // closed-loop controller
+    if (getPosition() <= refAngleWithOffset) {
+      closedLoopSlot = ClosedLoopSlot.kSlot0;
+    } else {
+      closedLoopSlot = ClosedLoopSlot.kSlot1;
+    }
+
     Logger.recordOutput("Intake/Arm/Setpoint/Position",
         new Rotation2d(referenceAngle * ArmConstants.kAngleConversionFactor));
-    armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition, closedLoopSlot);
   }
 
   /**
@@ -106,7 +117,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     Logger.recordOutput("Intake/Arm/Setpoint/Velocity", referenceVelocity);
     armClosedLoopController.setReference(refVelocityConverted,
-        ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+        ControlType.kVelocity, ClosedLoopSlot.kSlot2);
   }
 
   /**
