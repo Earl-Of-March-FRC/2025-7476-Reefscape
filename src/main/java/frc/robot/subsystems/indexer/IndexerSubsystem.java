@@ -49,10 +49,8 @@ public class IndexerSubsystem extends SubsystemBase {
     intakeSensorTrigger = new DigitalOutput(IndexerConstants.kIntakeSensorTriggerPin);
     launcherSensorTrigger = new DigitalOutput(IndexerConstants.kLauncherSensorTriggerPin);
 
-    intakeSensor = new UltrasonicSensor(IndexerConstants.kIntakeSensorChannel,
-        () -> (5 / RobotController.getVoltage5V()) * 0.125);
-    launcherSensor = new UltrasonicSensor(IndexerConstants.kLauncherSensorChannel,
-        () -> (5 / RobotController.getVoltage5V()) * 0.125);
+    intakeSensor = new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel);
+    launcherSensor = new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel);
 
     turnOnIntakeSensor();
   }
