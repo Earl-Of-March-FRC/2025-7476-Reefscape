@@ -238,7 +238,7 @@ public class AlgaeDetection {
                 logger.severe("Failed to open stream. Retrying...");
             }
 
-            // Optional: Sleep for a short time before retrying, to avoid a busy loop
+            // Sleep for a short time before retrying, to avoid a busy loop
             try {
                 Thread.sleep(1000); // 1 second wait
             } catch (InterruptedException e) {
