@@ -1,7 +1,5 @@
 package frc.robot.subsystems.indexer.sensors;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class BeamBreakSensor implements IndexerSensor {
