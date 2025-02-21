@@ -49,16 +49,16 @@ public class IndexerSubsystem extends SubsystemBase {
     intakeSensorTrigger = new DigitalOutput(IndexerConstants.kIntakeSensorTriggerPin);
     launcherSensorTrigger = new DigitalOutput(IndexerConstants.kLauncherSensorTriggerPin);
 
-    intakeSensor = new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel);
-    launcherSensor = new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel);
+    intakeSensor = new BeamBreakSensor("Intake", IndexerConstants.kIntakeSensorChannel);
+    launcherSensor = new BeamBreakSensor("Launcher", IndexerConstants.kLauncherSensorChannel);
 
     turnOnIntakeSensor();
   }
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Indexer/Intake", getIntakeSensor());
-    Logger.recordOutput("Indexer/Launcher", getLauncherSensor());
+    intakeSensor.periodic();
+    launcherSensor.periodic();
   }
 
   @Override
