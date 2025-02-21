@@ -1,4 +1,4 @@
-package frc.robot.subsystems.indexer;
+package frc.robot.subsystems.indexer.sensors;
 
 import java.util.function.DoubleSupplier;
 

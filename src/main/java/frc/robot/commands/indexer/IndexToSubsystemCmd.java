@@ -8,8 +8,8 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.IndexerConstants;
-import frc.robot.subsystems.indexer.IndexerSensor;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
+import frc.robot.subsystems.indexer.sensors.IndexerSensor;
 
 /**
  * Command that runs the indexer in a certain direction using closed-loop

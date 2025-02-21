@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.IndexerConstants;
+import frc.robot.subsystems.indexer.sensors.BeamBreakSensor;
+import frc.robot.subsystems.indexer.sensors.IndexerSensor;
 
 public class IndexerSubsystem extends SubsystemBase {
   private final SparkMax indexerSpark;
@@ -31,15 +33,11 @@ public class IndexerSubsystem extends SubsystemBase {
   public final DigitalOutput intakeSensorTrigger, launcherSensorTrigger;
   public final IndexerSensor intakeSensor, launcherSensor;
 
-  private final SparkSim indexerSparkSim; // In case we ever need to simulate the motor
-
   /**
    * Creates a new IndexerSubsystem
    */
   public IndexerSubsystem() {
     indexerSpark = new SparkMax(IndexerConstants.kMotorPort, IndexerConstants.kMotorType);
-
-    indexerSparkSim = new SparkSim(indexerSpark, DCMotor.getNeo550(1));
 
     indexerSpark.configure(Configs.IndexerSubsystem.indexerConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);

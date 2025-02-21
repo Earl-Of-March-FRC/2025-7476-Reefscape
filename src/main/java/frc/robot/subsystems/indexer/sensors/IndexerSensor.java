@@ -1,4 +1,4 @@
-package frc.robot.subsystems.indexer;
+package frc.robot.subsystems.indexer.sensors;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -7,6 +7,12 @@ import org.littletonrobotics.junction.Logger;
  * team's confusing switches between a Beam Break and an ultrasonic sensor.
  */
 public interface IndexerSensor {
+  /**
+   * Get the given name of the sensor object. Used to specify which sensor is
+   * being logged to AdvantageKit
+   * 
+   * @return The given name of the sensor object.
+   */
   default String getName() {
     return "Sensor";
   }
