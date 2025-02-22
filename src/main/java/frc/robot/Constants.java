@@ -120,34 +120,34 @@ public final class Constants {
     public static final double kDUpPositionController = 0;
     public static final double kUpPositionFF = 0;
 
-    public static final double kPDownPositionController = 0.05;
+    public static final double kPDownPositionController = 1.5;
     public static final double kIDownPositionController = 0;
     public static final double kDDownPositionController = 0;
     public static final double kDownPositionFF = 0;
 
-    public static final double kPVelocityController = 0.0002;
+    public static final double kPVelocityController = 1.5;
     public static final double kIVelocityController = 0;
-    public static final double kDVelocityController = 0.0008;
-    public static final double kVelocityFF = 0.001;
+    public static final double kDVelocityController = 0;
+    public static final double kVelocityFF = 0;
 
-    public static final double kGearReduction = 1 / 50; // Gear ratio
+    public static final double kGearReduction = 1.0 / 50; // Gear ratio
 
     public static final double kAngleConversionFactor = 2 * Math.PI / 360; // Degrees to radians
     public static final double kPositionConversionFactor = 2 * Math.PI * kGearReduction; // Rotations to radians
     public static final double kVelocityConversionFactor = 2 * Math.PI / 60 * kGearReduction; // RPM to radians/sec
 
-    // Max velocity of arm in RPM
+    // Max velocity of arm in RPM for manual joystick control
     public static final double kMaxVelocity = 60;
 
     // Tolerance of arm position PID in degrees
     public static final double kAngleTolerance = 15;
 
     // Angles need to be set in degrees
-    public static final double kAngleStart = 0;
-    public static final double kAngleFloor = 0;
+    public static final double kAngleStowedLow = 0;
+    public static final double kAngleIntake = 0;
     public static final double kAngleL2 = 0;
     public static final double kAngleL3 = 0;
-    public static final double kAngleProcessor = 0;
+    public static final double kAngleStowedHigh = -186;
   }
 
   public static final class IntakeConstants {
