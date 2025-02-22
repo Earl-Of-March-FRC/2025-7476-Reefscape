@@ -4,9 +4,15 @@
 
 package frc.robot.subsystems.vision;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -90,4 +96,51 @@ public class AlgaeSubsystem extends SubsystemBase {
   public Pose2d getRelativeToField() {
     return relativeToField;
   }
+
+  /**
+   * Calling this function will call pathplanner to drive to the algae AND intake!
+   * TODO move constants to constant file
+   * TODO consider not using local variable "relativeToField"
+   * TODO call commands to intake
+   * 
+   * @experimental
+   */
+  public void intakeAlgae() {
+    Pose2d overshoot = new Pose2d(1.0, 1.0, relativeToField.getRotation());
+    /*
+     * Use TWO waypoints:
+     * * Algae Position
+     * * Algae Position + Overshoot
+     */
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+        // WARNING I suspect that this should be getRelativeToRobot() to get an
+        // overshoot, get the difference vector, extend its magnitude by TODO ???
+        relativeToField,
+        // check for negativity??
+        // TODO avoid magnitudes, do vector math more directly
+        new Pose2d(relativeToField.getMeasureX().magnitude() + overshoot.getMeasureX().magnitude(),
+            relativeToField.getMeasureY().magnitude() + overshoot.getMeasureY().magnitude(),
+            relativeToField.getRotation()));
+
+    // TODO add constraints
+    PathConstraints constraints = new PathConstraints(2.0, 1.0, 2 * Math.PI, 4 * Math.PI);
+
+    // TODO fix this line of code.
+    PathPlannerPath path = new PathPlannerPath(
+        waypoints,
+        constraints,
+        null, // The ideal starting state, this is only relevant for pre-planned paths, so can
+              // be null for on-the-fly paths.
+        new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a holonomic rotation here. If
+                                                           // using a differential drivetrain, the rotation will have no
+                                                           // effect.
+    );
+
+    // Prevent the path from being flipped if the coordinates are already correct
+    // (this was copy pasted from
+    // https://pathplanner.dev/pplib-create-a-path-on-the-fly.html)
+    // TODO verify if this is helpful
+    path.preventFlipping = true;
+  }
+
 }
