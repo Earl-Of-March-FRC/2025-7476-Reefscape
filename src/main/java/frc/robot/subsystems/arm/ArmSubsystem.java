@@ -27,8 +27,9 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMax armSpark = new SparkMax(ArmConstants.kArmMotorCanId, SparkMax.MotorType.kBrushless);
   private final RelativeEncoder armEncoder = armSpark.getEncoder();
   private final SparkClosedLoopController armClosedLoopController = armSpark.getClosedLoopController();
+  public boolean isManual = false;
 
-  // Starting angle of the arm, in radians
+  // Starting angl e of the arm, in radians
   // Ex: arm starting position is 1 radian, then m_armAngularOffset is 1
   private double m_armAngularOffset = 0;
 

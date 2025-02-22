@@ -107,7 +107,6 @@ public class RobotContainer {
         Commands.run(() -> intakeSub.setVelocity(MathUtil.applyDeadband(operatorController.getLeftY(),
             0.08) * 0.05),
             intakeSub));
-
     configureAutos();
     configureBindings();
   }
@@ -157,5 +156,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public CommandXboxController getOperatorController() {
+    return operatorController;
   }
 }
