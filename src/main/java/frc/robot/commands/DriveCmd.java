@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,6 +28,7 @@ public class DriveCmd extends Command {
   private Supplier<Double> xSupplier;
   private Supplier<Double> ySupplier;
   private Supplier<Double> omegaSupplier;
+  Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   /**
    * Creates a new DriveCmd.
@@ -67,9 +69,10 @@ public class DriveCmd extends Command {
     double omega = omegaSupplier.get() * DriveConstants.kMaxAngularSpeed;
     // If the gyro is connected, use field relative drive, otherwise, use robot
     // relative
-    driveSub.runVelocity(new ChassisSpeeds(xVel, yVel, omega), driveSub.gyro.isConnected());
+    driveSub.runVelocity(new ChassisSpeeds(xVel, yVel, omega), m_debouncer.calculate(driveSub.gyro.isConnected()));
     SmartDashboard.putBoolean("gyroConnected", driveSub.gyro.isConnected());
     Logger.recordOutput("Gyro/isConnected", driveSub.gyro.isConnected());
+
   }
 
   /**

@@ -21,6 +21,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Quaternion;
@@ -57,7 +58,7 @@ public class Drivetrain extends SubsystemBase {
 
   // Current pose of the robot
   Pose2d pose;
-
+  Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
   private final PhotonCamera camera1;
   private final PhotonCamera camera2;
   public boolean gyroDisconnected;
@@ -149,7 +150,7 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     // Get the current angle from the gyro sensor
     var gyroAngle = gyro.getRotation2d();
-    if (!gyro.isConnected()) {
+    if (m_debouncer.calculate(gyro.isConnected())) {
       gyroDisconnected = true;
     }
 
@@ -331,4 +332,5 @@ public class Drivetrain extends SubsystemBase {
     photonPoseEstimator2.setReferencePose(prevEstimatedRobotPose);
     return photonPoseEstimator2.update(camera2.getLatestResult());
   }
+
 }
