@@ -135,7 +135,7 @@ public class RobotContainer {
     operatorController.povLeft().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL3));
     operatorController.povUp().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleStowedHigh));
 
-    operatorController.a().whileTrue(new IntakeSetVelocityPIDCmd(intakeSub, IntakeConstants.kMaxVelocity));
+    operatorController.a().whileTrue(new IntakeSetVelocityManualCmd(intakeSub, IntakeConstants.kPercent));
     operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
   }

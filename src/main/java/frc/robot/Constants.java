@@ -155,15 +155,19 @@ public final class Constants {
 
     public static final double kMotorReduction = 1 / 10.0;
 
-    public static final double kPVelocityController = 0.018;// 0.000002;
-    public static final double kIVelocityController = 0.00008; // 0.0;
-    public static final double kDVelocityController = 1;// 0.0008;
+    // Velocity PID currently not being used
+    public static final double kPVelocityController = 0.018;
+    public static final double kIVelocityController = 0.00008;
+    public static final double kDVelocityController = 1;
     public static final double kVelocityFF = 0.0001695;
 
     public static final double kPositionConversionFactor = (2 * Math.PI); // Rotations to radians
     public static final double kVelocityConversionFactor = (2 * Math.PI / 60); // RPM to radians/sec
 
-    public static final double kMaxVelocity = 60; // 60; // Max velocity of intake in RPM, used as a reference velocity
+    public static final double kMaxVelocity = 60; // Max velocity of intake in RPM, used as a reference velocity
+
+    // Percent output for intake rollers
+    public static final double kPercent = 0.5;
   }
 
   // PDP CAN IDs
