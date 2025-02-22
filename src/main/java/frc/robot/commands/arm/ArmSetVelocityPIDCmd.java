@@ -27,7 +27,6 @@ public class ArmSetVelocityPIDCmd extends Command {
   public ArmSetVelocityPIDCmd(ArmSubsystem armSub, DoubleSupplier input) {
     this.armSub = armSub;
     this.input = input;
-
     addRequirements(armSub);
   }
 

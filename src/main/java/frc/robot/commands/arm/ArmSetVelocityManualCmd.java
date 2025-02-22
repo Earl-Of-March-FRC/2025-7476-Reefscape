@@ -42,7 +42,11 @@ public class ArmSetVelocityManualCmd extends Command {
 
     // If joystick has not been moved, then don't do anything
     // Prevents this from interrupting the arm from holding its position with PID
+    // If a button has not been pressed, allow for inputs of 0
     if (percentDouble != 0) {
+      armSub.isManual = true;
+    }
+    if (armSub.isManual) {
       armSub.setVelocity(percentDouble);
     }
   }

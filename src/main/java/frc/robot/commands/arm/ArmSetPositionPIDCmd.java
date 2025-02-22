@@ -27,7 +27,6 @@ public class ArmSetPositionPIDCmd extends Command {
 
     this.armSub = armSub;
     this.referenceAngle = referenceAngle;
-
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(armSub);
   }
@@ -36,6 +35,7 @@ public class ArmSetPositionPIDCmd extends Command {
   @Override
   public void initialize() {
     armSub.setReferencePosition(referenceAngle);
+    armSub.isManual = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
