@@ -129,11 +129,11 @@ public class RobotContainer {
 
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
-    operatorController.povCenter().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleStart));
-    operatorController.povDown().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleFloor));
-    operatorController.povRight().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleProcessor));
-    operatorController.povLeft().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL2));
-    operatorController.povUp().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL3));
+    operatorController.povCenter().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleStowedLow));
+    operatorController.povDown().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleIntake));
+    operatorController.povRight().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL2));
+    operatorController.povLeft().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL3));
+    operatorController.povUp().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleStowedHigh));
 
     operatorController.a().whileTrue(new IntakeSetVelocityPIDCmd(intakeSub, IntakeConstants.kMaxVelocity));
     operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
