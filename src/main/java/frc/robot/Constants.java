@@ -114,16 +114,16 @@ public final class Constants {
     public static final int kFrontLauncherCanId = 12;
     public static final int kBackLauncherCanId = 13;
 
-    public static final double kPVelocityController = 0.002;
-    public static final double kIVelocityController = 0.0;
-    public static final double kDVelocityController = 0.01;
-    public static final double kVelocityFF = 0.002;
+    public static final double kPVelocityController = 0;
+    public static final double kIVelocityController = 0;
+    public static final double kDVelocityController = 0;
+    public static final double kVelocityFF = 0.00195;
 
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
-    // Sample velocities, need to be changed
-    public static final double kVelocityFront = 3820;
-    public static final double kVelocityBack = 2860;
+    // Velocities in RPM
+    public static final double kVelocityFront = 1575.63393661; // 165 rad/s
+    public static final double kVelocityBack = 2435.07062931; // 255 rad/s
   }
 
   // PDP CAN IDs

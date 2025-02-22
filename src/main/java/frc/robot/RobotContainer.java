@@ -117,10 +117,6 @@ public class RobotContainer {
 
     operatorController.rightBumper().onTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
-    // operatorController.rightBumper().onTrue(new
-    // LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocity2));
-    // operatorController.leftTrigger().onTrue(new
-    // LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocity3));
     operatorController.leftBumper().onTrue(new LauncherStopCmd(launcherSub));
   }
 
