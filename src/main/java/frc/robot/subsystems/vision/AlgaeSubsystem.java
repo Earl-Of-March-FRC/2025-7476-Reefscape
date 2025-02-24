@@ -42,6 +42,7 @@ public class AlgaeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    updateTargetPose();
     Logger.recordOutput("Vision/Algae/RelativeRobot", relativeToRobot);
     Logger.recordOutput("Vision/Algae/RelativeField", relativeToField);
   }
