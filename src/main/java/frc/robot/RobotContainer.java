@@ -69,7 +69,7 @@ public class RobotContainer {
     indexerSub = new Indexer();
 
     indexerSub.setDefaultCommand(
-        indexerSub.manualSpeed(() -> 0));
+        indexerSub.manualVelocity(() -> 0));
 
     driveSub.setDefaultCommand(
         new DriveCmd(
