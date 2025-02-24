@@ -55,20 +55,13 @@ public final class Configs {
     }
   }
 
-  public static final class IndexerSubsystem {
+  public static final class IndexerConfigs {
 
     public static final SparkMaxConfig indexerConfig = new SparkMaxConfig();
 
     static {
       indexerConfig.idleMode(IdleMode.kBrake);
       indexerConfig.smartCurrentLimit(40);
-      indexerConfig.closedLoop
-          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          // // Velocity is stored in slot 1 to match
-          // // the other subsystems.
-          // .pid(1, 0, 0, ClosedLoopSlot.kSlot1)
-          // .velocityFF(IndexerConstants.kVelocityFF)
-          .outputRange(-1, 1);
       indexerConfig.encoder
           .velocityConversionFactor(IndexerConstants.kWheelDiameterMeters * Math.PI
               / IndexerConstants.kMotorReduction / 60);

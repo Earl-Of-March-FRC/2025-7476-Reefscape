@@ -9,21 +9,18 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Configs;
+import frc.robot.Configs.IndexerConfigs;
 import frc.robot.Constants.IndexerConstants;
 
 public class Indexer extends SubsystemBase {
   private final SparkMax indexerSpark;
-  private final SparkClosedLoopController controller;
   private final RelativeEncoder encoder;
 
   public final IndexerSensor intakeSensor, launcherSensor;
@@ -34,9 +31,8 @@ public class Indexer extends SubsystemBase {
   public Indexer() {
     indexerSpark = new SparkMax(IndexerConstants.kMotorPort, IndexerConstants.kMotorType);
 
-    indexerSpark.configure(Configs.IndexerSubsystem.indexerConfig, ResetMode.kResetSafeParameters,
+    indexerSpark.configure(IndexerConfigs.indexerConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    controller = indexerSpark.getClosedLoopController();
     encoder = indexerSpark.getEncoder();
 
     intakeSensor = new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel);
@@ -45,8 +41,9 @@ public class Indexer extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Indexer/Intake", getIntakeSensor());
-    Logger.recordOutput("Indexer/Launcher", getLauncherSensor());
+    Logger.recordOutput("Indexer/Measured/IntakeSensor", getIntakeSensor());
+    Logger.recordOutput("Indexer/Measured/LauncherSensor", getLauncherSensor());
+    Logger.recordOutput("Indexer/Measured/Velocity", getVelocity());
   }
 
   @Override
@@ -54,30 +51,31 @@ public class Indexer extends SubsystemBase {
   }
 
   /**
-   * Set the output speed of the motors.
+   * Set the output velocity of the motors.
    * 
    * @param percent Percentage between -1.0 and +1.0
    * @see #setVoltage
    */
-  public void setSpeed(double percent) {
+  public void setVelocity(double percent) {
+    Logger.recordOutput("Indexer/Setpoint/PercentVelocity", percent);
     indexerSpark.set(percent * IndexerConstants.kDirectionConstant);
   };
 
   /**
-   * Get the output speed of the motors.
+   * Get the velocity of the indexer belts in meters.
    * 
-   * @return Percent between -1.0 and +1.0
+   * @return velocity of belts in meters
    * @see #getVoltage
    */
-  public double getSpeed() {
-    return indexerSpark.get();
+  public double getVelocity() {
+    return encoder.getVelocity();
   }
 
   /**
    * Set the output voltage of the motors.
    * 
    * @param voltage Output voltage.
-   * @see #setSpeed
+   * @see #setVelocity
    */
   public void setVoltage(double voltage) {
     indexerSpark.setVoltage(voltage * IndexerConstants.kDirectionConstant);
@@ -87,28 +85,10 @@ public class Indexer extends SubsystemBase {
    * Get the output voltage of the motors.
    * 
    * @return Output voltage.
-   * @see #getSpeed
+   * @see #getVelocity
    */
   public double getVoltage() {
     return indexerSpark.getAppliedOutput();
-  }
-
-  /**
-   * Set the velocity (RPM) of the indexer motors in meters
-   * 
-   * @param velocity RPM in meters
-   */
-  public void setVelocity(double velocity) {
-    controller.setReference(velocity, ControlType.kVelocity);
-  }
-
-  /**
-   * Get the velocity (RPM) of the indexer motors in meters.
-   * 
-   * @return RPM in meters
-   */
-  public double getVelocity() {
-    return encoder.getVelocity();
   }
 
   /**
@@ -162,22 +142,12 @@ public class Indexer extends SubsystemBase {
   }
 
   /**
-   * Runs the indexer at the same velocity as another subsystem.
+   * Manually control the velocity of the indexer
    * 
-   * @param velocity The velocity to run at
+   * @param percent A joystick input between -1.0 and +1.0
    * @return A command requiring the indexer.
    */
-  public Command followVelocity(DoubleSupplier velocity) {
-    return Commands.runEnd(() -> setVelocity(velocity.getAsDouble()), () -> setVelocity(0), this);
-  }
-
-  /**
-   * Manually control the speed of the indexer
-   * 
-   * @param input A joystick input between -1.0 and +1.0
-   * @return A command requiring the indexer.
-   */
-  public Command manualSpeed(DoubleSupplier input) {
-    return Commands.run(() -> setSpeed(input.getAsDouble()), this);
+  public Command manualVelocity(DoubleSupplier percent) {
+    return Commands.run(() -> setVelocity(percent.getAsDouble()), this);
   }
 }
