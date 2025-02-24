@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.EventMarker;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
@@ -91,6 +91,9 @@ public class AlgaeSubsystem extends SubsystemBase {
 
   /**
    * Calling this function will call pathplanner to drive to the algae AND intake!
+   * Path will use two waypoints:
+   * * Algae Position
+   * * Algae Position + Overshoot
    * TODO move constants to constant file
    * TODO consider not using local variable "relativeToField"
    * TODO call commands to intake
@@ -100,34 +103,6 @@ public class AlgaeSubsystem extends SubsystemBase {
   public void intakeAlgae() {
     double overshootDistance = 1.0; // Distance to overshoot the algae (adjust when testing) -- 1.0 units of
                                     // overshot distance
-    /*
-     * Use TWO waypoints:
-     * * Algae Position
-     * * Algae Position + Overshoot
-     */
-
-    /*
-     * Eric, this code does not work because it adds the magnitudes of the
-     * relativeToField
-     * and overshoot translation components directly, which results in a positional
-     * shift rather than extending the overshoot in the correct direction. To
-     * achieve the desired overshoot, you should calculate the direction vector from
-     * the robot's current position and then apply the overshoot distance in that
-     * direction, rather than simply adding magnitudes.
-     * 
-     * 
-     * List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-     * // WARNING I suspect that this should be getRelativeToRobot() to get an
-     * // overshoot, get the difference vector, extend its magnitude by TODO ???
-     * relativeToField,
-     * // check for negativity??
-     * // TODO avoid magnitudes, do vector math more directly
-     * new Pose2d(relativeToField.getMeasureX().magnitude() +
-     * overshoot.getMeasureX().magnitude(),
-     * relativeToField.getMeasureY().magnitude() +
-     * overshoot.getMeasureY().magnitude(),
-     * relativeToField.getRotation()));
-     */
 
     /*
      * Calculate the overshoot position by extending the algae position in the
@@ -152,22 +127,30 @@ public class AlgaeSubsystem extends SubsystemBase {
     Pose2d overshootPose = new Pose2d(overshootTranslation, this.getRelativeToField().getRotation());
 
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-        relativeToField, // Starting point: The robot's current position on the field
-        overshootPose // Overshoot point: The position after overshooting the algae
-    );
+        // Starting point: The robot's current position on the field
 
-    PathConstraints constraints = new PathConstraints(2.0, 1.0, 2 * Math.PI, 4 * Math.PI); // Will need to tune the
-                                                                                           // constraints
+        // Algae point: The algae's position, +-20cm
+        // NOTE: the robot needs to rotate so that its intake faces the algae
+        // TODO make sure the swerve rotation is OK
+        relativeToField,
+        // Overshoot point: The position after overshooting the algae
+        overshootPose);
+
+    // TODO tune constraints
+    PathConstraints constraints = new PathConstraints(2.0, 1.0, 2 * Math.PI, 4 * Math.PI);
 
     PathPlannerPath path = new PathPlannerPath(
         waypoints,
         constraints,
-        null, // The ideal starting state, this is only relevant for pre-planned paths, so can
-              // be null for on-the-fly paths.
-        new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a holonomic rotation here. If
-                                                           // using a differential drivetrain, the rotation will have no
-                                                           // effect.
-    );
+        null,
+        null);
+    // new GoalEndState(0.0, Rotation2d.fromDegrees(-90))
+
+    // TODO verify if 1.0 & 2.0 work as expected. Try waypoints.get(0),
+    // waypoints.get(1) as a backup
+    // TODO add intake commands (replace fourth parameter of "null")
+    // TODO rename named command name ("Intake") to something meaningful
+    path.getEventMarkers().add(new EventMarker("Intake", 1.0, 2.0, null));
 
     // Prevent the path from being flipped if the coordinates are already correct
     // (this was copy pasted from
