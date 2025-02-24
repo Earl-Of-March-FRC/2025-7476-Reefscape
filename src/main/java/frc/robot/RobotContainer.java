@@ -11,6 +11,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.CalibrateCmd;
 import frc.robot.commands.DriveCmd;
 import frc.robot.commands.TimedAutoDrive;
+import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroNavX;
@@ -77,7 +78,7 @@ public class RobotContainer {
         new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel));
 
     indexerSub.setDefaultCommand(
-        indexerSub.manualVelocity(() -> 0));
+        new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
 
     driveSub.setDefaultCommand(
         new DriveCmd(
