@@ -5,6 +5,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.LauncherConstants;
 
 public final class Configs {
   public static final class MAXSwerveModule {
@@ -51,6 +52,26 @@ public final class Configs {
           // longer route.
           .positionWrappingEnabled(true)
           .positionWrappingInputRange(0, turningFactor);
+    }
+  }
+
+  public static final class LauncherConfigs {
+    public static final SparkMaxConfig launcherConfig = new SparkMaxConfig();
+
+    static {
+      launcherConfig
+          .idleMode(IdleMode.kCoast)
+          .smartCurrentLimit(50);
+      launcherConfig.encoder
+          .positionConversionFactor(1)
+          .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
+      launcherConfig.closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .pidf(LauncherConstants.kPVelocityController,
+              LauncherConstants.kIVelocityController,
+              LauncherConstants.kDVelocityController,
+              LauncherConstants.kVelocityFF)
+          .outputRange(-1, 1);
     }
   }
 }

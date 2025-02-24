@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -84,6 +86,8 @@ public final class Constants {
     public static final int kDriverControllerYAxis = 1;
     public static final int kDriverControllerRotAxis = 4;
     public static final int kDriverControllerCalibrateButton = 1;
+
+    public static final int kOperatorControllerPort = 1;
   }
 
   public static final class AutoConstants {
@@ -108,8 +112,21 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
-  public static final class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
+  public static final class LauncherConstants {
+    public static final int kFrontCanId = 12;
+    public static final int kBackCanId = 13;
+    public static MotorType kMotorType = MotorType.kBrushless;
+
+    public static final double kPVelocityController = 0;
+    public static final double kIVelocityController = 0;
+    public static final double kDVelocityController = 0;
+    public static final double kVelocityFF = 0.00195;
+
+    public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
+
+    // Velocities in RPM
+    public static final double kVelocityFront = 1575.63393661; // 165 rad/s
+    public static final double kVelocityBack = 2435.07062931; // 255 rad/s
   }
 
   // PDP CAN IDs

@@ -4,24 +4,29 @@
 
 package frc.robot;
 
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.CalibrateCmd;
-import frc.robot.commands.DriveCmd;
-import frc.robot.commands.TimedAutoDrive;
-import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.drivetrain.Gyro;
-import frc.robot.subsystems.drivetrain.GyroADXRS450;
-import frc.robot.subsystems.drivetrain.GyroNavX;
-import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.LauncherConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.commands.CalibrateCmd;
+import frc.robot.commands.DriveCmd;
+import frc.robot.commands.TimedAutoDrive;
+import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
+import frc.robot.commands.launcher.LauncherStopCmd;
+import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Gyro;
+import frc.robot.subsystems.drivetrain.GyroNavX;
+import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import frc.robot.subsystems.launcher.Launcher;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -37,8 +42,12 @@ public class RobotContainer {
   public final Drivetrain driveSub;
   public final Gyro gyro;
 
+  private final Launcher launcherSub;
+
   private final CommandXboxController driverController = new CommandXboxController(
-      OperatorConstants.kDriverControllerPort);
+      OIConstants.kDriverControllerPort);
+  private final CommandXboxController operatorController = new CommandXboxController(
+      OIConstants.kOperatorControllerPort);
 
   private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
 
@@ -63,6 +72,10 @@ public class RobotContainer {
             DriveConstants.kRearRightTurningCanId,
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
+
+    launcherSub = new Launcher(
+        new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
+        new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 
     driveSub.setDefaultCommand(
         new DriveCmd(
@@ -99,6 +112,10 @@ public class RobotContainer {
    */
   private void configureBindings() {
     driverController.b().onTrue(new CalibrateCmd(driveSub));
+
+    operatorController.rightBumper().onTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
+    operatorController.leftBumper().onTrue(new LauncherStopCmd(launcherSub));
   }
 
   /**
