@@ -6,6 +6,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.ModuleConstants;
@@ -94,6 +95,19 @@ public final class Configs {
       intakeConfig.encoder
           .positionConversionFactor(IntakeConstants.kPositionConversionFactor * IntakeConstants.kMotorReduction)
           .velocityConversionFactor(IntakeConstants.kVelocityConversionFactor * IntakeConstants.kMotorReduction);
+    }
+  }
+
+  public static final class IndexerConfigs {
+
+    public static final SparkMaxConfig indexerConfig = new SparkMaxConfig();
+
+    static {
+      indexerConfig.idleMode(IdleMode.kBrake);
+      indexerConfig.smartCurrentLimit(40);
+      indexerConfig.encoder
+          .velocityConversionFactor(IndexerConstants.kWheelDiameterMeters * Math.PI
+              / IndexerConstants.kMotorReduction / 60);
     }
   }
 

@@ -165,6 +165,24 @@ public final class Constants {
     public static final double kDefaultPercent = 0.5;
   }
 
+  public static final class IndexerConstants {
+    public static final int kMotorCanId = 10;
+    public static final MotorType kMotorType = MotorType.kBrushless;
+
+    /**
+     * Multiplier at which decides whether + or - inputs move the algae towards the
+     * launcher.
+     */
+    public static final double kDirectionConstant = 1.0;
+
+    public static final double kMotorReduction = 1.0;
+    public static final double kWheelDiameterMeters = 0.17;
+
+    // Ports for sensors. TBD
+    public static final int kIntakeSensorChannel = 0;
+    public static final int kLauncherSensorChannel = 1;
+  }
+
   public static final class LauncherConstants {
     public static final int kFrontCanId = 12;
     public static final int kBackCanId = 13;

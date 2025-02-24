@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
@@ -25,6 +26,7 @@ import frc.robot.commands.TimedAutoDrive;
 import frc.robot.commands.arm.ArmResetEncoderCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
+import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeStopCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
@@ -34,6 +36,8 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import frc.robot.subsystems.indexer.BeamBreakSensor;
+import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
 
@@ -53,7 +57,7 @@ public class RobotContainer {
 
   private final ArmSubsystem armSub;
   private final IntakeSubsystem intakeSub;
-
+  private final Indexer indexerSub;
   private final Launcher launcherSub;
 
   private final CommandXboxController driverController = new CommandXboxController(
@@ -89,6 +93,11 @@ public class RobotContainer {
 
     intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
 
+    indexerSub = new Indexer(
+        new SparkMax(IndexerConstants.kMotorCanId, IndexerConstants.kMotorType),
+        new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel),
+        new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel));
+
     launcherSub = new Launcher(
         new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
@@ -121,6 +130,9 @@ public class RobotContainer {
                 operatorController.getRawAxis(
                     OIConstants.kOperatorIndexerManualAxis),
                 OIConstants.kIndexerDeadband)));
+
+    indexerSub.setDefaultCommand(
+        new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
 
     configureAutos();
     configureBindings();
