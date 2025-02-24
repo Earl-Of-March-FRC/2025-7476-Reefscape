@@ -24,16 +24,8 @@ import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
 import frc.robot.commands.launcher.LauncherStopCmd;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
-import frc.robot.subsystems.drivetrain.GyroADXRS450;
 import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.launcher.Launcher;
 
 /**
