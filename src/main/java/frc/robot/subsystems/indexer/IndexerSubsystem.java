@@ -11,12 +11,10 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkSim;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,15 +31,11 @@ public class IndexerSubsystem extends SubsystemBase {
   public final DigitalOutput intakeSensorTrigger, launcherSensorTrigger;
   public final IndexerSensor intakeSensor, launcherSensor;
 
-  private final SparkSim indexerSparkSim; // In case we ever need to simulate the motor
-
   /**
    * Creates a new IndexerSubsystem
    */
   public IndexerSubsystem() {
     indexerSpark = new SparkMax(IndexerConstants.kMotorPort, IndexerConstants.kMotorType);
-
-    indexerSparkSim = new SparkSim(indexerSpark, DCMotor.getNeo550(1));
 
     indexerSpark.configure(Configs.IndexerSubsystem.indexerConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
