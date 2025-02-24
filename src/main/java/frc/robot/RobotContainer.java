@@ -18,6 +18,9 @@ import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.arm.ArmSetVelocityPIDCmd;
@@ -46,8 +49,8 @@ public class RobotContainer {
   public final Drivetrain driveSub;
   public final Gyro gyro;
 
-  private final ArmSubsystem armSub = new ArmSubsystem();
-  private final IntakeSubsystem intakeSub = new IntakeSubsystem();
+  private final ArmSubsystem armSub;
+  private final IntakeSubsystem intakeSub;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
@@ -77,6 +80,10 @@ public class RobotContainer {
             DriveConstants.kRearRightTurningCanId,
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
+
+    armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType));
+
+    intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
 
     driveSub.setDefaultCommand(
         new DriveCmd(

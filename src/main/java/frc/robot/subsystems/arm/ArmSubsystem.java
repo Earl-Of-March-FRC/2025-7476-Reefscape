@@ -24,9 +24,9 @@ import frc.robot.Constants.ArmConstants;
  * pivot the arm.
  */
 public class ArmSubsystem extends SubsystemBase {
-  private final SparkMax armSpark = new SparkMax(ArmConstants.kArmMotorCanId, SparkMax.MotorType.kBrushless);
-  private final RelativeEncoder armEncoder = armSpark.getEncoder();
-  private final SparkClosedLoopController armClosedLoopController = armSpark.getClosedLoopController();
+  private final SparkMax armSpark;
+  private final RelativeEncoder armEncoder;
+  private final SparkClosedLoopController armClosedLoopController;
   public boolean isManual = false;
 
   // Starting angl e of the arm, in radians
@@ -36,7 +36,11 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * The constructor for the ArmSubsystem class configures the arm motor.
    */
-  public ArmSubsystem() {
+  public ArmSubsystem(SparkMax armSpark) {
+    this.armSpark = armSpark;
+
+    armEncoder = armSpark.getEncoder();
+    armClosedLoopController = armSpark.getClosedLoopController();
 
     // Configures arm motor
     armSpark.configure(ArmConfigs.armConfig, ResetMode.kResetSafeParameters,

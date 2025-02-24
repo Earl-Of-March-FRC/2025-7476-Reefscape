@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -113,7 +115,8 @@ public final class Constants {
   }
 
   public static final class ArmConstants {
-    public static final int kArmMotorCanId = 10;
+    public static final int kMotorCanId = 10;
+    public static final MotorType kMotorType = MotorType.kBrushless;
 
     public static final double kPUpPositionController = 1.5;
     public static final double kIUpPositionController = 0;
@@ -151,7 +154,8 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final int kIntakeMotorCanId = 9;
+    public static final int kMotorCanId = 9;
+    public static final MotorType kMotorType = MotorType.kBrushless;
 
     public static final double kMotorReduction = 1 / 10.0;
 

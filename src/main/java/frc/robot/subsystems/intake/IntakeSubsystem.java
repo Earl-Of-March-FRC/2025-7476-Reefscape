@@ -23,14 +23,19 @@ import frc.robot.Constants.IntakeConstants;
  */
 public class IntakeSubsystem extends SubsystemBase {
 
-  private final SparkMax intakeSpark = new SparkMax(IntakeConstants.kIntakeMotorCanId, SparkMax.MotorType.kBrushless);
-  private final RelativeEncoder intakeEncoder = intakeSpark.getEncoder();
-  private final SparkClosedLoopController intakeClosedLoopController = intakeSpark.getClosedLoopController();
+  private final SparkMax intakeSpark;
+  private final RelativeEncoder intakeEncoder;
+  private final SparkClosedLoopController intakeClosedLoopController;
 
   /**
    * The constructor for the IntakeSubsystem configures the intake motor.
    */
-  public IntakeSubsystem() {
+  public IntakeSubsystem(SparkMax intakeSpark) {
+    this.intakeSpark = intakeSpark;
+
+    intakeEncoder = intakeSpark.getEncoder();
+    intakeClosedLoopController = intakeSpark.getClosedLoopController();
+
     intakeSpark.configure(IntakeConfigs.intakeConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
   }
