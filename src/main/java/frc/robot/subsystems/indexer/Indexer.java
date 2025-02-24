@@ -79,6 +79,7 @@ public class Indexer extends SubsystemBase {
    * @see #setVelocity
    */
   public void setVoltage(double voltage) {
+    Logger.recordOutput("Indexer/Setpoint/Voltage", voltage);
     indexerSpark.setVoltage(voltage * IndexerConstants.kDirectionConstant);
   };
 
