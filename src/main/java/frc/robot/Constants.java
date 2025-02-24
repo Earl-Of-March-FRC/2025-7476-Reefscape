@@ -89,7 +89,9 @@ public final class Constants {
 
     public static final int kOperatorControllerPort = 1;
     public static final double kArmDeadband = 0.5;
-    public static final int kOperatorControllerYAxis = 1;
+    public static final int kOperatorArmManualAxis = 1;
+    public static final double kIndexerDeadband = 0.5;
+    public static final int kOperatorIndexerManualAxis = 5;
   }
 
   public static final class AutoConstants {
@@ -128,11 +130,6 @@ public final class Constants {
     public static final double kDDownPositionController = 0;
     public static final double kDownPositionFF = 0;
 
-    public static final double kPVelocityController = 0.0002;
-    public static final double kIVelocityController = 0;
-    public static final double kDVelocityController = 0;
-    public static final double kVelocityFF = 0;
-
     public static final double kGearReduction = 1.0 / 50; // Gear ratio
 
     public static final double kAngleConversionFactor = 2 * Math.PI / 360; // Degrees to radians
@@ -159,19 +156,13 @@ public final class Constants {
 
     public static final double kMotorReduction = 1 / 10.0;
 
-    // Velocity PID currently not being used
-    public static final double kPVelocityController = 0.018;
-    public static final double kIVelocityController = 0.00008;
-    public static final double kDVelocityController = 1;
-    public static final double kVelocityFF = 0.0001695;
-
     public static final double kPositionConversionFactor = (2 * Math.PI); // Rotations to radians
     public static final double kVelocityConversionFactor = (2 * Math.PI / 60); // RPM to radians/sec
 
     public static final double kMaxVelocity = 60; // Max velocity of intake in RPM, used as a reference velocity
 
     // Percent output for intake rollers
-    public static final double kPercent = 0.5;
+    public static final double kDefaultPercent = 0.5;
   }
 
   // PDP CAN IDs

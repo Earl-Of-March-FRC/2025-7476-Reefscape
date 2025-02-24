@@ -78,10 +78,6 @@ public final class Configs {
           // Downward position PID controller is slot 1
           .pidf(ArmConstants.kPDownPositionController, ArmConstants.kIDownPositionController,
               ArmConstants.kDDownPositionController, ArmConstants.kDownPositionFF, ClosedLoopSlot.kSlot1)
-          // Velocity PID controller is slot 2
-          .pidf(ArmConstants.kPVelocityController, ArmConstants.kIVelocityController,
-              ArmConstants.kDVelocityController,
-              ArmConstants.kVelocityFF, ClosedLoopSlot.kSlot2)
           .outputRange(-1, 1);
     }
   }
@@ -97,13 +93,6 @@ public final class Configs {
       intakeConfig.encoder
           .positionConversionFactor(IntakeConstants.kPositionConversionFactor * IntakeConstants.kMotorReduction)
           .velocityConversionFactor(IntakeConstants.kVelocityConversionFactor * IntakeConstants.kMotorReduction);
-
-      // Configure closed-loop control
-      intakeConfig.closedLoop
-          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .pidf(IntakeConstants.kPVelocityController, IntakeConstants.kIVelocityController,
-              IntakeConstants.kDVelocityController, IntakeConstants.kVelocityFF)
-          .outputRange(-1, 1); // Set output range for the controller
     }
   }
 }

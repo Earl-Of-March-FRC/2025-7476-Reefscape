@@ -79,11 +79,11 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * Sets the velocity of the arm.
    * 
-   * @param velocity Percent output, from -1 to 1.
+   * @param percent Percent output, from -1 to 1.
    */
-  public void setVelocity(double velocity) {
-    Logger.recordOutput("Intake/Arm/Setpoint/PercentVelocity", velocity);
-    armSpark.set(velocity);
+  public void setVelocity(double percent) {
+    Logger.recordOutput("Intake/Arm/Setpoint/PercentVelocity", percent);
+    armSpark.set(percent);
   }
 
   /**
@@ -109,20 +109,6 @@ public class ArmSubsystem extends SubsystemBase {
     Logger.recordOutput("Intake/Arm/Setpoint/Position",
         new Rotation2d(referenceAngle * ArmConstants.kAngleConversionFactor));
     armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition, closedLoopSlot);
-  }
-
-  /**
-   * Sets the reference velocity for the arm closed loop controller.
-   *
-   * @param referenceVelocity The reference velocity, in RPM.
-   */
-  public void setReferenceVelocity(double referenceVelocity) {
-    // Convert RPM to radians per second
-    double refVelocityConverted = referenceVelocity * ArmConstants.kVelocityConversionFactor;
-
-    Logger.recordOutput("Intake/Arm/Setpoint/Velocity", referenceVelocity);
-    armClosedLoopController.setReference(refVelocityConverted,
-        ControlType.kVelocity, ClosedLoopSlot.kSlot2);
   }
 
   /**

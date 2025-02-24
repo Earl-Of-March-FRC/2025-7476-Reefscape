@@ -23,14 +23,13 @@ import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.arm.ArmSetVelocityPIDCmd;
 import frc.robot.commands.arm.ArmResetEncoderCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
+import frc.robot.commands.arm.ArmSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeStopCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -102,15 +101,18 @@ public class RobotContainer {
                 OIConstants.kDriveDeadband)));
 
     armSub.setDefaultCommand(
-        new ArmSetVelocityPIDCmd(armSub, () -> MathUtil.applyDeadband(
+        new ArmSetVelocityManualCmd(armSub, () -> MathUtil.applyDeadband(
             -operatorController.getRawAxis(
-                OIConstants.kOperatorControllerYAxis),
+                OIConstants.kOperatorArmManualAxis),
             OIConstants.kArmDeadband)));
 
     intakeSub.setDefaultCommand(
-        Commands.run(() -> intakeSub.setVelocity(MathUtil.applyDeadband(operatorController.getLeftY(),
-            0.08) * 0.05),
-            intakeSub));
+        new IntakeSetVelocityManualCmd(intakeSub,
+            () -> MathUtil.applyDeadband(
+                operatorController.getRawAxis(
+                    OIConstants.kOperatorIndexerManualAxis),
+                OIConstants.kIndexerDeadband)));
+
     configureAutos();
     configureBindings();
   }
@@ -139,7 +141,7 @@ public class RobotContainer {
     operatorController.povLeft().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL3));
     operatorController.povUp().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleProcessor));
 
-    operatorController.a().whileTrue(new IntakeSetVelocityManualCmd(intakeSub, IntakeConstants.kPercent));
+    operatorController.a().whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
     operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
   }

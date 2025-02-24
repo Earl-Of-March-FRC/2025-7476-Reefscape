@@ -4,6 +4,8 @@
 
 package frc.robot.commands.intake;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
@@ -13,7 +15,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 public class IntakeSetVelocityManualCmd extends Command {
 
   private IntakeSubsystem intakeSub;
-  private double percent;
+  private DoubleSupplier percentVelocity;
 
   /**
    * Sets the velocity of the intake rollers.
@@ -21,10 +23,10 @@ public class IntakeSetVelocityManualCmd extends Command {
    * @param intakeSub The instance of the IntakeSubsystem class to be used.
    * @param percent   Percent output, from -1 to 1.
    */
-  public IntakeSetVelocityManualCmd(IntakeSubsystem intakeSub, double percent) {
+  public IntakeSetVelocityManualCmd(IntakeSubsystem intakeSub, DoubleSupplier percentVelocity) {
 
     this.intakeSub = intakeSub;
-    this.percent = percent;
+    this.percentVelocity = percentVelocity;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(intakeSub);
@@ -38,7 +40,7 @@ public class IntakeSetVelocityManualCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intakeSub.setVelocity(percent);
+    intakeSub.setVelocity(percentVelocity.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.

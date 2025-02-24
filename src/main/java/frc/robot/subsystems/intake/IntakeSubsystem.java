@@ -7,10 +7,8 @@ package frc.robot.subsystems.intake;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,7 +23,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private final SparkMax intakeSpark;
   private final RelativeEncoder intakeEncoder;
-  private final SparkClosedLoopController intakeClosedLoopController;
 
   /**
    * The constructor for the IntakeSubsystem configures the intake motor.
@@ -34,7 +31,6 @@ public class IntakeSubsystem extends SubsystemBase {
     this.intakeSpark = intakeSpark;
 
     intakeEncoder = intakeSpark.getEncoder();
-    intakeClosedLoopController = intakeSpark.getClosedLoopController();
 
     intakeSpark.configure(IntakeConfigs.intakeConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
@@ -61,30 +57,17 @@ public class IntakeSubsystem extends SubsystemBase {
   /**
    * Sets the velocity of the intake motor using percent output.
    * 
-   * @param velocity Percent output, from -1 to 1.
+   * @param percent Percent output, from -1 to 1.
    */
-  public void setVelocity(double velocity) {
-    Logger.recordOutput("Intake/Rollers/Setpoint/PercentVelocity", velocity);
-    intakeSpark.set(velocity);
+  public void setVelocity(double percent) {
+    Logger.recordOutput("Intake/Rollers/Setpoint/PercentVelocity", percent);
+    intakeSpark.set(percent);
   }
 
   /**
    * Stops the intake motor.
    */
   public void stopIntake() {
-    setReferenceVelocity(0);
-  }
-
-  /**
-   * Sets the reference velocity for the intake closed loop controller.
-   * 
-   * @param referenceVelocity The reference velocity, in RPM.
-   */
-  public void setReferenceVelocity(double referenceVelocity) {
-    // Convert RPM to radians per second
-    double refVelocityConverted = referenceVelocity * IntakeConstants.kVelocityConversionFactor;
-
-    Logger.recordOutput("Intake/Rollers/Setpoint/Velocity", referenceVelocity);
-    intakeClosedLoopController.setReference(refVelocityConverted, ControlType.kVelocity);
+    setVelocity(0);
   }
 }
