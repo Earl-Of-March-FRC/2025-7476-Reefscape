@@ -6,6 +6,8 @@ package frc.robot;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,7 +50,7 @@ public class RobotContainer {
   public final Drivetrain driveSub;
   public final Gyro gyro;
 
-  private final LauncherSubsystem launcherSub = new LauncherSubsystem();
+  private final LauncherSubsystem launcherSub;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
@@ -78,6 +80,10 @@ public class RobotContainer {
             DriveConstants.kRearRightTurningCanId,
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
+
+    launcherSub = new LauncherSubsystem(
+        new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
+        new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 
     driveSub.setDefaultCommand(
         new DriveCmd(

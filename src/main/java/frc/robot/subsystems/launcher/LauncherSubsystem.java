@@ -20,22 +20,26 @@ import frc.robot.Constants.LauncherConstants;
  * It manages motor speed, velocity, and PID control for the launcher.
  */
 public class LauncherSubsystem extends SubsystemBase {
-  private final SparkMax frontLauncherSpark = new SparkMax(LauncherConstants.kFrontLauncherCanId,
-      SparkMax.MotorType.kBrushless);
-  private final RelativeEncoder frontLauncherEncoder = frontLauncherSpark.getEncoder();
-  private final SparkClosedLoopController frontLauncherClosedLoopController = frontLauncherSpark
-      .getClosedLoopController();
+  private final SparkMax frontLauncherSpark;
+  private final RelativeEncoder frontLauncherEncoder;
+  private final SparkClosedLoopController frontLauncherClosedLoopController;
 
-  private final SparkMax backLauncherSpark = new SparkMax(LauncherConstants.kBackLauncherCanId,
-      SparkMax.MotorType.kBrushless);
-  private final RelativeEncoder backLauncherEncoder = backLauncherSpark.getEncoder();
-  private final SparkClosedLoopController backLauncherClosedLoopController = backLauncherSpark
-      .getClosedLoopController();
+  private final SparkMax backLauncherSpark;
+  private final RelativeEncoder backLauncherEncoder;
+  private final SparkClosedLoopController backLauncherClosedLoopController;
 
   /**
    * Constructs a new LauncherSubsystem and configures the launcher motors.
    */
-  public LauncherSubsystem() {
+  public LauncherSubsystem(SparkMax frontLauncherSpark, SparkMax backLauncherSpark) {
+    this.frontLauncherSpark = frontLauncherSpark;
+    this.backLauncherSpark = backLauncherSpark;
+
+    this.frontLauncherEncoder = frontLauncherSpark.getEncoder();
+    this.backLauncherEncoder = backLauncherSpark.getEncoder();
+    this.frontLauncherClosedLoopController = frontLauncherSpark.getClosedLoopController();
+    this.backLauncherClosedLoopController = backLauncherSpark.getClosedLoopController();
+
     // Configure motors
     frontLauncherSpark.configure(LauncherConfigs.launcherConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
