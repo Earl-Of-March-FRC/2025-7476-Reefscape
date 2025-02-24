@@ -44,6 +44,7 @@ public class Indexer extends SubsystemBase {
     Logger.recordOutput("Indexer/Measured/IntakeSensor", getIntakeSensor());
     Logger.recordOutput("Indexer/Measured/LauncherSensor", getLauncherSensor());
     Logger.recordOutput("Indexer/Measured/Velocity", getVelocity());
+    Logger.recordOutput("Indexer/Measured/Voltage", getVoltage());
   }
 
   @Override
