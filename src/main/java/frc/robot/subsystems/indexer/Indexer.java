@@ -23,16 +23,19 @@ public class Indexer extends SubsystemBase {
 
   /**
    * Creates a new IndexerSubsystem
+   * 
+   * @param indexerSpark   SparkMax motor controller for the indexer
+   * @param intakeSensor   Sensor near the intake
+   * @param launcherSensor Sensor near the launcher
    */
-  public Indexer() {
-    indexerSpark = new SparkMax(IndexerConstants.kMotorPort, IndexerConstants.kMotorType);
+  public Indexer(SparkMax indexerSpark, IndexerSensor intakeSensor, IndexerSensor launcherSensor) {
+    this.intakeSensor = intakeSensor;
+    this.launcherSensor = launcherSensor;
+    this.indexerSpark = indexerSpark;
 
     indexerSpark.configure(IndexerConfigs.indexerConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     encoder = indexerSpark.getEncoder();
-
-    intakeSensor = new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel);
-    launcherSensor = new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel);
   }
 
   @Override

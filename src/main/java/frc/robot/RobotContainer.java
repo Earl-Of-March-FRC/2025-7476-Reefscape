@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.CalibrateCmd;
@@ -15,6 +16,10 @@ import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.revrobotics.spark.SparkMax;
+
+import frc.robot.subsystems.indexer.BeamBreakSensor;
 import frc.robot.subsystems.indexer.Indexer;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -66,7 +71,10 @@ public class RobotContainer {
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
 
-    indexerSub = new Indexer();
+    indexerSub = new Indexer(
+        new SparkMax(IndexerConstants.kMotorPort, IndexerConstants.kMotorType),
+        new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel),
+        new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel));
 
     indexerSub.setDefaultCommand(
         indexerSub.manualVelocity(() -> 0));
