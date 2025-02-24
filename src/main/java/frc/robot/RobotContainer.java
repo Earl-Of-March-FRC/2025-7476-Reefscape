@@ -15,7 +15,7 @@ import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import frc.robot.subsystems.indexer.IndexerSubsystem;
+import frc.robot.subsystems.indexer.Indexer;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,7 +37,7 @@ public class RobotContainer {
   public final Drivetrain driveSub;
   public final Gyro gyro;
 
-  private final IndexerSubsystem indexerSub;
+  private final Indexer indexerSub;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
@@ -66,7 +66,7 @@ public class RobotContainer {
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
 
-    indexerSub = new IndexerSubsystem();
+    indexerSub = new Indexer();
 
     indexerSub.setDefaultCommand(
         indexerSub.manualSpeed(() -> 0));

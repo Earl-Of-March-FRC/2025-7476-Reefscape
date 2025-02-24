@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.IndexerConstants;
 
-public class IndexerSubsystem extends SubsystemBase {
+public class Indexer extends SubsystemBase {
   private final SparkMax indexerSpark;
   private final SparkClosedLoopController controller;
   private final RelativeEncoder encoder;
@@ -34,7 +34,7 @@ public class IndexerSubsystem extends SubsystemBase {
   /**
    * Creates a new IndexerSubsystem
    */
-  public IndexerSubsystem() {
+  public Indexer() {
     indexerSpark = new SparkMax(IndexerConstants.kMotorPort, IndexerConstants.kMotorType);
 
     indexerSpark.configure(Configs.IndexerSubsystem.indexerConfig, ResetMode.kResetSafeParameters,
