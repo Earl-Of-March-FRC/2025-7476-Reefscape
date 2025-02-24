@@ -143,11 +143,11 @@ public final class Constants {
     public static final double kAngleTolerance = 15;
 
     // Angles need to be set in degrees
-    public static final double kAngleStowedLow = 0;
-    public static final double kAngleIntake = 0;
-    public static final double kAngleL2 = 0;
-    public static final double kAngleL3 = 0;
-    public static final double kAngleStowedHigh = -186;
+    public static final double kAngleStowed = -6.5;
+    public static final double kAngleGroundIntake = -59.5;
+    public static final double kAngleL2 = -88.5;
+    public static final double kAngleL3 = -146.5;
+    public static final double kAngleProcessor = -186.5;
   }
 
   public static final class IntakeConstants {
