@@ -5,17 +5,23 @@
 package frc.robot;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.CalibrateCmd;
 import frc.robot.commands.DriveCmd;
 import frc.robot.commands.TimedAutoDrive;
+import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
-import frc.robot.subsystems.drivetrain.GyroADXRS450;
 import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.revrobotics.spark.SparkMax;
+
+import frc.robot.subsystems.indexer.BeamBreakSensor;
+import frc.robot.subsystems.indexer.Indexer;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,10 +43,12 @@ public class RobotContainer {
   public final Drivetrain driveSub;
   public final Gyro gyro;
 
+  private final Indexer indexerSub;
+
   private final CommandXboxController driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
 
-  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
+  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -63,6 +71,14 @@ public class RobotContainer {
             DriveConstants.kRearRightTurningCanId,
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
+
+    indexerSub = new Indexer(
+        new SparkMax(IndexerConstants.kMotorCanId, IndexerConstants.kMotorType),
+        new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel),
+        new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel));
+
+    indexerSub.setDefaultCommand(
+        new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
 
     driveSub.setDefaultCommand(
         new DriveCmd(
@@ -99,6 +115,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     driverController.b().onTrue(new CalibrateCmd(driveSub));
+
   }
 
   /**

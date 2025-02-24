@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -110,6 +112,24 @@ public final class Constants {
 
   public static final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+  }
+
+  public static final class IndexerConstants {
+    public static final int kMotorCanId = 10;
+    public static final MotorType kMotorType = MotorType.kBrushless;
+
+    /**
+     * Multiplier at which decides whether + or - inputs move the algae towards the
+     * launcher.
+     */
+    public static final double kDirectionConstant = 1.0;
+
+    public static final double kMotorReduction = 1.0;
+    public static final double kWheelDiameterMeters = 0.17;
+
+    // Ports for sensors. TBD
+    public static final int kIntakeSensorChannel = 0;
+    public static final int kLauncherSensorChannel = 1;
   }
 
   // PDP CAN IDs
