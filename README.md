@@ -4,6 +4,7 @@ This repository contains the code of team 7476 for the 2025 FRC seasion
 
 ## Branches
 `main` - Tested and verified working robot code
+`staging` - Subsystem code individually tested and ready for integration. Will be tested together then merged into main.
 
 ### Development branches
 These branches contain potentially incomplete, in-development code
