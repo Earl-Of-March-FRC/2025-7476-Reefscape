@@ -7,7 +7,7 @@ package frc.robot.commands.launcher;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.launcher.LauncherSubsystem;
+import frc.robot.subsystems.launcher.Launcher;
 
 /**
  * Command to set the velocity of the launcher subsystem.
@@ -17,7 +17,7 @@ import frc.robot.subsystems.launcher.LauncherSubsystem;
  */
 public class LauncherSetVelocityManualCmd extends Command {
 
-  private final LauncherSubsystem launcherSub;
+  private final Launcher launcherSub;
   private final DoubleSupplier percent;
 
   /**
@@ -26,7 +26,7 @@ public class LauncherSetVelocityManualCmd extends Command {
    * @param launcherSub The launcher subsystem that this command will control.
    * @param percent     Percent output, from -1 to 1.
    */
-  public LauncherSetVelocityManualCmd(LauncherSubsystem launcherSub, DoubleSupplier percent) {
+  public LauncherSetVelocityManualCmd(Launcher launcherSub, DoubleSupplier percent) {
     this.launcherSub = launcherSub;
     this.percent = percent;
 

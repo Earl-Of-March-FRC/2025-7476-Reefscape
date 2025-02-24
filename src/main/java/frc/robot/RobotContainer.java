@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.launcher.LauncherSubsystem;
+import frc.robot.subsystems.launcher.Launcher;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -50,7 +50,7 @@ public class RobotContainer {
   public final Drivetrain driveSub;
   public final Gyro gyro;
 
-  private final LauncherSubsystem launcherSub;
+  private final Launcher launcherSub;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
@@ -81,7 +81,7 @@ public class RobotContainer {
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
 
-    launcherSub = new LauncherSubsystem(
+    launcherSub = new Launcher(
         new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 

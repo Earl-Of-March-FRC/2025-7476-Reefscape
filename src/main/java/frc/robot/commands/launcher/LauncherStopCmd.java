@@ -5,14 +5,14 @@
 package frc.robot.commands.launcher;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.launcher.LauncherSubsystem;
+import frc.robot.subsystems.launcher.Launcher;
 
 /**
  * This command stops the launcher using percent output.
  */
 public class LauncherStopCmd extends InstantCommand {
 
-  private LauncherSubsystem launcherSub;
+  private Launcher launcherSub;
 
   /**
    * Constructs a new LauncherStopCmd.
@@ -20,7 +20,7 @@ public class LauncherStopCmd extends InstantCommand {
    * @param launcherSub The instance of the LauncherSubsystem class to be
    *                    used.
    */
-  public LauncherStopCmd(LauncherSubsystem launcherSub) {
+  public LauncherStopCmd(Launcher launcherSub) {
     this.launcherSub = launcherSub;
 
     // Use addRequirements() here to declare subsystem dependencies.

@@ -19,7 +19,7 @@ import frc.robot.Constants.LauncherConstants;
  * LauncherSubsystem controls the launcher mechanism of the robot.
  * It manages motor speed, velocity, and PID control for the launcher.
  */
-public class LauncherSubsystem extends SubsystemBase {
+public class Launcher extends SubsystemBase {
   private final SparkMax frontLauncherSpark;
   private final RelativeEncoder frontLauncherEncoder;
   private final SparkClosedLoopController frontLauncherClosedLoopController;
@@ -31,7 +31,7 @@ public class LauncherSubsystem extends SubsystemBase {
   /**
    * Constructs a new LauncherSubsystem and configures the launcher motors.
    */
-  public LauncherSubsystem(SparkMax frontLauncherSpark, SparkMax backLauncherSpark) {
+  public Launcher(SparkMax frontLauncherSpark, SparkMax backLauncherSpark) {
     this.frontLauncherSpark = frontLauncherSpark;
     this.backLauncherSpark = backLauncherSpark;
 

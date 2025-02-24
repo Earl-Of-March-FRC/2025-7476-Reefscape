@@ -5,7 +5,7 @@
 package frc.robot.commands.launcher;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.launcher.LauncherSubsystem;
+import frc.robot.subsystems.launcher.Launcher;
 
 /**
  * Command for controlling the launcher using a PID loop.
@@ -15,7 +15,7 @@ import frc.robot.subsystems.launcher.LauncherSubsystem;
  */
 public class LauncherSetVelocityPIDCmd extends Command {
 
-  private final LauncherSubsystem launcherSub;
+  private final Launcher launcherSub;
   private final double frontReferenceVelocity;
   private final double backReferenceVelocity;
 
@@ -28,7 +28,7 @@ public class LauncherSetVelocityPIDCmd extends Command {
    *                               RPM.
    * @param backReferenceVelocity  The target speed for the back launcher, in RPM.
    */
-  public LauncherSetVelocityPIDCmd(LauncherSubsystem launcherSub, double frontReferenceVelocity,
+  public LauncherSetVelocityPIDCmd(Launcher launcherSub, double frontReferenceVelocity,
       double backReferenceVelocity) {
     this.launcherSub = launcherSub;
     this.frontReferenceVelocity = frontReferenceVelocity;
