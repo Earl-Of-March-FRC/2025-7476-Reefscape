@@ -115,7 +115,7 @@ public final class Constants {
   }
 
   public static final class IndexerConstants {
-    public static final int kMotorPort = 10;
+    public static final int kMotorCanId = 10;
     public static final MotorType kMotorType = MotorType.kBrushless;
 
     /**
@@ -126,8 +126,6 @@ public final class Constants {
 
     public static final double kMotorReduction = 1.0;
     public static final double kWheelDiameterMeters = 0.17;
-
-    public static final double kVelocityFF = 12.0 / 1000; // Max voltage / Max velocity
 
     // Ports for sensors. TBD
     public static final int kIntakeSensorChannel = 0;

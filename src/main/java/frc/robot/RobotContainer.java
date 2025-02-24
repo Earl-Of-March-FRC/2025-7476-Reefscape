@@ -73,7 +73,7 @@ public class RobotContainer {
         gyro);
 
     indexerSub = new Indexer(
-        new SparkMax(IndexerConstants.kMotorPort, IndexerConstants.kMotorType),
+        new SparkMax(IndexerConstants.kMotorCanId, IndexerConstants.kMotorType),
         new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel),
         new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel));
 
