@@ -88,6 +88,10 @@ public final class Constants {
     public static final int kDriverControllerCalibrateButton = 1;
 
     public static final int kOperatorControllerPort = 1;
+    public static final double kArmDeadband = 0.5;
+    public static final int kOperatorArmManualAxis = 1;
+    public static final double kIndexerDeadband = 0.5;
+    public static final int kOperatorIndexerManualAxis = 5;
   }
 
   public static final class AutoConstants {
@@ -110,6 +114,55 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
+  }
+
+  public static final class ArmConstants {
+    public static final int kMotorCanId = 10;
+    public static final MotorType kMotorType = MotorType.kBrushless;
+
+    public static final double kPUpPositionController = 1.5;
+    public static final double kIUpPositionController = 0;
+    public static final double kDUpPositionController = 0;
+    public static final double kUpPositionFF = 0;
+
+    public static final double kPDownPositionController = 1.5;
+    public static final double kIDownPositionController = 0;
+    public static final double kDDownPositionController = 0;
+    public static final double kDownPositionFF = 0;
+
+    public static final double kGearReduction = 1.0 / 50; // Gear ratio
+
+    public static final double kAngleConversionFactor = 2 * Math.PI / 360; // Degrees to radians
+    public static final double kPositionConversionFactor = 2 * Math.PI * kGearReduction; // Rotations to radians
+    public static final double kVelocityConversionFactor = 2 * Math.PI / 60 * kGearReduction; // RPM to radians/sec
+
+    // Max velocity of arm in RPM for manual joystick control
+    public static final double kMaxVelocity = 60;
+
+    // Tolerance of arm position PID in degrees
+    public static final double kAngleTolerance = 15;
+
+    // Angles need to be set in degrees
+    public static final double kAngleStowed = -6.5;
+    public static final double kAngleGroundIntake = -59.5;
+    public static final double kAngleL2 = -88.5;
+    public static final double kAngleL3 = -146.5;
+    public static final double kAngleProcessor = -186.5;
+  }
+
+  public static final class IntakeConstants {
+    public static final int kMotorCanId = 9;
+    public static final MotorType kMotorType = MotorType.kBrushless;
+
+    public static final double kMotorReduction = 1 / 10.0;
+
+    public static final double kPositionConversionFactor = (2 * Math.PI); // Rotations to radians
+    public static final double kVelocityConversionFactor = (2 * Math.PI / 60); // RPM to radians/sec
+
+    public static final double kMaxVelocity = 60; // Max velocity of intake in RPM, used as a reference velocity
+
+    // Percent output for intake rollers
+    public static final double kDefaultPercent = 0.5;
   }
 
   public static final class LauncherConstants {

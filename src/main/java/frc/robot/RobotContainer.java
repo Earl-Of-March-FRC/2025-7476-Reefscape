@@ -14,18 +14,27 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.CalibrateCmd;
 import frc.robot.commands.DriveCmd;
 import frc.robot.commands.TimedAutoDrive;
+import frc.robot.commands.arm.ArmResetEncoderCmd;
+import frc.robot.commands.arm.ArmSetPositionPIDCmd;
+import frc.robot.commands.arm.ArmSetVelocityManualCmd;
+import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
+import frc.robot.commands.intake.IntakeStopCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
 import frc.robot.commands.launcher.LauncherStopCmd;
+import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
 
 /**
@@ -41,6 +50,9 @@ public class RobotContainer {
 
   public final Drivetrain driveSub;
   public final Gyro gyro;
+
+  private final ArmSubsystem armSub;
+  private final IntakeSubsystem intakeSub;
 
   private final Launcher launcherSub;
 
@@ -73,6 +85,10 @@ public class RobotContainer {
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
 
+    armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType));
+
+    intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
+
     launcherSub = new Launcher(
         new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
@@ -92,6 +108,20 @@ public class RobotContainer {
                 -driverController.getRawAxis(
                     OIConstants.kDriverControllerRotAxis),
                 OIConstants.kDriveDeadband)));
+
+    armSub.setDefaultCommand(
+        new ArmSetVelocityManualCmd(armSub, () -> MathUtil.applyDeadband(
+            -operatorController.getRawAxis(
+                OIConstants.kOperatorArmManualAxis),
+            OIConstants.kArmDeadband)));
+
+    intakeSub.setDefaultCommand(
+        new IntakeSetVelocityManualCmd(intakeSub,
+            () -> MathUtil.applyDeadband(
+                operatorController.getRawAxis(
+                    OIConstants.kOperatorIndexerManualAxis),
+                OIConstants.kIndexerDeadband)));
+
     configureAutos();
     configureBindings();
   }
@@ -111,7 +141,18 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+
     driverController.b().onTrue(new CalibrateCmd(driveSub));
+
+    operatorController.povCenter().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleStowed));
+    operatorController.povDown().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleGroundIntake));
+    operatorController.povRight().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL2));
+    operatorController.povLeft().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL3));
+    operatorController.povUp().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleProcessor));
+
+    operatorController.a().whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
+    operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
+    operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
 
     operatorController.rightBumper().onTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
@@ -134,5 +175,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public CommandXboxController getOperatorController() {
+    return operatorController;
   }
 }
