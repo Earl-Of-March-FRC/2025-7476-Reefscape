@@ -15,8 +15,6 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
-import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,7 +26,6 @@ public class Indexer extends SubsystemBase {
   private final SparkClosedLoopController controller;
   private final RelativeEncoder encoder;
 
-  public final DigitalOutput intakeSensorTrigger, launcherSensorTrigger;
   public final IndexerSensor intakeSensor, launcherSensor;
 
   /**
@@ -42,15 +39,8 @@ public class Indexer extends SubsystemBase {
     controller = indexerSpark.getClosedLoopController();
     encoder = indexerSpark.getEncoder();
 
-    intakeSensorTrigger = new DigitalOutput(IndexerConstants.kIntakeSensorTriggerPin);
-    launcherSensorTrigger = new DigitalOutput(IndexerConstants.kLauncherSensorTriggerPin);
-
-    intakeSensor = new UltrasonicSensor(IndexerConstants.kIntakeSensorChannel,
-        () -> (5 / RobotController.getVoltage5V()) * 0.125);
-    launcherSensor = new UltrasonicSensor(IndexerConstants.kLauncherSensorChannel,
-        () -> (5 / RobotController.getVoltage5V()) * 0.125);
-
-    turnOnIntakeSensor();
+    intakeSensor = new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel);
+    launcherSensor = new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel);
   }
 
   @Override
@@ -189,20 +179,5 @@ public class Indexer extends SubsystemBase {
    */
   public Command manualSpeed(DoubleSupplier input) {
     return Commands.run(() -> setSpeed(input.getAsDouble()), this);
-  }
-
-  public void turnOnIntakeSensor() {
-    intakeSensorTrigger.set(true);
-    launcherSensorTrigger.set(false);
-  }
-
-  public void turnOnLauncherSensor() {
-    intakeSensorTrigger.set(false);
-    launcherSensorTrigger.set(true);
-  }
-
-  public void turnOffBothSensors() {
-    intakeSensorTrigger.set(false);
-    launcherSensorTrigger.set(false);
   }
 }

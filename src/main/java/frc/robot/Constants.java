@@ -129,9 +129,7 @@ public final class Constants {
 
     public static final double kVelocityFF = 12.0 / 1000; // Max voltage / Max velocity
 
-    // Analogue Ports for sensors. TBD
-    public static final int kIntakeSensorTriggerPin = 0;
-    public static final int kLauncherSensorTriggerPin = 1;
+    // Ports for sensors. TBD
     public static final int kIntakeSensorChannel = 0;
     public static final int kLauncherSensorChannel = 1;
   }
