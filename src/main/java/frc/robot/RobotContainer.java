@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -181,7 +182,10 @@ public class RobotContainer {
         new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
     driverController.leftBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
-
+    driverController.leftStick().onTrue(
+        Commands.run(() -> {
+          driveSub.isFieldRelative = !driveSub.isFieldRelative;
+        }, driveSub));
   }
 
   /**

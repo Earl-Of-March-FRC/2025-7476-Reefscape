@@ -31,6 +31,7 @@ public class Drivetrain extends SubsystemBase {
   // Gyro sensor to get the robot's orientation
   public final Gyro gyro;
   public boolean gyroDisconnected;
+  public boolean isFieldRelative = true;
   Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   // Current pose of the robot
@@ -77,6 +78,7 @@ public class Drivetrain extends SubsystemBase {
     var gyroAngle = gyro.getRotation2d();
     if (!m_debouncer.calculate(gyro.isConnected())) {
       gyroDisconnected = true;
+      isFieldRelative = false;
     }
 
     // Update the robot's pose using the odometry class
@@ -153,6 +155,10 @@ public class Drivetrain extends SubsystemBase {
 
     // Log the desired states of the swerve modules to the logger
     Logger.recordOutput("Swerve/Module/Setpoint", states);
+  }
+
+  public void runVelocity(ChassisSpeeds speeds) {
+    runVelocity(speeds, isFieldRelative);
   }
 
   /**
