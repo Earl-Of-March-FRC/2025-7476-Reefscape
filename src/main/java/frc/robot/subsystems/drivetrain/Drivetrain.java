@@ -6,6 +6,7 @@ package frc.robot.subsystems.drivetrain;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -29,6 +30,8 @@ public class Drivetrain extends SubsystemBase {
 
   // Gyro sensor to get the robot's orientation
   public final Gyro gyro;
+  public boolean gyroDisconnected;
+  Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   // Current pose of the robot
   Pose2d pose;
@@ -72,14 +75,18 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     // Get the current angle from the gyro sensor
     var gyroAngle = gyro.getRotation2d();
+    if (!m_debouncer.calculate(gyro.isConnected())) {
+      gyroDisconnected = true;
+    }
 
     // Update the robot's pose using the odometry class
-    pose = odometry.update(gyroAngle,
-        new SwerveModulePosition[] {
-            modules[0].getPosition(), modules[1].getPosition(),
-            modules[2].getPosition(), modules[3].getPosition()
-        });
-
+    if (!gyroDisconnected) {
+      pose = odometry.update(gyroAngle,
+          new SwerveModulePosition[] {
+              modules[0].getPosition(), modules[1].getPosition(),
+              modules[2].getPosition(), modules[3].getPosition()
+          });
+    }
     // Log the current pose to the logger
     Logger.recordOutput("Odometry", pose);
 

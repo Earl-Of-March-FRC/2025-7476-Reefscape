@@ -6,30 +6,34 @@ package frc.robot.commands;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 /**
- * The DriveCmd class is a command that controls the drivetrain using joystick inputs.
+ * The DriveCmd class is a command that controls the drivetrain using joystick
+ * inputs.
  */
 public class DriveCmd extends Command {
 
   // Reference to the drivetrain subsystem
   private Drivetrain driveSub;
-  
+
   // Suppliers for joystick inputs
   private Supplier<Double> xSupplier;
   private Supplier<Double> ySupplier;
   private Supplier<Double> omegaSupplier;
+  public boolean gyroDisconnected;
+  Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   /**
    * Creates a new DriveCmd.
    * 
-   * @param driveSub The drivetrain subsystem used by this command.
-   * @param xSupplier Supplier for the x-axis joystick input.
-   * @param ySupplier Supplier for the y-axis joystick input.
+   * @param driveSub      The drivetrain subsystem used by this command.
+   * @param xSupplier     Supplier for the x-axis joystick input.
+   * @param ySupplier     Supplier for the y-axis joystick input.
    * @param omegaSupplier Supplier for the omega (rotation) joystick input.
    */
   public DriveCmd(Drivetrain driveSub, Supplier<Double> xSupplier, Supplier<Double> ySupplier,
@@ -53,14 +57,15 @@ public class DriveCmd extends Command {
 
   /**
    * Called every time the scheduler runs while the command is scheduled.
-   * This method reads the joystick inputs and sets the drivetrain speeds accordingly.
+   * This method reads the joystick inputs and sets the drivetrain speeds
+   * accordingly.
    */
   @Override
   public void execute() {
     double xVel = xSupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
     double yVel = ySupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
     double omega = omegaSupplier.get() * DriveConstants.kMaxAngularSpeed;
-    driveSub.runVelocityRobotRelative(new ChassisSpeeds(xVel, yVel, omega));
+    driveSub.runVelocity(new ChassisSpeeds(xVel, yVel, omega), m_debouncer.calculate(driveSub.gyro.isConnected()));
   }
 
   /**

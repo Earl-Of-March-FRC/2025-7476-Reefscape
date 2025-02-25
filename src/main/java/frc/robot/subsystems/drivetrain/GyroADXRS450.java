@@ -26,4 +26,9 @@ public class GyroADXRS450 implements Gyro {
     gyro.reset();
   }
 
+  @Override
+  public boolean isConnected() {
+    return gyro.isConnected();
+  }
+
 }
