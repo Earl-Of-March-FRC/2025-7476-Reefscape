@@ -150,7 +150,7 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     // Get the current angle from the gyro sensor
     var gyroAngle = gyro.getRotation2d();
-    if (m_debouncer.calculate(gyro.isConnected())) {
+    if (!m_debouncer.calculate(gyro.isConnected())) {
       gyroDisconnected = true;
     }
 
