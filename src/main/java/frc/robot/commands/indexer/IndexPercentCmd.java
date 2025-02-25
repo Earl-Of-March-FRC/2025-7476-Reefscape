@@ -10,19 +10,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 
 /*
- * Open-loop controll of the indexer rollers.
+ * Open-loop control of the indexer.
  */
-public class IndexSpeedCmd extends Command {
+public class IndexPercentCmd extends Command {
   private final IndexerSubsystem indexerSub;
   private final DoubleSupplier speed;
 
   /**
-   * Manually control the speed of the indexer
+   * Manually control the speed percentage of the indexer
    * 
    * @param input A joystick input between -1.0 and +1.0
    * @return A command requiring the indexer.
    */
-  public IndexSpeedCmd(IndexerSubsystem indexerSub, DoubleSupplier speed) {
+  public IndexPercentCmd(IndexerSubsystem indexerSub, DoubleSupplier speed) {
     this.indexerSub = indexerSub;
     this.speed = speed;
   }
