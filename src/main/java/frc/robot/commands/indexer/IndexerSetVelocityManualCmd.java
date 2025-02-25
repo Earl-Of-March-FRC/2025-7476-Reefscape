@@ -7,24 +7,25 @@ package frc.robot.commands.indexer;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.indexer.IndexerSubsystem;
+import frc.robot.subsystems.indexer.Indexer;
 
-/*
- * Open-loop control of the indexer.
- */
-public class IndexerPercentCmd extends Command {
-  private final IndexerSubsystem indexerSub;
-  private final DoubleSupplier speed;
+public class IndexerSetVelocityManualCmd extends Command {
+  private final Indexer indexerSub;
+  private final DoubleSupplier percentVelocity;
 
   /**
-   * Manually control the speed percentage of the indexer
+   * Creates a new IndexerManualVelocity.
+   * Manually control the speed of the indexer
    * 
-   * @param input A joystick input between -1.0 and +1.0
-   * @return A command requiring the indexer.
+   * @param indexerSub      The indexer subsystem used by this command.
+   * @param percentVelocity A joystick input between -1.0 and +1.0
+   *
    */
-  public IndexerPercentCmd(IndexerSubsystem indexerSub, DoubleSupplier speed) {
+  public IndexerSetVelocityManualCmd(Indexer indexerSub, DoubleSupplier percentVelocity) {
+    // Use addRequirements() here to declare subsystem dependencies.
     this.indexerSub = indexerSub;
-    this.speed = speed;
+    this.percentVelocity = percentVelocity;
+    addRequirements(indexerSub);
   }
 
   // Called when the command is initially scheduled.
@@ -35,12 +36,13 @@ public class IndexerPercentCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    indexerSub.setSpeed(speed.getAsDouble());
+    indexerSub.setVelocity(percentVelocity.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    indexerSub.setVelocity(0);
   }
 
   // Returns true when the command should end.

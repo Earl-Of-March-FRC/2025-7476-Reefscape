@@ -27,7 +27,7 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 2; // Default 4.8 - Max net robot translational speed
+    public static final double kMaxSpeedMetersPerSecond = 4.8; // Default 4.8 - Max net robot translational speed
     public static final double kMaxWheelSpeedMetersPerSecond = 4.8; // Max possible speed for wheel
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
@@ -86,6 +86,12 @@ public final class Constants {
     public static final int kDriverControllerYAxis = 1;
     public static final int kDriverControllerRotAxis = 4;
     public static final int kDriverControllerCalibrateButton = 1;
+
+    public static final int kOperatorControllerPort = 1;
+    public static final double kArmDeadband = 0.1;
+    public static final int kOperatorArmManualAxis = 1;
+    public static final double kIntakeDeadband = 0.5;
+    public static final int kOperatorIntakeManualAxis = 5;
   }
 
   public static final class AutoConstants {
@@ -110,19 +116,64 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
-  public static final class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
+  public static final class ArmConstants {
+    public static final int kMotorCanId = 10;
+    public static final MotorType kMotorType = MotorType.kBrushless;
+
+    public static final double kPUpPositionController = 1.5;
+    public static final double kIUpPositionController = 0;
+    public static final double kDUpPositionController = 0;
+    public static final double kUpPositionFF = 0;
+
+    public static final double kPDownPositionController = 1.5;
+    public static final double kIDownPositionController = 0;
+    public static final double kDDownPositionController = 0;
+    public static final double kDownPositionFF = 0;
+
+    public static final double kGearReduction = 1.0 / 50; // Gear ratio
+
+    public static final double kAngleConversionFactor = 2 * Math.PI / 360; // Degrees to radians
+    public static final double kPositionConversionFactor = 2 * Math.PI * kGearReduction; // Rotations to radians
+    public static final double kVelocityConversionFactor = 2 * Math.PI / 60 * kGearReduction; // RPM to radians/sec
+
+    // Max velocity of arm in RPM for manual joystick control
+    public static final double kMaxVelocity = 60;
+
+    // Tolerance of arm position PID in degrees
+    public static final double kAngleTolerance = 15;
+
+    // Angles need to be set in degrees
+    public static final double kAngleStowed = -6.5;
+    public static final double kAngleGroundIntake = -59.5;
+    public static final double kAngleL2 = -88.5;
+    public static final double kAngleL3 = -146.5;
+    public static final double kAngleProcessor = -186.5;
+  }
+
+  public static final class IntakeConstants {
+    public static final int kMotorCanId = 9;
+    public static final MotorType kMotorType = MotorType.kBrushless;
+
+    public static final double kMotorReduction = 1 / 10.0;
+
+    public static final double kPositionConversionFactor = (2 * Math.PI); // Rotations to radians
+    public static final double kVelocityConversionFactor = (2 * Math.PI / 60); // RPM to radians/sec
+
+    public static final double kMaxVelocity = 60; // Max velocity of intake in RPM, used as a reference velocity
+
+    // Percent output for intake rollers
+    public static final double kDefaultPercent = 0.5;
   }
 
   public static final class IndexerConstants {
-    public static final int kMotorPort = 10;
+    public static final int kMotorCanId = 11;
     public static final MotorType kMotorType = MotorType.kBrushless;
 
     /**
      * Multiplier at which decides whether + or - inputs move the algae towards the
      * launcher.
      */
-    public static final double kDirectionConstant = 1.0;
+    public static final double kDirectionConstant = -1.0;
 
     public static final double kMotorReduction = 1.0;
     public static final double kWheelDiameterMeters = 0.17;
@@ -135,8 +186,26 @@ public final class Constants {
     // Analogue Ports for sensors. TBD
     public static final int kIntakeSensorTriggerPin = 0;
     public static final int kLauncherSensorTriggerPin = 1;
+    // Ports for sensors. TBD
     public static final int kIntakeSensorChannel = 0;
     public static final int kLauncherSensorChannel = 1;
+  }
+
+  public static final class LauncherConstants {
+    public static final int kFrontCanId = 12;
+    public static final int kBackCanId = 13;
+    public static MotorType kMotorType = MotorType.kBrushless;
+
+    public static final double kPVelocityController = 0;
+    public static final double kIVelocityController = 0;
+    public static final double kDVelocityController = 0;
+    public static final double kVelocityFF = 0.00195;
+
+    public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
+
+    // Velocities in RPM
+    public static final double kVelocityFront = 1575.63393661; // 165 rad/s
+    public static final double kVelocityBack = 2435.07062931; // 255 rad/s
   }
 
   // PDP CAN IDs

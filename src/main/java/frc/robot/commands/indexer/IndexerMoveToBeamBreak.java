@@ -8,15 +8,14 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.IndexerConstants;
-import frc.robot.subsystems.indexer.IndexerSubsystem;
-import frc.robot.subsystems.indexer.sensors.IndexerSensor;
+import frc.robot.subsystems.indexer.Indexer;
 
 /**
  * Command that runs the indexer in a certain direction using closed-loop
  * velocity.
  */
-public class IndexToSubsystemCmd extends Command {
-  private final IndexerSubsystem indexerSub;
+public class IndexerMoveToBeamBreak extends Command {
+  private final Indexer indexerSub;
   private final DoubleSupplier indexVelocity;
 
   /**
@@ -28,7 +27,7 @@ public class IndexToSubsystemCmd extends Command {
    * 
    * @return A command requiring the indexer.
    */
-  public IndexToSubsystemCmd(IndexerSubsystem indexerSub, DoubleSupplier indexVelocity) {
+  public IndexerMoveToBeamBreak(Indexer indexerSub, DoubleSupplier indexVelocity) {
     this.indexerSub = indexerSub;
     this.indexVelocity = indexVelocity;
   }
@@ -52,13 +51,13 @@ public class IndexToSubsystemCmd extends Command {
     }
     // If sensor is tripped, stop the indexer. Else, continue to set it to the
     // velocity.
-    indexerSub.setReferenceVelocity(sensorIsTripped ? 0 : indexVelocity.getAsDouble());
+    indexerSub.setVelocity(sensorIsTripped ? 0 : indexVelocity.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    indexerSub.setReferenceVelocity(0);
+    indexerSub.setVelocity(0);
   }
 
   // Returns true when the command should end.
