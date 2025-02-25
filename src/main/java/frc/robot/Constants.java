@@ -88,10 +88,10 @@ public final class Constants {
     public static final int kDriverControllerCalibrateButton = 1;
 
     public static final int kOperatorControllerPort = 1;
-    public static final double kArmDeadband = 0.5;
+    public static final double kArmDeadband = 0.1;
     public static final int kOperatorArmManualAxis = 1;
-    public static final double kIndexerDeadband = 0.5;
-    public static final int kOperatorIndexerManualAxis = 5;
+    public static final double kIntakeDeadband = 0.5;
+    public static final int kOperatorIntakeManualAxis = 5;
   }
 
   public static final class AutoConstants {
@@ -166,14 +166,14 @@ public final class Constants {
   }
 
   public static final class IndexerConstants {
-    public static final int kMotorCanId = 10;
+    public static final int kMotorCanId = 11;
     public static final MotorType kMotorType = MotorType.kBrushless;
 
     /**
      * Multiplier at which decides whether + or - inputs move the algae towards the
      * launcher.
      */
-    public static final double kDirectionConstant = 1.0;
+    public static final double kDirectionConstant = -1.0;
 
     public static final double kMotorReduction = 1.0;
     public static final double kWheelDiameterMeters = 0.17;
