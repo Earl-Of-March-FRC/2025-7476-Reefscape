@@ -12,7 +12,7 @@ import frc.robot.subsystems.indexer.IndexerSubsystem;
 /*
  * Open-loop control of the indexer.
  */
-public class IndexPercentCmd extends Command {
+public class IndexerPercentCmd extends Command {
   private final IndexerSubsystem indexerSub;
   private final DoubleSupplier speed;
 
@@ -22,7 +22,7 @@ public class IndexPercentCmd extends Command {
    * @param input A joystick input between -1.0 and +1.0
    * @return A command requiring the indexer.
    */
-  public IndexPercentCmd(IndexerSubsystem indexerSub, DoubleSupplier speed) {
+  public IndexerPercentCmd(IndexerSubsystem indexerSub, DoubleSupplier speed) {
     this.indexerSub = indexerSub;
     this.speed = speed;
   }

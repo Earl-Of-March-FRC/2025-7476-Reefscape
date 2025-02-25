@@ -13,7 +13,7 @@ import frc.robot.subsystems.indexer.IndexerSubsystem;
  * Command that runs the indexer in a certain RPM using closed-loop
  * velocity.
  */
-public class IndexRPMCmd extends InstantCommand {
+public class IndexerRPMCmd extends InstantCommand {
   private final IndexerSubsystem indexerSub;
   private final DoubleSupplier velocity;
 
@@ -23,7 +23,7 @@ public class IndexRPMCmd extends InstantCommand {
    * @param velocity The velocity to run at
    * @return A command requiring the indexer.
    */
-  public IndexRPMCmd(IndexerSubsystem indexerSub, DoubleSupplier velocity) {
+  public IndexerRPMCmd(IndexerSubsystem indexerSub, DoubleSupplier velocity) {
     this.indexerSub = indexerSub;
     this.velocity = velocity;
     addRequirements(indexerSub);

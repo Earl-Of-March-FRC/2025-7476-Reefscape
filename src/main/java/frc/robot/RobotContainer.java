@@ -18,7 +18,7 @@ import frc.robot.subsystems.drivetrain.GyroNavX;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
-import frc.robot.commands.indexer.IndexRPMCmd;
+import frc.robot.commands.indexer.IndexerRPMCmd;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -72,7 +72,7 @@ public class RobotContainer {
 
     indexerSub = new IndexerSubsystem();
 
-    indexerSub.setDefaultCommand(new IndexRPMCmd(indexerSub, () -> 0));
+    indexerSub.setDefaultCommand(new IndexerRPMCmd(indexerSub, () -> 0));
 
     driveSub.setDefaultCommand(
         new DriveCmd(
