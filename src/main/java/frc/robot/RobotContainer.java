@@ -118,21 +118,8 @@ public class RobotContainer {
                     OIConstants.kDriverControllerRotAxis),
                 OIConstants.kDriveDeadband)));
 
-    armSub.setDefaultCommand(
-        new ArmSetVelocityManualCmd(armSub, () -> MathUtil.applyDeadband(
-            -operatorController.getRawAxis(
-                OIConstants.kOperatorArmManualAxis),
-            OIConstants.kArmDeadband)));
-
-    intakeSub.setDefaultCommand(
-        new IntakeSetVelocityManualCmd(intakeSub,
-            () -> MathUtil.applyDeadband(
-                operatorController.getRawAxis(
-                    OIConstants.kOperatorIndexerManualAxis),
-                OIConstants.kIndexerDeadband)));
-
-    indexerSub.setDefaultCommand(
-        new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
+    // indexerSub.setDefaultCommand(
+    // new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
 
     configureAutos();
     configureBindings();
@@ -153,22 +140,48 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    // Manual arm control with
+    armSub.setDefaultCommand(
+        new ArmSetVelocityManualCmd(armSub, () -> MathUtil.applyDeadband(
+            operatorController.getRawAxis(
+                OIConstants.kOperatorArmManualAxis) * 0.5,
+            OIConstants.kArmDeadband)));
+
+    // Manual intake (arm roller) control with
+    intakeSub.setDefaultCommand(
+        new IntakeSetVelocityManualCmd(intakeSub,
+            () -> MathUtil.applyDeadband(
+                operatorController.getRawAxis(
+                    OIConstants.kOperatorIntakeManualAxis),
+                OIConstants.kIntakeDeadband)));
 
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
-    operatorController.povCenter().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleStowed));
-    operatorController.povDown().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleGroundIntake));
-    operatorController.povRight().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL2));
-    operatorController.povLeft().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleL3));
-    operatorController.povUp().whileTrue(new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleProcessor));
+    // UNCOMMENT AFTER THE ARM IS TESTED
+    // operatorController.povCenter().whileTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleStowed));
+    // operatorController.povDown().whileTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleGroundIntake));
+    // operatorController.povRight().whileTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleL2));
+    // operatorController.povLeft().whileTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleL3));
+    // operatorController.povUp().whileTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleProcessor));
 
-    operatorController.a().whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
-    operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
-    operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
+    operatorController.a()
+        .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
 
-    operatorController.rightBumper().onTrue(
+    // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
+    // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
+
+    driverController.rightTrigger().whileTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
-    operatorController.leftBumper().onTrue(new LauncherStopCmd(launcherSub));
+    driverController.rightBumper().whileTrue(
+        new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
+    driverController.leftBumper().whileTrue(
+        new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
+
   }
 
   /**
