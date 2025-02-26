@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.PhotonCamera;
 
 import com.pathplanner.lib.path.EventMarker;
 import com.pathplanner.lib.path.PathConstraints;
@@ -22,6 +23,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AlgaeConstants;
+import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class AlgaeSubsystem extends SubsystemBase {
@@ -29,6 +32,7 @@ public class AlgaeSubsystem extends SubsystemBase {
   private Drivetrain drivetrain;
   private final Supplier<Pose2d> drivetrainPoseSupplier;
   private Pose2d relativeToRobot = new Pose2d(), relativeToField = new Pose2d(); // In m
+  private final PhotonCamera camera1;
 
   /**
    * Creates a new AlgaeSubsystem
@@ -37,6 +41,8 @@ public class AlgaeSubsystem extends SubsystemBase {
    *                               position
    */
   public AlgaeSubsystem(Supplier<Pose2d> drivetrainPoseSupplier) {
+    camera1 = new PhotonCamera(Constants.PhotonConstants.kCamera1);
+
     this.drivetrainPoseSupplier = drivetrainPoseSupplier;
     networkTable = NetworkTableInstance.getDefault().getTable(AlgaeConstants.kNetworkTableKey);
     relativeToRobot = new Pose2d();
@@ -176,4 +182,7 @@ public class AlgaeSubsystem extends SubsystemBase {
     return path;
   }
 
+  public void setPipeline(int pipelineIndex) {
+    camera1.setPipelineIndex(pipelineIndex);
+  }
 }

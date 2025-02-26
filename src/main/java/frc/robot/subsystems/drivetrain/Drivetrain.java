@@ -122,8 +122,8 @@ public class Drivetrain extends SubsystemBase {
         },
         this);
 
-    camera1 = new PhotonCamera("camera1");
-    camera2 = new PhotonCamera("camera2");
+    camera1 = new PhotonCamera(Constants.PhotonConstants.kCamera1);
+    camera2 = new PhotonCamera(Constants.PhotonConstants.kCamera2);
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
     Transform3d robotToCam1 = new Transform3d(
         new Translation3d(Constants.PhotonConstants.camera1X, Constants.PhotonConstants.camera1Y,

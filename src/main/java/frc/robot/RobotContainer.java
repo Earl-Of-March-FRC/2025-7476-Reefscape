@@ -25,9 +25,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.vision.AlgaeSubsystem;
 import frc.robot.subsystems.vision.LimelightSubsystem;
-import frc.robot.commands.SetPipelineCommand;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -117,9 +115,6 @@ public class RobotContainer {
                                                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
 
                 driverController.b().onTrue(new CalibrateCmd(driveSub));
-
-                // Bind the Y button to the SetPipelineCommand
-                driverController.y().onTrue(new SetPipelineCommand(limelightSubsystem, driverController.y()));
         }
 
         /**

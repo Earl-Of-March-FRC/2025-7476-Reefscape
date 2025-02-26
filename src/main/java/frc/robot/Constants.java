@@ -126,6 +126,7 @@ public final class Constants {
     public static final String kNetworkTableKey = "photonvision";
     public static final double camera1X = 0.0;
     public static final double camera1Z = 0.0;
+
   }
 
   public static final class OperatorConstants {
@@ -133,6 +134,8 @@ public final class Constants {
   }
 
   public static final class PhotonConstants {
+    public static final String kCamera1 = "camera1";
+    public static final String kCamera2 = "camera2";
     public static final double camera1Roll = 0;
     public static final double camera1Pitch = 0;
     public static final double camera1Yaw = 0;
@@ -146,6 +149,9 @@ public final class Constants {
     public static final double camera2X = 0.17;
     public static final double camera2Y = 0.18;
     public static final double camera2Z = 0.45;
+
+    public static final int kAlgaePipeline = 0;
+    public static final int kAprilTagPipeline = 1;
   }
 
   public static final class IntakeConstants {

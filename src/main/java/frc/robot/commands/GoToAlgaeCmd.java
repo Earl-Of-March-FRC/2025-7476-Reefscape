@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.vision.AlgaeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 
 public class GoToAlgaeCmd extends Command {
@@ -25,6 +26,9 @@ public class GoToAlgaeCmd extends Command {
   public void initialize() {
     timer.reset(); // Reset timer when the command starts
     timer.start(); // Start the timer
+
+    // Switch to Algae pipeline
+    algaeSubsystem.setPipeline(Constants.PhotonConstants.kAlgaePipeline);
   }
 
   @Override
@@ -70,6 +74,9 @@ public class GoToAlgaeCmd extends Command {
       pathCommand.cancel();
     }
     intakeSubsystem.stopIntake();
+
+    // Switch back to the AprilTag pipeline =
+    algaeSubsystem.setPipeline(Constants.PhotonConstants.kAprilTagPipeline);
   }
 
   @Override
