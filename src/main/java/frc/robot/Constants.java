@@ -173,7 +173,7 @@ public final class Constants {
      * Multiplier at which decides whether + or - inputs move the algae towards the
      * launcher.
      */
-    public static final double kDirectionConstant = -1.0;
+    public static final double kDirectionConstant = 1.0;
 
     public static final double kMotorReduction = 1.0;
     public static final double kWheelDiameterMeters = 0.17;

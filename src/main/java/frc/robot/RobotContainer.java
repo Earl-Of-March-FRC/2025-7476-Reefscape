@@ -178,8 +178,8 @@ public class RobotContainer {
 
     // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
-    driverController.x().whileTrue(new IndexToSubsystemCmd(indexerSub, () -> -0.5));
-    driverController.y().whileTrue(new IndexToSubsystemCmd(indexerSub, () -> 0.5));
+    driverController.x().onTrue(new IndexToSubsystemCmd(indexerSub, () -> -1));
+    driverController.y().onTrue(new IndexToSubsystemCmd(indexerSub, () -> 1));
     driverController.rightTrigger().whileTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
     driverController.rightBumper().whileTrue(

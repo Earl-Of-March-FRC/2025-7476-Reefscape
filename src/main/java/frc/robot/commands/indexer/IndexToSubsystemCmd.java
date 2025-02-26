@@ -53,7 +53,7 @@ public class IndexToSubsystemCmd extends Command {
   public boolean isFinished() {
     if (Math.signum(percentVelocity.getAsDouble()) == Math.signum(IndexerConstants.kDirectionConstant)) {
       // Move towards the launcher
-      if (indexerSub.getLauncherSensor()) {
+      if (!indexerSub.getLauncherSensor()) {
         return true;
       }
     } else {

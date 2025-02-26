@@ -19,7 +19,7 @@ public class Indexer extends SubsystemBase {
   private final SparkMax indexerSpark;
   private final RelativeEncoder encoder;
 
-  public final IndexerSensor intakeSensor, launcherSensor;
+  public final BeamBreakSensor intakeSensor, launcherSensor;
 
   /**
    * Creates a new IndexerSubsystem
@@ -28,7 +28,7 @@ public class Indexer extends SubsystemBase {
    * @param intakeSensor   Sensor near the intake
    * @param launcherSensor Sensor near the launcher
    */
-  public Indexer(SparkMax indexerSpark, IndexerSensor intakeSensor, IndexerSensor launcherSensor) {
+  public Indexer(SparkMax indexerSpark, BeamBreakSensor intakeSensor, BeamBreakSensor launcherSensor) {
     this.intakeSensor = intakeSensor;
     this.launcherSensor = launcherSensor;
     this.indexerSpark = indexerSpark;
@@ -40,8 +40,8 @@ public class Indexer extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Indexer/Measured/IntakeSensor", getIntakeSensor());
-    Logger.recordOutput("Indexer/Measured/LauncherSensor", getLauncherSensor());
+    Logger.recordOutput("Indexer/Measured/IntakeSensor", intakeSensor.triggered());
+    Logger.recordOutput("Indexer/Measured/LauncherSensor", launcherSensor.triggered());
     Logger.recordOutput("Indexer/Measured/Velocity", getVelocity());
     Logger.recordOutput("Indexer/Measured/Voltage", getVoltage());
   }
