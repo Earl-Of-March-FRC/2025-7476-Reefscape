@@ -27,8 +27,8 @@ public class MoveAlgaeToIntake extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
         new IndexerMoveToBeamBreak(indexer, () -> -IndexerConstants.kDirectionConstant),
-        new WaitUntilCommand(() -> arm.getPosition() >= -Math.PI * 0.75),
+        new WaitUntilCommand(() -> arm.getPosition() <= -Math.PI * 0.75),
         new IntakeSetVelocityManualCmd(intake, () -> -1)
-            .alongWith(new IndexerSetVelocityManualCmd(indexer, () -> intake.getVelocity())));
+            .alongWith(new IndexerSetVelocityManualCmd(indexer, () -> -IndexerConstants.kDirectionConstant)));
   }
 }
