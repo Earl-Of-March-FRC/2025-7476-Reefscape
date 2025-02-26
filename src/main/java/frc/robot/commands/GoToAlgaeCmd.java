@@ -4,6 +4,9 @@
 
 package frc.robot.commands;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.vision.AlgaeSubsystem;
@@ -13,6 +16,7 @@ public class GoToAlgaeCmd extends Command {
   private final AlgaeSubsystem algaeSubsystem;
   private final Trigger buttonTrigger;
   private boolean wasButtonPressed = false;
+  public static PathPlannerPath currentPath;
 
   /** Creates a new GoToAlgaeCmd. */
   public GoToAlgaeCmd(AlgaeSubsystem algaeSubsystem, Trigger btn) {
@@ -30,6 +34,10 @@ public class GoToAlgaeCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    currentPath = algaeSubsystem.getPath();
+
+    AutoBuilder.followPath(currentPath);
+
     boolean isButtonPressed = buttonTrigger.getAsBoolean();
 
     if (isButtonPressed && !wasButtonPressed) {

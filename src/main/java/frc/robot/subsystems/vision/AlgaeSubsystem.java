@@ -93,7 +93,7 @@ public class AlgaeSubsystem extends SubsystemBase {
   }
 
   /**
-   * Calling this function will call pathplanner to drive to the algae AND intake!
+   * This function returns a path so that the robot can intake the algae!
    * Path will use two waypoints:
    * * Algae Position
    * * Algae Position + Overshoot
@@ -101,9 +101,10 @@ public class AlgaeSubsystem extends SubsystemBase {
    * TODO consider not using local variable "relativeToField"
    * TODO call commands to intake
    * 
+   * @return PathPlannerPath the path the robot should follow to eat the algae
    * @experimental
    */
-  public void intakeAlgae() {
+  public PathPlannerPath getPath() {
     updateTargetPose();
 
     Translation2d currentTranslation2d = drivetrain.getPose().getTranslation();
@@ -171,6 +172,8 @@ public class AlgaeSubsystem extends SubsystemBase {
     // https://pathplanner.dev/pplib-create-a-path-on-the-fly.html)
     // TODO verify if this is helpful
     path.preventFlipping = true;
+
+    return path;
   }
 
 }

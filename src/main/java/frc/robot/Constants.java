@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -144,6 +146,22 @@ public final class Constants {
     public static final double camera2X = 0.17;
     public static final double camera2Y = 0.18;
     public static final double camera2Z = 0.45;
+  }
+
+  public static final class IntakeConstants {
+    public static final int kMotorCanId = 9;
+    public static final MotorType kMotorType = MotorType.kBrushless;
+
+    public static final double kMotorReduction = 1 / 10.0;
+
+    public static final double kPositionConversionFactor = (2 * Math.PI); // Rotations to radians
+    public static final double kVelocityConversionFactor = (2 * Math.PI / 60); // RPM to radians/sec
+
+    public static final double kMaxVelocity = 60; // Max velocity of intake in RPM, used as a reference velocity
+
+    // Percent output for intake rollers
+    public static final double kDefaultPercent = 0.5;
+    public static final double kDefaultAlgaeIntake = 0.7;
   }
 
   // PDP CAN IDs
