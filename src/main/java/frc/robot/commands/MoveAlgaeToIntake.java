@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.IndexerConstants;
@@ -22,13 +24,16 @@ public class MoveAlgaeToIntake extends SequentialCommandGroup {
   public MoveAlgaeToIntake(
       ArmSubsystem arm,
       IntakeSubsystem intake,
-      Indexer indexer) {
+      Indexer indexer,
+      double armMinSetpoint,
+      DoubleSupplier intakeVelocity,
+      DoubleSupplier indexerVelocity) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new IndexerMoveToBeamBreak(indexer, () -> -IndexerConstants.kDirectionConstant),
-        new WaitUntilCommand(() -> arm.getPosition() <= -Math.PI * 0.75),
-        new IntakeSetVelocityManualCmd(intake, () -> -1)
-            .alongWith(new IndexerSetVelocityManualCmd(indexer, () -> -IndexerConstants.kDirectionConstant)));
+        new IndexerMoveToBeamBreak(indexer, indexerVelocity),
+        new WaitUntilCommand(() -> arm.getPosition() <= armMinSetpoint),
+        new IntakeSetVelocityManualCmd(intake, intakeVelocity)
+            .alongWith(new IndexerSetVelocityManualCmd(indexer, indexerVelocity)));
   }
 }

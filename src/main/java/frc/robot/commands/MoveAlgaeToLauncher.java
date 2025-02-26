@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.IndexerConstants;
@@ -25,12 +27,16 @@ public class MoveAlgaeToLauncher extends ParallelCommandGroup {
   public MoveAlgaeToLauncher(
       Launcher launcher,
       IntakeSubsystem intake,
-      Indexer indexer) {
+      Indexer indexer,
+      double launcherFrontVelocity,
+      double launcherBackVelocity,
+      DoubleSupplier intakeVelocity,
+      DoubleSupplier indexerVelocity) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new IndexerMoveToBeamBreak(indexer, () -> IndexerConstants.kDirectionConstant)
-            .raceWith(new IntakeSetVelocityManualCmd(intake, () -> IntakeConstants.kDefaultPercent)),
-        new LauncherSetVelocityPIDCmd(launcher, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
+        new IndexerMoveToBeamBreak(indexer, indexerVelocity)
+            .raceWith(new IntakeSetVelocityManualCmd(intake, intakeVelocity)),
+        new LauncherSetVelocityPIDCmd(launcher, launcherFrontVelocity, launcherBackVelocity));
   }
 }
