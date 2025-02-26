@@ -159,16 +159,16 @@ public class RobotContainer {
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
     // UNCOMMENT AFTER THE ARM IS TESTED
-    // operatorController.povCenter().whileTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleStowed));
-    // operatorController.povDown().whileTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleGroundIntake));
-    // operatorController.povRight().whileTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleL2));
-    // operatorController.povLeft().whileTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleL3));
-    // operatorController.povUp().whileTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleProcessor));
+    operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
+        ArmConstants.kAngleStowed));
+    operatorController.povDown().onTrue(new ArmSetPositionPIDCmd(armSub,
+        ArmConstants.kAngleGroundIntake));
+    operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
+        ArmConstants.kAngleL2));
+    operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
+        ArmConstants.kAngleL3));
+    operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
+        ArmConstants.kAngleProcessor));
 
     operatorController.a()
         .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));

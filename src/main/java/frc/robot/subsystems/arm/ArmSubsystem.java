@@ -103,7 +103,10 @@ public class ArmSubsystem extends SubsystemBase {
     // Note: arm moving upward is in the negative direction
     if (getPosition() >= refAngleWithOffset) {
       closedLoopSlot = ClosedLoopSlot.kSlot0;
-    } else {
+    }
+
+    // Otherwise, use the downward closed-loop controller
+    else {
       closedLoopSlot = ClosedLoopSlot.kSlot1;
     }
 
