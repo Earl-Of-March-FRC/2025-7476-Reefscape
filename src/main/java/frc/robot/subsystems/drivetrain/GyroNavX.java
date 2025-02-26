@@ -31,4 +31,9 @@ public class GyroNavX implements Gyro {
   public void calibrate() {
     gyro.zeroYaw();
   }
+
+  @Override
+  public boolean isConnected() {
+    return gyro.isConnected();
+  }
 }
