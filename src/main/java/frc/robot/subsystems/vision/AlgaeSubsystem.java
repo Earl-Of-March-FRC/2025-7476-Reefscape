@@ -22,9 +22,11 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AlgaeConstants;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class AlgaeSubsystem extends SubsystemBase {
   private final NetworkTable networkTable;
+  private Drivetrain drivetrain;
   private final Supplier<Pose2d> drivetrainPoseSupplier;
   private Pose2d relativeToRobot = new Pose2d(), relativeToField = new Pose2d(); // In m
 
@@ -42,7 +44,7 @@ public class AlgaeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    updateTargetPose();
+    // updateTargetPose();
     Logger.recordOutput("Vision/Algae/RelativeRobot", relativeToRobot);
     Logger.recordOutput("Vision/Algae/RelativeField", relativeToField);
   }
@@ -102,8 +104,19 @@ public class AlgaeSubsystem extends SubsystemBase {
    * @experimental
    */
   public void intakeAlgae() {
+    updateTargetPose();
+
+    Translation2d currentTranslation2d = drivetrain.getPose().getTranslation();
+
     double overshootDistance = 1.0; // Distance to overshoot the algae (adjust when testing) -- 1.0 units of
                                     // overshot distance
+
+    // this will be the direction/path the robot will travel in to get to the algae
+    Translation2d distanceToAlgae = relativeToField.getTranslation().minus(currentTranslation2d);
+
+    // what angle should the robot face so that it can intake the algae?
+    // NOTE: the intake is on the front (0 deg) of the robot
+    Rotation2d desiredAngle = distanceToAlgae.getAngle();
 
     /*
      * Calculate the overshoot position by extending the algae position in the
@@ -125,7 +138,7 @@ public class AlgaeSubsystem extends SubsystemBase {
      * Pose2d combines the translation (position) and rotation (angle) into a single
      * object.
      */
-    Pose2d overshootPose = new Pose2d(overshootTranslation, this.getRelativeToField().getRotation());
+    Pose2d overshootPose = new Pose2d(overshootTranslation, desiredAngle);
 
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
         // Starting point: The robot's current position on the field
@@ -133,7 +146,7 @@ public class AlgaeSubsystem extends SubsystemBase {
         // Algae point: The algae's position, +-20cm
         // NOTE: the robot needs to rotate so that its intake faces the algae
         // TODO make sure the swerve rotation is OK
-        relativeToField,
+        new Pose2d(relativeToField.getTranslation(), desiredAngle),
         // Overshoot point: The position after overshooting the algae
         overshootPose);
 
