@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.revrobotics.spark.SparkMax;
@@ -27,6 +29,7 @@ import frc.robot.commands.TimedAutoDrive;
 import frc.robot.commands.arm.ArmResetEncoderCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
+import frc.robot.commands.indexer.IndexToSubsystemCmd;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeStopCmd;
@@ -159,23 +162,24 @@ public class RobotContainer {
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
     // UNCOMMENT AFTER THE ARM IS TESTED
-    operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
-        ArmConstants.kAngleStowed));
-    operatorController.povDown().onTrue(new ArmSetPositionPIDCmd(armSub,
-        ArmConstants.kAngleGroundIntake));
-    operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
-        ArmConstants.kAngleL2));
-    operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
-        ArmConstants.kAngleL3));
-    operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
-        ArmConstants.kAngleProcessor));
+    // operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleStowed));
+    // operatorController.povDown().onTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleGroundIntake));
+    // operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleL2));
+    // operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleL3));
+    // operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleProcessor));
 
     operatorController.a()
         .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
 
     // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
-
+    driverController.x().whileTrue(new IndexToSubsystemCmd(indexerSub, () -> -0.5));
+    driverController.y().whileTrue(new IndexToSubsystemCmd(indexerSub, () -> 0.5));
     driverController.rightTrigger().whileTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
     driverController.rightBumper().whileTrue(
