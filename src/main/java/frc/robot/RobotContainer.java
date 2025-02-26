@@ -8,7 +8,6 @@ import frc.robot.commands.CalibrateCmd;
 import frc.robot.commands.DriveCmd;
 import frc.robot.commands.GoToAlgaeCmd;
 import frc.robot.commands.TimedAutoDrive;
-import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroADXRS450;
@@ -112,8 +111,11 @@ public class RobotContainer {
          * joysticks}.
          */
         private void configureBindings() {
-                driverController.a().onTrue(Commands.deadline(new GoToAlgaeCmd(algaeSubsystem, driverController.a()),
-                                new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultAlgaeIntake)));
+                driverController.a()
+                                .onTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub))
+                                .onFalse(new GoToAlgaeCmd(algaeSubsystem, intakeSub)
+                                                .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
+
                 driverController.b().onTrue(new CalibrateCmd(driveSub));
 
                 // Bind the Y button to the SetPipelineCommand

@@ -1,62 +1,80 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
-
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.vision.AlgaeSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.Constants.IntakeConstants;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class GoToAlgaeCmd extends Command {
   private final AlgaeSubsystem algaeSubsystem;
-  private final Trigger buttonTrigger;
-  private boolean wasButtonPressed = false;
-  public static PathPlannerPath currentPath;
+  private final IntakeSubsystem intakeSubsystem;
+  private Command pathCommand;
+  private final Timer timer = new Timer(); // Timer to track elapsed time
 
   /** Creates a new GoToAlgaeCmd. */
-  public GoToAlgaeCmd(AlgaeSubsystem algaeSubsystem, Trigger btn) {
+  public GoToAlgaeCmd(AlgaeSubsystem algaeSubsystem, IntakeSubsystem intakeSubsystem) {
     this.algaeSubsystem = algaeSubsystem;
-    this.buttonTrigger = btn;
-    this.addRequirements(algaeSubsystem);
+    this.intakeSubsystem = intakeSubsystem;
+    this.addRequirements(algaeSubsystem, intakeSubsystem);
   }
 
-  // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
+    timer.reset(); // Reset timer when the command starts
+    timer.start(); // Start the timer
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    currentPath = algaeSubsystem.getPath();
+    // The button state is automatically handled by whileHeld, no need for manual
+    // checking
 
-    AutoBuilder.followPath(currentPath);
+    // If the button was pressed, start tracking and moving
+    algaeSubsystem.updateTargetPose();
+    PathPlannerPath path = algaeSubsystem.getPath();
 
-    boolean isButtonPressed = buttonTrigger.getAsBoolean();
+    // If the path has changed, cancel the old path command and start a new one
+    if (pathCommand != null) {
+      pathCommand.cancel();
+    }
+    pathCommand = AutoBuilder.followPath(path);
+    pathCommand.schedule();
 
-    if (isButtonPressed && !wasButtonPressed) {
-      // If buton is pressed track and find algae
-      algaeSubsystem.updateTargetPose();
-    } else if (!isButtonPressed && wasButtonPressed) {
-      // stop tracking
+    // Start the intake
+    intakeSubsystem.setVelocity(IntakeConstants.kDefaultAlgaeIntake);
 
+    // Update the path every 1 second
+    if (timer.hasElapsed(1.0)) {
+      algaeSubsystem.updateTargetPose(); // Update the target pose
+      PathPlannerPath newPath = algaeSubsystem.getPath();
+
+      // Cancel the old path command and schedule the new one
+      if (pathCommand != null) {
+        pathCommand.cancel();
+      }
+      pathCommand = AutoBuilder.followPath(newPath);
+      pathCommand.schedule();
+
+      // Reset the timer for the next update
+      timer.reset();
     }
   }
 
-  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    // Ensure the path command and intake stop when command ends
+    if (pathCommand != null) {
+      pathCommand.cancel();
+    }
+    intakeSubsystem.stopIntake();
   }
 
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    // Keep running as long as the button is held down
     return false;
   }
 }

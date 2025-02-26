@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Color Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <img id="webcam" src="http://localhost:1181/stream.mjpg" alt="Webcam Feed">
+        <button id="capture-btn">Capture Image</button>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <div id="results"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
