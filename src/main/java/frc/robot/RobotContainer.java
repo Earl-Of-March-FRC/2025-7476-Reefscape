@@ -182,6 +182,9 @@ public class RobotContainer {
     driverController.y().onTrue(new IndexToSubsystemCmd(indexerSub, () -> 1));
     driverController.rightTrigger().whileTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
+    driverController.leftTrigger().whileTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, -LauncherConstants.kVelocityFront,
+            -LauncherConstants.kVelocityBack));
     driverController.rightBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
     driverController.leftBumper().whileTrue(

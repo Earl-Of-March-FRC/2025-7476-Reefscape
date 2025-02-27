@@ -51,7 +51,7 @@ public class IndexToSubsystemCmd extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (Math.signum(percentVelocity.getAsDouble()) == Math.signum(IndexerConstants.kDirectionConstant)) {
+    if (Math.signum(percentVelocity.getAsDouble()) != Math.signum(IndexerConstants.kDirectionConstant)) {
       // Move towards the launcher
       if (!indexerSub.getLauncherSensor()) {
         return true;
