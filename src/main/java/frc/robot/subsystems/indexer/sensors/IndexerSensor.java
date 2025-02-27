@@ -31,6 +31,6 @@ public interface IndexerSensor {
    * Periodically log to AdvantageKit
    */
   default void periodic() {
-    Logger.recordOutput("Indexer/" + getName(), triggered());
+    Logger.recordOutput("Indexer/Measured/" + getName(), triggered());
   };
 }

@@ -95,8 +95,8 @@ public class RobotContainer {
 
     indexerSub = new Indexer(
         new SparkMax(IndexerConstants.kMotorCanId, IndexerConstants.kMotorType),
-        new BeamBreakSensor("Intake", IndexerConstants.kIntakeSensorChannel),
-        new BeamBreakSensor("Launcher", IndexerConstants.kLauncherSensorChannel));
+        new BeamBreakSensor("IntakeSensor", IndexerConstants.kIntakeSensorChannel),
+        new BeamBreakSensor("LauncherSensor", IndexerConstants.kLauncherSensorChannel));
 
     launcherSub = new Launcher(
         new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
