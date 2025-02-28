@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.pathplanner.lib.path.EventMarker;
 import com.pathplanner.lib.path.PathConstraints;
@@ -18,16 +19,16 @@ import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.AlgaeConstants;
+import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class AlgaeSubsystem extends SubsystemBase {
-  private final NetworkTable networkTable;
   private Drivetrain drivetrain;
   private final Supplier<Pose2d> drivetrainPoseSupplier;
   private Pose2d relativeToRobot = new Pose2d(), relativeToField = new Pose2d(); // In m
@@ -40,9 +41,9 @@ public class AlgaeSubsystem extends SubsystemBase {
    *                               position
    */
   public AlgaeSubsystem(Supplier<Pose2d> drivetrainPoseSupplier) {
-    camera1 = new PhotonCamera("camera1");
+    camera1 = new PhotonCamera(Constants.PhotonConstants.kCamera1);
     this.drivetrainPoseSupplier = drivetrainPoseSupplier;
-    networkTable = NetworkTableInstance.getDefault().getTable(AlgaeConstants.kNetworkTableKey);
+
     relativeToRobot = new Pose2d();
   }
 
@@ -54,20 +55,21 @@ public class AlgaeSubsystem extends SubsystemBase {
   }
 
   public void updateTargetPose() {
-    boolean hasTarget = networkTable.getEntry("hasTarget").getBoolean(false);
+    var result = camera1.getLatestResult();
+    boolean hasTarget = result.hasTargets();
 
     if (hasTarget) {
-      double targetYaw = networkTable.getEntry("targetYaw").getDouble(0.0); // in degrees (x angle)
-      double[] targetPose = networkTable.getEntry("targetPose").getDoubleArray(new double[7]);
+      PhotonTrackedTarget target = result.getBestTarget();
+
+      double targetYaw = target.getYaw(); // in degrees (x angle)
+      Transform3d pose = target.bestCameraToTarget;
 
       SmartDashboard.putBoolean("Algae Detected", targetYaw < 2 && targetYaw > -2);
 
-      double xDistance = targetPose[0];
-
       relativeToRobot = new Pose2d(
-          ((Math.tan(targetYaw) * xDistance) - AlgaeConstants.camera1X) * 0.01,
-          (xDistance - AlgaeConstants.camera1Z) * 0.01,
-          Rotation2d.kZero); // Algae's rotation has no effect
+          pose.getTranslation().getX(),
+          pose.getTranslation().getY(),
+          Rotation2d.kZero);
 
       // Assuming we already have the robot's position on the field
       relativeToField = drivetrainPoseSupplier.get()

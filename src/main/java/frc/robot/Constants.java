@@ -149,6 +149,9 @@ public final class Constants {
 
     public static final int kAlgaePipeline = 1;
     public static final int kAprilTagPipeline = 0;
+
+    public static final String kCamera1 = "camera1";
+    public static final String kCamera2 = "camera2";
   }
 
   public static final class IntakeConstants {
