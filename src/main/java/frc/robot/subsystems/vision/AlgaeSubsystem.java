@@ -54,7 +54,6 @@ public class AlgaeSubsystem extends SubsystemBase {
   }
 
   public void updateTargetPose() {
-
     boolean hasTarget = networkTable.getEntry("hasTarget").getBoolean(false);
 
     if (hasTarget) {
@@ -73,6 +72,8 @@ public class AlgaeSubsystem extends SubsystemBase {
       // Assuming we already have the robot's position on the field
       relativeToField = drivetrainPoseSupplier.get()
           .plus(new Transform2d(relativeToRobot.getTranslation(), relativeToRobot.getRotation()));
+    } else {
+      SmartDashboard.putBoolean("Algae Detected", false);
     }
   }
 
