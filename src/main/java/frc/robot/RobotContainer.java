@@ -162,10 +162,10 @@ public class RobotContainer {
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
     // UNCOMMENT AFTER THE ARM IS TESTED
-    // operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleStowed));
-    // operatorController.povDown().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleGroundIntake));
+    operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
+        ArmConstants.kAngleStowed));
+    operatorController.povDown().onTrue(new ArmSetPositionPIDCmd(armSub,
+        ArmConstants.kAngleGroundIntake));
     // operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
     // ArmConstants.kAngleL2));
     // operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
@@ -179,7 +179,7 @@ public class RobotContainer {
     // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
     driverController.x().onTrue(new IndexToSubsystemCmd(indexerSub, () -> -1));
-    driverController.y().onTrue(new IndexToSubsystemCmd(indexerSub, () -> 1));
+    driverController.y().onTrue(new IndexToSubsystemCmd(indexerSub, () -> 0.75));
     driverController.rightTrigger().whileTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
     driverController.leftTrigger().whileTrue(
@@ -192,7 +192,7 @@ public class RobotContainer {
     driverController.leftStick().onTrue(
         Commands.run(() -> {
           driveSub.isFieldRelative = !driveSub.isFieldRelative;
-        }, driveSub));
+        }));
   }
 
   /**

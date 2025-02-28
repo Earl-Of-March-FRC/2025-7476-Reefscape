@@ -58,7 +58,7 @@ public class IndexToSubsystemCmd extends Command {
       }
     } else {
       // Move towards the intake
-      if (indexerSub.getIntakeSensor()) {
+      if (!indexerSub.getIntakeSensor()) {
         return true;
       }
     }
