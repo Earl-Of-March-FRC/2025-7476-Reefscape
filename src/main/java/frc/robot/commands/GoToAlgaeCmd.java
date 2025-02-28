@@ -38,14 +38,13 @@ public class GoToAlgaeCmd extends Command {
 
     // If the button was pressed, start tracking and moving
     algaeSubsystem.updateTargetPose();
-    PathPlannerPath path = algaeSubsystem.getPath();
 
-    // If the path has changed, cancel the old path command and start a new one
-    if (pathCommand != null) {
-      pathCommand.cancel();
-    }
-    pathCommand = AutoBuilder.followPath(path);
-    pathCommand.schedule();
+    // // If the path has changed, cancel the old path command and start a new one
+    // if (pathCommand != null) {
+    // pathCommand.cancel();
+    // }
+    // pathCommand = AutoBuilder.followPath(path);
+    // pathCommand.schedule();
 
     // Start the intake
     intakeSubsystem.setVelocity(IntakeConstants.kDefaultAlgaeIntake);
@@ -58,7 +57,8 @@ public class GoToAlgaeCmd extends Command {
       }
 
       // Schedule the new path command
-      algaeSubsystem.updateTargetPose(); // Update the target pose
+      PathPlannerPath path = algaeSubsystem.getPath();
+      // algaeSubsystem.updateTargetPose(); // Update the target pose
       // If (and when) the path finishes, gracefully end GoToAlgaeCmd
       pathCommand = AutoBuilder.followPath(algaeSubsystem.getPath()).andThen(
           () -> end(false));
