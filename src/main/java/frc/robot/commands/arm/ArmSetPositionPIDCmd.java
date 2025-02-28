@@ -51,19 +51,18 @@ public class ArmSetPositionPIDCmd extends Command {
     // then set the current arm angle as the new reference angle using position PID
     // If it has already reached the setpoint, it should continue holding its
     // current position
-    // if (Math.abs(
-    // referenceAngle - armSub.getPosition() / ArmConstants.kAngleConversionFactor)
-    // > ArmConstants.kAngleTolerance) {
+    if (Math.abs(
+        referenceAngle - armSub.getPosition() / ArmConstants.kAngleConversionFactor) > ArmConstants.kAngleTolerance) {
 
-    // // Convert the current position to degrees
-    // armSub.setReferencePosition(armSub.getPosition() /
-    // ArmConstants.kAngleConversionFactor);
-    // }
+      // Convert the current position to degrees
+      armSub.setReferencePosition(armSub.getPosition() /
+          ArmConstants.kAngleConversionFactor);
+    }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return armSub.isManual;
   }
 }
