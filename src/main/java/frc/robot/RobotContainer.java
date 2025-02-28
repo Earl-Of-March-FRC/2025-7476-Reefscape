@@ -194,7 +194,11 @@ public class RobotContainer {
           driveSub.isFieldRelative = !driveSub.isFieldRelative;
         }));
     operatorController.axisGreaterThan(OIConstants.kOperatorArmManualAxis, OIConstants.kArmDeadband).onTrue(
-        Commands.run(() -> {
+        Commands.runOnce(() -> {
+          armSub.isManual = true;
+        }));
+    operatorController.axisLessThan(OIConstants.kOperatorArmManualAxis, -OIConstants.kArmDeadband).onTrue(
+        Commands.runOnce(() -> {
           armSub.isManual = true;
         }));
   }

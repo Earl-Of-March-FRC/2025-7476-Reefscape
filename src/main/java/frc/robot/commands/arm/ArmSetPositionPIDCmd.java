@@ -36,6 +36,7 @@ public class ArmSetPositionPIDCmd extends Command {
   public void initialize() {
     armSub.setReferencePosition(referenceAngle);
     armSub.isManual = false;
+    System.out.println("HIIHDISHDISH");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -51,13 +52,14 @@ public class ArmSetPositionPIDCmd extends Command {
     // then set the current arm angle as the new reference angle using position PID
     // If it has already reached the setpoint, it should continue holding its
     // current position
-    if (Math.abs(
-        referenceAngle - armSub.getPosition() / ArmConstants.kAngleConversionFactor) > ArmConstants.kAngleTolerance) {
+    // if (Math.abs(
+    // referenceAngle - armSub.getPosition() / ArmConstants.kAngleConversionFactor)
+    // > ArmConstants.kAngleTolerance) {
 
-      // Convert the current position to degrees
-      armSub.setReferencePosition(armSub.getPosition() /
-          ArmConstants.kAngleConversionFactor);
-    }
+    // // Convert the current position to degrees
+    // armSub.setReferencePosition(armSub.getPosition() /
+    // ArmConstants.kAngleConversionFactor);
+    // }
   }
 
   // Returns true when the command should end.
