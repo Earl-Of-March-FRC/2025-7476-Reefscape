@@ -146,6 +146,9 @@ public final class Constants {
     public static final double camera2X = 0.17;
     public static final double camera2Y = 0.18;
     public static final double camera2Z = 0.45;
+
+    public static final int kAlgaePipeline = 1;
+    public static final int kAprilTagPipeline = 0;
   }
 
   public static final class IntakeConstants {

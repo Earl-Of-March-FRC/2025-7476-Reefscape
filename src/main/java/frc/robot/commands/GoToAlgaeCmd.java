@@ -56,8 +56,6 @@ public class GoToAlgaeCmd extends Command {
         pathCommand.cancel();
       }
 
-      // Schedule the new path command
-      PathPlannerPath path = algaeSubsystem.getPath();
       // algaeSubsystem.updateTargetPose(); // Update the target pose
       // If (and when) the path finishes, gracefully end GoToAlgaeCmd
       pathCommand = AutoBuilder.followPath(algaeSubsystem.getPath()).andThen(

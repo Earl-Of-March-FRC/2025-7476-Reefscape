@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.PhotonCamera;
 
 import com.pathplanner.lib.path.EventMarker;
 import com.pathplanner.lib.path.PathConstraints;
@@ -20,6 +21,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AlgaeConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -29,6 +31,7 @@ public class AlgaeSubsystem extends SubsystemBase {
   private Drivetrain drivetrain;
   private final Supplier<Pose2d> drivetrainPoseSupplier;
   private Pose2d relativeToRobot = new Pose2d(), relativeToField = new Pose2d(); // In m
+  private PhotonCamera camera1;
 
   /**
    * Creates a new AlgaeSubsystem
@@ -37,6 +40,7 @@ public class AlgaeSubsystem extends SubsystemBase {
    *                               position
    */
   public AlgaeSubsystem(Supplier<Pose2d> drivetrainPoseSupplier) {
+    camera1 = new PhotonCamera("camera1");
     this.drivetrainPoseSupplier = drivetrainPoseSupplier;
     networkTable = NetworkTableInstance.getDefault().getTable(AlgaeConstants.kNetworkTableKey);
     relativeToRobot = new Pose2d();
@@ -56,6 +60,8 @@ public class AlgaeSubsystem extends SubsystemBase {
     if (hasTarget) {
       double targetYaw = networkTable.getEntry("targetYaw").getDouble(0.0); // in degrees (x angle)
       double[] targetPose = networkTable.getEntry("targetPose").getDoubleArray(new double[7]);
+
+      SmartDashboard.putBoolean("Algae Detected", targetYaw < 2 && targetYaw > -2);
 
       double xDistance = targetPose[0];
 
@@ -169,11 +175,15 @@ public class AlgaeSubsystem extends SubsystemBase {
 
     // Prevent the path from being flipped if the coordinates are already correct
     // (this was copy pasted from
-    // https://pathplanner.dev/pplib-create-a-path-on-the-fly.html)
+    // https://pathplanner.dev/pplib-create-a-pat(h-on-the-fly.html)
     // TODO verify if this is helpful
     path.preventFlipping = true;
 
     return path;
+  }
+
+  public void setPipeline(int index) {
+    camera1.setPipelineIndex(index);
   }
 
 }

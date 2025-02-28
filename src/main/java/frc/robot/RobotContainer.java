@@ -32,69 +32,69 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
 
-    public final Gyro gyro;
-    public final Drivetrain driveSub;
-    private final LimelightSubsystem limelightSubsystem;
+        public final Gyro gyro;
+        public final Drivetrain driveSub;
+        private final LimelightSubsystem limelightSubsystem;
 
-    private final CommandXboxController driverController = new CommandXboxController(
-            OperatorConstants.kDriverControllerPort);
-    private final LoggedDashboardChooser<Command> autoChooser;
+        private final CommandXboxController driverController = new CommandXboxController(
+                        OperatorConstants.kDriverControllerPort);
+        private final LoggedDashboardChooser<Command> autoChooser;
 
-    private final AlgaeSubsystem algaeSubsystem;
-    private final IntakeSubsystem intakeSub;
-    private GoToAlgaeCmd algaeCommand;
+        private final AlgaeSubsystem algaeSubsystem;
+        private final IntakeSubsystem intakeSub;
+        private GoToAlgaeCmd algaeCommand;
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
+        /**
+         * The container for the robot. Contains subsystems, OI devices, and commands.
+         */
+        public RobotContainer() {
 
-        gyro = new GyroNavX();
-        gyro.calibrate();
+                gyro = new GyroNavX();
+                gyro.calibrate();
 
-        limelightSubsystem = new LimelightSubsystem();
+                limelightSubsystem = new LimelightSubsystem();
 
-        driveSub = new Drivetrain(
-                new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
-                        DriveConstants.kFrontLeftTurningCanId,
-                        DriveConstants.kFrontLeftChassisAngularOffset),
-                new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
-                        DriveConstants.kFrontRightTurningCanId,
-                        DriveConstants.kFrontRightChassisAngularOffset),
-                new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
-                        DriveConstants.kRearLeftTurningCanId,
-                        DriveConstants.kBackLeftChassisAngularOffset),
-                new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
-                        DriveConstants.kRearRightTurningCanId,
-                        DriveConstants.kBackRightChassisAngularOffset),
-                gyro);
+                driveSub = new Drivetrain(
+                                new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
+                                                DriveConstants.kFrontLeftTurningCanId,
+                                                DriveConstants.kFrontLeftChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
+                                                DriveConstants.kFrontRightTurningCanId,
+                                                DriveConstants.kFrontRightChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
+                                                DriveConstants.kRearLeftTurningCanId,
+                                                DriveConstants.kBackLeftChassisAngularOffset),
+                                new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
+                                                DriveConstants.kRearRightTurningCanId,
+                                                DriveConstants.kBackRightChassisAngularOffset),
+                                gyro);
 
-        algaeSubsystem = new AlgaeSubsystem(() -> driveSub.getPose());
+                algaeSubsystem = new AlgaeSubsystem(() -> driveSub.getPose());
 
-        intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
-        driveSub.setDefaultCommand(
-                new DriveCmd(
-                        driveSub,
-                        () -> MathUtil.applyDeadband(
-                                -driverController.getRawAxis(
-                                        OIConstants.kDriverControllerYAxis),
-                                OIConstants.kDriveDeadband),
-                        () -> MathUtil.applyDeadband(
-                                -driverController.getRawAxis(
-                                        OIConstants.kDriverControllerXAxis),
-                                OIConstants.kDriveDeadband),
-                        () -> MathUtil.applyDeadband(
-                                -driverController.getRawAxis(
-                                        OIConstants.kDriverControllerRotAxis),
-                                OIConstants.kDriveDeadband)));
+                intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
+                driveSub.setDefaultCommand(
+                                new DriveCmd(
+                                                driveSub,
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerYAxis),
+                                                                OIConstants.kDriveDeadband),
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerXAxis),
+                                                                OIConstants.kDriveDeadband),
+                                                () -> MathUtil.applyDeadband(
+                                                                -driverController.getRawAxis(
+                                                                                OIConstants.kDriverControllerRotAxis),
+                                                                OIConstants.kDriveDeadband)));
 
-        autoChooser = new LoggedDashboardChooser<>("Auto Routine",
-                AutoBuilder.buildAutoChooser());
-        configureAutos();
-        configureBindings();
-    }
+                autoChooser = new LoggedDashboardChooser<>("Auto Routine",
+                                AutoBuilder.buildAutoChooser());
+                configureAutos();
+                configureBindings();
+        }
 
-    /**
+        /**
          * Use this method to define your trigger->command mappings. Triggers can be
          * created via the
          * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
@@ -110,28 +110,28 @@ public class RobotContainer {
          */
         private void configureBindings() {
                 driverController.a()
-                                .whileTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub))
-                                // .onFalse(new GoToAlgaeCmd(algaeSubsystem, intakeSub)
-                                //                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
+                                .whileTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub));
+                // .onFalse(new GoToAlgaeCmd(algaeSubsystem, intakeSub)
+                // .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
 
                 driverController.b().onTrue(new CalibrateCmd(driveSub));
         }
 
-    /**
-     * Use this method to define the autonomous command.
-     */
-    private void configureAutos() {
-        autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
-        autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
-        SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
-    }
+        /**
+         * Use this method to define the autonomous command.
+         */
+        private void configureAutos() {
+                autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+                autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
+                SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
+        }
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        return autoChooser.get();
-    }
+        /**
+         * Use this to pass the autonomous command to the main {@link Robot} class.
+         *
+         * @return the command to run in autonomous
+         */
+        public Command getAutonomousCommand() {
+                return autoChooser.get();
+        }
 }
