@@ -29,7 +29,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkClosedLoopController armClosedLoopController;
   public boolean isManual = false;
 
-  // Starting angl e of the arm, in radians
+  // Starting angle of the arm, in radians
   // Ex: arm starting position is 1 radian, then m_armAngularOffset is 1
   private double m_armAngularOffset = 0;
 
@@ -100,9 +100,13 @@ public class ArmSubsystem extends SubsystemBase {
 
     // If arm needs to move up to reach reference position, use the upward
     // closed-loop controller
-    if (getPosition() <= refAngleWithOffset) {
+    // Note: arm moving upward is in the negative direction
+    if (getPosition() >= refAngleWithOffset) {
       closedLoopSlot = ClosedLoopSlot.kSlot0;
-    } else {
+    }
+
+    // Otherwise, use the downward closed-loop controller
+    else {
       closedLoopSlot = ClosedLoopSlot.kSlot1;
     }
 

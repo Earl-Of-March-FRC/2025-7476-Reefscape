@@ -55,13 +55,14 @@ public class ArmSetPositionPIDCmd extends Command {
         referenceAngle - armSub.getPosition() / ArmConstants.kAngleConversionFactor) > ArmConstants.kAngleTolerance) {
 
       // Convert the current position to degrees
-      armSub.setReferencePosition(armSub.getPosition() / ArmConstants.kAngleConversionFactor);
+      armSub.setReferencePosition(armSub.getPosition() /
+          ArmConstants.kAngleConversionFactor);
     }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return armSub.isManual;
   }
 }

@@ -4,12 +4,16 @@
 
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -21,10 +25,13 @@ import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.CalibrateCmd;
 import frc.robot.commands.DriveCmd;
+import frc.robot.commands.MoveAlgaeToIntake;
+import frc.robot.commands.MoveAlgaeToLauncher;
 import frc.robot.commands.TimedAutoDrive;
 import frc.robot.commands.arm.ArmResetEncoderCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
+import frc.robot.commands.indexer.IndexToSubsystemCmd;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeStopCmd;
@@ -64,8 +71,7 @@ public class RobotContainer {
   private final CommandXboxController operatorController = new CommandXboxController(
       OIConstants.kOperatorControllerPort);
 
-  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>(
-      "Auto Routine");
+  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -158,15 +164,15 @@ public class RobotContainer {
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
     // UNCOMMENT AFTER THE ARM IS TESTED
-    // operatorController.povCenter().whileTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleStowed));
-    // operatorController.povDown().whileTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleGroundIntake));
-    // operatorController.povRight().whileTrue(new ArmSetPositionPIDCmd(armSub,
+    operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
+        ArmConstants.kAngleStowed));
+    operatorController.povDown().onTrue(
+        new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleGroundIntake));
+    // operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
     // ArmConstants.kAngleL2));
-    // operatorController.povLeft().whileTrue(new ArmSetPositionPIDCmd(armSub,
+    // operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
     // ArmConstants.kAngleL3));
-    // operatorController.povUp().whileTrue(new ArmSetPositionPIDCmd(armSub,
+    // operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
     // ArmConstants.kAngleProcessor));
 
     operatorController.a()
@@ -174,14 +180,27 @@ public class RobotContainer {
 
     // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
-
+    driverController.x().onTrue(new IndexToSubsystemCmd(indexerSub, () -> -1));
+    driverController.y().onTrue(new IndexToSubsystemCmd(indexerSub, () -> 0.75));
     driverController.rightTrigger().whileTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
+    driverController.leftTrigger().whileTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, -LauncherConstants.kVelocityFront,
+            -LauncherConstants.kVelocityBack));
     driverController.rightBumper().whileTrue(
-        new IndexerSetVelocityManualCmd(indexerSub, () -> IndexerConstants.kDirectionConstant));
+        new MoveAlgaeToLauncher(launcherSub, intakeSub, indexerSub, LauncherConstants.kVelocityFront,
+            LauncherConstants.kVelocityBack, () -> 1, () -> 0.75));
     driverController.leftBumper().whileTrue(
-        new IndexerSetVelocityManualCmd(indexerSub, () -> -IndexerConstants.kDirectionConstant));
-
+        new MoveAlgaeToIntake(armSub, launcherSub, intakeSub, indexerSub, ArmConstants.kAngleL2, () -> -1, () -> -1,
+            () -> -1));
+    driverController.leftStick().onTrue(
+        Commands.run(() -> {
+          driveSub.isFieldRelative = !driveSub.isFieldRelative;
+        }));
+    operatorController.axisGreaterThan(OIConstants.kOperatorArmManualAxis, OIConstants.kArmDeadband).onTrue(
+        Commands.run(() -> {
+          armSub.isManual = true;
+        }));
   }
 
   /**
