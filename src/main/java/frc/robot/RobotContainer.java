@@ -4,24 +4,46 @@
 
 package frc.robot;
 
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.CalibrateCmd;
-import frc.robot.commands.DriveCmd;
-import frc.robot.commands.TimedAutoDrive;
-import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.drivetrain.Gyro;
-import frc.robot.subsystems.drivetrain.GyroADXRS450;
-import frc.robot.subsystems.drivetrain.GyroNavX;
-import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.IndexerConstants;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.LauncherConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.commands.CalibrateCmd;
+import frc.robot.commands.DriveCmd;
+import frc.robot.commands.TimedAutoDrive;
+import frc.robot.commands.arm.ArmResetEncoderCmd;
+import frc.robot.commands.arm.ArmSetPositionPIDCmd;
+import frc.robot.commands.arm.ArmSetVelocityManualCmd;
+import frc.robot.commands.indexer.IndexToSubsystemCmd;
+import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
+import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
+import frc.robot.commands.intake.IntakeStopCmd;
+import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
+import frc.robot.commands.launcher.LauncherStopCmd;
+import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Gyro;
+import frc.robot.subsystems.drivetrain.GyroNavX;
+import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import frc.robot.subsystems.indexer.BeamBreakSensor;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.launcher.Launcher;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -37,8 +59,15 @@ public class RobotContainer {
   public final Drivetrain driveSub;
   public final Gyro gyro;
 
+  private final ArmSubsystem armSub;
+  private final IntakeSubsystem intakeSub;
+  private final Indexer indexerSub;
+  private final Launcher launcherSub;
+
   private final CommandXboxController driverController = new CommandXboxController(
-      OperatorConstants.kDriverControllerPort);
+      OIConstants.kDriverControllerPort);
+  private final CommandXboxController operatorController = new CommandXboxController(
+      OIConstants.kOperatorControllerPort);
 
   private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
 
@@ -64,6 +93,19 @@ public class RobotContainer {
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
 
+    armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType));
+
+    intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
+
+    indexerSub = new Indexer(
+        new SparkMax(IndexerConstants.kMotorCanId, IndexerConstants.kMotorType),
+        new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel),
+        new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel));
+
+    launcherSub = new Launcher(
+        new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
+        new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
+
     driveSub.setDefaultCommand(
         new DriveCmd(
             driveSub,
@@ -79,6 +121,10 @@ public class RobotContainer {
                 -driverController.getRawAxis(
                     OIConstants.kDriverControllerRotAxis),
                 OIConstants.kDriveDeadband)));
+
+    // indexerSub.setDefaultCommand(
+    // new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
+
     configureAutos();
     configureBindings();
   }
@@ -98,7 +144,59 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    // Manual arm control with
+    armSub.setDefaultCommand(
+        new ArmSetVelocityManualCmd(armSub, () -> MathUtil.applyDeadband(
+            operatorController.getRawAxis(
+                OIConstants.kOperatorArmManualAxis) * 0.5,
+            OIConstants.kArmDeadband)));
+
+    // Manual intake (arm roller) control with
+    intakeSub.setDefaultCommand(
+        new IntakeSetVelocityManualCmd(intakeSub,
+            () -> MathUtil.applyDeadband(
+                operatorController.getRawAxis(
+                    OIConstants.kOperatorIntakeManualAxis),
+                OIConstants.kIntakeDeadband)));
+
     driverController.b().onTrue(new CalibrateCmd(driveSub));
+
+    // UNCOMMENT AFTER THE ARM IS TESTED
+    operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
+        ArmConstants.kAngleStowed));
+    operatorController.povDown().onTrue(
+        new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleGroundIntake));
+    // operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleL2));
+    // operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleL3));
+    // operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
+    // ArmConstants.kAngleProcessor));
+
+    operatorController.a()
+        .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
+
+    // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
+    // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
+    driverController.x().onTrue(new IndexToSubsystemCmd(indexerSub, () -> -1));
+    driverController.y().onTrue(new IndexToSubsystemCmd(indexerSub, () -> 0.75));
+    driverController.rightTrigger().whileTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
+    driverController.leftTrigger().whileTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, -LauncherConstants.kVelocityFront,
+            -LauncherConstants.kVelocityBack));
+    driverController.rightBumper().whileTrue(
+        new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
+    driverController.leftBumper().whileTrue(
+        new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
+    driverController.leftStick().onTrue(
+        Commands.run(() -> {
+          driveSub.isFieldRelative = !driveSub.isFieldRelative;
+        }));
+    operatorController.axisGreaterThan(OIConstants.kOperatorArmManualAxis, OIConstants.kArmDeadband).onTrue(
+        Commands.run(() -> {
+          armSub.isManual = true;
+        }));
   }
 
   /**
@@ -117,5 +215,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public CommandXboxController getOperatorController() {
+    return operatorController;
   }
 }

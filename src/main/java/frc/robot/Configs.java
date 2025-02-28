@@ -1,9 +1,14 @@
 package frc.robot;
 
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.IndexerConstants;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.ModuleConstants;
 
 public final class Configs {
@@ -51,6 +56,78 @@ public final class Configs {
           // longer route.
           .positionWrappingEnabled(true)
           .positionWrappingInputRange(0, turningFactor);
+    }
+  }
+
+  public static final class ArmConfigs {
+    public static final SparkMaxConfig armConfig = new SparkMaxConfig();
+
+    static {
+
+      armConfig
+          .idleMode(IdleMode.kBrake) // Set to kBrake to hold position when not moving
+          .smartCurrentLimit(30); // Adjust current limit as needed
+
+      armConfig.encoder
+          .positionConversionFactor(ArmConstants.kPositionConversionFactor) // Radians
+          .velocityConversionFactor(ArmConstants.kVelocityConversionFactor); // Radians per second
+
+      armConfig.closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          // Upward position PID controller is slot 0
+          .pidf(ArmConstants.kPUpPositionController, ArmConstants.kIUpPositionController,
+              ArmConstants.kDUpPositionController, ArmConstants.kUpPositionFF, ClosedLoopSlot.kSlot0)
+          // Downward position PID controller is slot 1
+          .pidf(ArmConstants.kPDownPositionController, ArmConstants.kIDownPositionController,
+              ArmConstants.kDDownPositionController, ArmConstants.kDownPositionFF, ClosedLoopSlot.kSlot1)
+          .outputRange(-1, 1);
+    }
+  }
+
+  public static final class IntakeConfigs {
+    public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();
+
+    static {
+      intakeConfig
+          .idleMode(IdleMode.kBrake) // Set to kBrake to hold position when not moving
+          .smartCurrentLimit(30); // Adjust current limit as needed
+
+      intakeConfig.encoder
+          .positionConversionFactor(IntakeConstants.kPositionConversionFactor * IntakeConstants.kMotorReduction)
+          .velocityConversionFactor(IntakeConstants.kVelocityConversionFactor * IntakeConstants.kMotorReduction);
+    }
+  }
+
+  public static final class IndexerConfigs {
+
+    public static final SparkMaxConfig indexerConfig = new SparkMaxConfig();
+
+    static {
+      indexerConfig.idleMode(IdleMode.kBrake);
+      indexerConfig.smartCurrentLimit(40);
+      indexerConfig.encoder
+          .velocityConversionFactor(IndexerConstants.kWheelDiameterMeters * Math.PI
+              / IndexerConstants.kMotorReduction / 60);
+    }
+  }
+
+  public static final class LauncherConfigs {
+    public static final SparkMaxConfig launcherConfig = new SparkMaxConfig();
+
+    static {
+      launcherConfig
+          .idleMode(IdleMode.kCoast)
+          .smartCurrentLimit(50);
+      launcherConfig.encoder
+          .positionConversionFactor(1)
+          .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
+      launcherConfig.closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .pidf(LauncherConstants.kPVelocityController,
+              LauncherConstants.kIVelocityController,
+              LauncherConstants.kDVelocityController,
+              LauncherConstants.kVelocityFF)
+          .outputRange(-1, 1);
     }
   }
 }
