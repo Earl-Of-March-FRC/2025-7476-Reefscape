@@ -187,9 +187,24 @@ public class RobotContainer {
     driverController.leftTrigger().whileTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, -LauncherConstants.kVelocityFront,
             -LauncherConstants.kVelocityBack));
-    driverController.rightBumper().whileTrue(
-        new MoveAlgaeToLauncher(launcherSub, intakeSub, indexerSub, LauncherConstants.kVelocityFront,
-            LauncherConstants.kVelocityBack, () -> 1, () -> 0.75));
+
+    driverController.rightBumper().onTrue(
+        new MoveAlgaeToLauncher(
+            launcherSub,
+            intakeSub,
+            indexerSub,
+            LauncherConstants.kVelocityFront,
+            LauncherConstants.kVelocityBack,
+            LauncherConstants.kVelocityTolerance,
+            LauncherConstants.kVelocityTolerance,
+            () -> 1,
+            () -> 0.75,
+            () -> !driverController.rightBumper().getAsBoolean() // Signals a launch when the driver lets go of the
+                                                                 // right bumper.
+
+        )
+
+    );
     driverController.leftBumper().whileTrue(
         new MoveAlgaeToIntake(armSub, launcherSub, intakeSub, indexerSub, ArmConstants.kAngleL2, () -> -1, () -> -1,
             () -> -1));
