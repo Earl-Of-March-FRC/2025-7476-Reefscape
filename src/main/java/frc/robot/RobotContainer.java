@@ -173,9 +173,10 @@ public class RobotContainer {
         () -> ArmConstants.kAngleL2 - armSub.armOffset));
     operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
         () -> ArmConstants.kAngleL3 - armSub.armOffset));
-    // operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleProcessor));
-
+    operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleProcessor - armSub.armOffset));
+    operatorController.button(8).onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleCoral - armSub.armOffset));
     operatorController.a()
         .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
 
