@@ -103,9 +103,12 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
     public static final double kMaxAngularSpeed = 2 * Math.PI;
 
-    public static final double kPXController = 1;
-    public static final double kPYController = 1;
+    public static final double kPTranslationController = 1.5;
     public static final double kPThetaController = 1;
+    public static final double kITranslationController = 0.75;
+    public static final double kIThetaController = 0;
+    public static final double kDTranslationController = 0.25;
+    public static final double kDThetaController = 0;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
@@ -168,11 +171,43 @@ public final class Constants {
     public static final double kDefaultAlgaeIntake = 0.7;
   }
 
-  public static final class PhotonConstants {
-    public static int kAprilTagPipeline = 0;
-    public static int kAlgaePipeline = 1;
+  public static final class LimelightConstants {
+    public static final String kNetworkTableKey = "limelight";
+    public static final String kNetworkTableEntry = "llpython";
+    public static final boolean hasBorders = true;
+  }
 
-    public static String kCamera1 = "camera1";
+  public static final class AlgaeConstants {
+    // public static final String kNetworkTableKey = "algae_vision";
+    public static final String kNetworkTableKey = "photonvision";
+    public static final double camera1X = 0.0;
+    public static final double camera1Z = 0.0;
+  }
+
+  public static final class OperatorConstants {
+    public static final int kDriverControllerPort = 0;
+  }
+
+  public static final class PhotonConstants {
+    public static final double camera1Roll = 0;
+    public static final double camera1Pitch = 0;
+    public static final double camera1Yaw = 0;
+    public static final double camera1X = 0.29;
+    public static final double camera1Y = 0.21;
+    public static final double camera1Z = 0.52;
+
+    public static final double camera2Roll = -4.851 * Math.PI / 180;
+    public static final double camera2Pitch = 0;
+    public static final double camera2Yaw = Math.PI;
+    public static final double camera2X = 0.17;
+    public static final double camera2Y = 0.18;
+    public static final double camera2Z = 0.45;
+
+    public static final int kAlgaePipeline = 1;
+    public static final int kAprilTagPipeline = 0;
+
+    public static final String kCamera1 = "camera1";
+    public static final String kCamera2 = "camera2";
   }
 
   public static final class IndexerConstants {
