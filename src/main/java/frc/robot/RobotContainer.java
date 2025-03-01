@@ -23,9 +23,8 @@ import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.CalibrateCmd;
-import frc.robot.commands.DriveCmd;
-import frc.robot.commands.TimedAutoDrive;
+import frc.robot.commands.drivetrain.*;
+import frc.robot.commands.GoToAlgaeCmd;
 import frc.robot.commands.arm.ArmResetEncoderCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
@@ -44,6 +43,7 @@ import frc.robot.subsystems.indexer.BeamBreakSensor;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
+import frc.robot.subsystems.vision.AlgaeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -63,6 +63,7 @@ public class RobotContainer {
   private final IntakeSubsystem intakeSub;
   private final Indexer indexerSub;
   private final Launcher launcherSub;
+  private final AlgaeSubsystem algaeSubsystem;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
@@ -121,6 +122,8 @@ public class RobotContainer {
                 -driverController.getRawAxis(
                     OIConstants.kDriverControllerRotAxis),
                 OIConstants.kDriveDeadband)));
+
+    algaeSubsystem = new AlgaeSubsystem(() -> driveSub.getPose());
 
     // indexerSub.setDefaultCommand(
     // new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
@@ -201,6 +204,7 @@ public class RobotContainer {
         Commands.runOnce(() -> {
           armSub.isManual = true;
         }));
+    driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub));
   }
 
   /**

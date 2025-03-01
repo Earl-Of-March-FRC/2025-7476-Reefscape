@@ -163,6 +163,16 @@ public final class Constants {
 
     // Percent output for intake rollers
     public static final double kDefaultPercent = 0.5;
+
+    // Percent output for algae intake rollers
+    public static final double kDefaultAlgaeIntake = 0.7;
+  }
+
+  public static final class PhotonConstants {
+    public static int kAprilTagPipeline = 0;
+    public static int kAlgaePipeline = 1;
+
+    public static String kCamera1 = "camera1";
   }
 
   public static final class IndexerConstants {
