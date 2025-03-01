@@ -199,10 +199,9 @@ public class RobotContainer {
             LauncherConstants.kVelocityTolerance,
             () -> 1,
             () -> 0.75,
-            () -> !driverController.rightBumper().getAsBoolean() // Signals a launch when the driver lets go of the
-                                                                 // right bumper.
-
-        )
+            () -> !driverController.rightBumper().getAsBoolean(), // Signals a launch when the driver lets go of the
+                                                                  // right bumper.
+            3.0)
 
     );
     driverController.leftBumper().whileTrue(
