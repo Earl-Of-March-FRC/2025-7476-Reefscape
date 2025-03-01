@@ -4,9 +4,15 @@
 
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants.LauncherConstants;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
@@ -20,45 +26,110 @@ import frc.robot.subsystems.launcher.Launcher;
  * the timeline of tasks being ran.
  */
 public class MoveAlgaeToLauncher extends SequentialCommandGroup {
-
   /**
    * Create a MoveAlgaeToLauncher command
    * 
-   * @param launcher              The launcher subsystem
-   * @param intake                The intake subsystem
-   * @param indexer               The indexer subsystem
-   * @param launcherFrontVelocity The velocity (PID) to run the launcher's front
-   *                              rollers at
-   * @param launcherBackVelocity  The velocity (PID) to run the launcher's back
-   *                              rollers at
-   * @param intakeVelocity        The velocity (percent) to run the intake at
-   * @param indexerVelocity       The velocity (percent) to run the indexer at
+   * @param launcher                       The launcher subsystem
+   * @param intake                         The intake subsystem
+   * @param indexer                        The indexer subsystem
+   * @param launcherFrontReferenceVelocity The velocity (PID) of the front rollers
+   *                                       to
+   *                                       launch the algae at
+   * @param launcherBackReferenceVelocity  The velocity (PID) of the back rollers
+   *                                       to
+   *                                       launch the algae at
+   * @param launcherFrontTolerance         The PID tolerance of the launcher's
+   *                                       front
+   *                                       roller
+   * @param launcherBackTolerance          The PID tolerance of the launcher's
+   *                                       back roller
+   * @param intakeVelocity                 The velocity (percent) to intake algae
+   * @param indexerVelocity                The velocity (percent) to move algae
+   *                                       from the
+   *                                       intake to the launcher
+   * @param releaseSignal                  Returns true when the driver releases
+   *                                       the trigger.
+   *                                       If the launcher's velocity doesn't meet
+   *                                       the tolerance, the command will be
+   *                                       cancelled without
+   *                                       launching the algae.
+   * @param launchTimeout                  Timeout (seconds) after the driver
+   *                                       triggers a launch.
    */
   public MoveAlgaeToLauncher(
       Launcher launcher,
       IntakeSubsystem intake,
       Indexer indexer,
-      double launcherFrontVelocity,
-      double launcherBackVelocity,
+      double launcherFrontReferenceVelocity,
+      double launcherBackReferenceVelocity,
+      double launcherFrontTolerance,
+      double launcherBackTolerance,
       DoubleSupplier intakeVelocity,
-      DoubleSupplier indexerVelocity) {
+      DoubleSupplier indexerVelocity,
+      BooleanSupplier releaseSignal,
+      double launchTimeout) {
+
+    /*
+     * Supplier returns true when the launcher rollers' recorded velocity is within
+     * the range of the tolerance.
+     */
+    BooleanSupplier launcherIsRevved = () -> {
+      // Get absolute values
+      final double absFront = Math.abs(launcher.getFrontVelocity()); // Front velocity
+      final double absBack = Math.abs(launcher.getBackVelocity()); // Back velocity
+      final double absFrontSetpoint = Math.abs(launcherFrontReferenceVelocity); // Front setpoint
+      final double absBackSetpoint = Math.abs(launcherBackReferenceVelocity); // Back setpoint
+
+      // Condition: (setpoint - tolerance) <= velocity <= (setpoint + tolerance)
+      return
+
+      // Front roller
+      (absFront >= absFrontSetpoint - launcherFrontTolerance
+          && absFront <= absFrontSetpoint + launcherFrontTolerance)
+
+          // Back roller
+          && (absBack >= absBackSetpoint - launcherBackTolerance
+              && absBack <= absBackSetpoint + launcherBackTolerance);
+    };
 
     addCommands(
         /*
-         * Run the intake and the indexer towards the launcher until the algae makes it
-         * to the launcher sensor, or this command is interrupted.
+         * Move the algae towards the launcher while the launcher is revving up. This
+         * ends when the launcher is fully revved, or the driver releases the trigger.
          */
-        new IntakeSetVelocityManualCmd(intake, intakeVelocity)
-            .alongWith(new IndexerSetVelocityManualCmd(indexer, indexerVelocity))
-            .until(() -> indexer.getLauncherSensor()),
+        new ParallelCommandGroup(
+            /* Move algae to launcher sensor */
+            new IntakeSetVelocityManualCmd(intake, intakeVelocity).until(() -> indexer.getLauncherSensor()),
+            new IndexerSetVelocityManualCmd(indexer, indexerVelocity).until(() -> indexer.getLauncherSensor()),
+
+            /* Run launcher in order to rev it up */
+            new LauncherSetVelocityPIDCmd(launcher, launcherFrontReferenceVelocity, launcherBackReferenceVelocity)
+
+        ).until(() -> launcherIsRevved.getAsBoolean() || releaseSignal.getAsBoolean()),
 
         /*
-         * Start the launcher and keep it going until this command is interrupted.
+         * Launch the algae if the launcher is already revved. Otherwise, this step will
+         * be ignored and the command will end.
          * 
-         * Keep running the indexer until the launcher sensor no longer detects an
-         * algae, or this command is interrupted.
+         * Once the above condition passes, this step will end once the algae leaves the
+         * launcher sensor, which indicates that it was launched.
+         * 
+         * This step also times out in case for some reason, the algae isn't being
+         * launched.
          */
-        new LauncherSetVelocityPIDCmd(launcher, launcherFrontVelocity, launcherBackVelocity).alongWith(
-            new IndexerSetVelocityManualCmd(indexer, indexerVelocity).until(() -> !indexer.getLauncherSensor())));
+        new ParallelCommandGroup(
+            /*
+             * If the algae is still not at the launcher sensor (for some reason), the
+             * intake will continue to run, in case the algae is still in the intake. This
+             * will end once the algae reaches the launcher sensor.
+             */
+            new IntakeSetVelocityManualCmd(intake, intakeVelocity).onlyIf(() -> !indexer.getLauncherSensor())
+                .until(() -> indexer.getLauncherSensor()),
+
+            /* Launch the algae. */
+            new IndexerSetVelocityManualCmd(indexer, indexerVelocity),
+            new LauncherSetVelocityPIDCmd(launcher, launcherFrontReferenceVelocity, launcherBackReferenceVelocity)
+
+        ).onlyIf(launcherIsRevved).until(() -> !indexer.getLauncherSensor()).withTimeout(launchTimeout));
   }
 }
