@@ -166,13 +166,13 @@ public class RobotContainer {
 
     // UNCOMMENT AFTER THE ARM IS TESTED
     operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
-        ArmConstants.kAngleStowed));
+        () -> ArmConstants.kAngleStowed - armSub.armOffset));
     operatorController.povDown().onTrue(
-        new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleGroundIntake));
-    // operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleL2));
-    // operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleL3));
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake - armSub.armOffset));
+    operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleL2 - armSub.armOffset));
+    operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleL3 - armSub.armOffset));
     // operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
     // ArmConstants.kAngleProcessor));
 
@@ -204,6 +204,16 @@ public class RobotContainer {
         Commands.runOnce(() -> {
           armSub.isManual = true;
         }));
+    operatorController.leftBumper().onTrue(
+        Commands.runOnce(() -> {
+          armSub.armOffset += 2;
+        }));
+
+    operatorController.rightBumper().onTrue(
+        Commands.runOnce(() -> {
+          armSub.armOffset -= 2;
+        }));
+
     driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub));
   }
 
