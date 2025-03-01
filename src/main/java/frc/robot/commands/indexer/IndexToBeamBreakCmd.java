@@ -11,20 +11,20 @@ import frc.robot.Constants.IndexerConstants;
 import frc.robot.subsystems.indexer.Indexer;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class IndexToSubsystemCmd extends Command {
+public class IndexToBeamBreakCmd extends Command {
   private final Indexer indexerSub;
   private final DoubleSupplier percentVelocity;
 
   /**
-   * Creates a new IndexToSubsystemCmd.
-   * Runs the indexer towards a subsystem.
+   * Creates a new IndexToBeamBreak.
+   * Runs the indexer towards a beam-break.
    * 
    * @param indexerSub      The indexer subsystem used by this command.
    * @param percentVelocity The velocity to run the indexer. Will determine the
-   *                        direction to run at, therefore which subsystem to run
+   *                        direction to run at, therefore which beam-break to run
    *                        to.
    */
-  public IndexToSubsystemCmd(Indexer indexerSub, DoubleSupplier percentVelocity) {
+  public IndexToBeamBreakCmd(Indexer indexerSub, DoubleSupplier percentVelocity) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.indexerSub = indexerSub;
     this.percentVelocity = percentVelocity;
