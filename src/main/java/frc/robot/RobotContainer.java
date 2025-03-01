@@ -31,7 +31,7 @@ import frc.robot.commands.TimedAutoDrive;
 import frc.robot.commands.arm.ArmResetEncoderCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
-import frc.robot.commands.indexer.IndexToSubsystemCmd;
+import frc.robot.commands.indexer.IndexToBeamBreakCmd;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeStopCmd;
@@ -180,8 +180,8 @@ public class RobotContainer {
 
     // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
-    driverController.x().onTrue(new IndexToSubsystemCmd(indexerSub, () -> -1));
-    driverController.y().onTrue(new IndexToSubsystemCmd(indexerSub, () -> 0.75));
+    driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
+    driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
     driverController.rightTrigger().whileTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
     driverController.leftTrigger().whileTrue(
@@ -198,7 +198,11 @@ public class RobotContainer {
           driveSub.isFieldRelative = !driveSub.isFieldRelative;
         }));
     operatorController.axisGreaterThan(OIConstants.kOperatorArmManualAxis, OIConstants.kArmDeadband).onTrue(
-        Commands.run(() -> {
+        Commands.runOnce(() -> {
+          armSub.isManual = true;
+        }));
+    operatorController.axisLessThan(OIConstants.kOperatorArmManualAxis, -OIConstants.kArmDeadband).onTrue(
+        Commands.runOnce(() -> {
           armSub.isManual = true;
         }));
   }
