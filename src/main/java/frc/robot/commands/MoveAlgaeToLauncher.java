@@ -47,6 +47,8 @@ public class MoveAlgaeToLauncher extends ParallelCommandGroup {
    *                               tolerance, the command will be cancelled
    *                               without
    *                               launching the algae.
+   * @param launchTimeout          Timeout (seconds) after the driver triggers a
+   *                               launch.
    */
   public MoveAlgaeToLauncher(
       Launcher launcher,
@@ -58,7 +60,8 @@ public class MoveAlgaeToLauncher extends ParallelCommandGroup {
       double launcherBackTolerance,
       DoubleSupplier intakeVelocity,
       DoubleSupplier indexerVelocity,
-      BooleanSupplier launchSignal) {
+      BooleanSupplier launchSignal,
+      double launchTimeout) {
 
     /*
      * Supplier returns true when the launcher rollers' recorded velocity is within
@@ -99,10 +102,10 @@ public class MoveAlgaeToLauncher extends ParallelCommandGroup {
             .until(() -> indexer.getLauncherSensor() && launcherIsRevved.getAsBoolean())
             /*
              * Keep running the launcher at the setpoint (to launch the algae) until the
-             * algae leaves the launcher sensor.
+             * algae leaves the launcher sensor, or time runs out.
              */
             .andThen(new LauncherSetVelocityPIDCmd(launcher, launcherFrontVelocity, launcherBackVelocity)
-                .until(() -> !indexer.getLauncherSensor())),
+                .until(() -> !indexer.getLauncherSensor()).withTimeout(launchTimeout)),
 
         /* Will run the following commands one at a time instead of in unison. */
         new SequentialCommandGroup(
@@ -117,10 +120,12 @@ public class MoveAlgaeToLauncher extends ParallelCommandGroup {
             /*
              * If the launcher has been revved, the indexer will start again to move the
              * algae from the launcher sensor into the launcher. This will stop
-             * when the algae leaves the launcher sensor.
+             * when the algae leaves the launcher sensor, or time runs out.
              */
-            new IndexerSetVelocityManualCmd(indexer, indexerVelocity).onlyIf(launcherIsRevved))
+            new IndexerSetVelocityManualCmd(indexer, indexerVelocity)
+                .onlyIf(launcherIsRevved))
             .until(() -> !indexer.getLauncherSensor())
+            .withTimeout(launchTimeout)
 
     );
   }
