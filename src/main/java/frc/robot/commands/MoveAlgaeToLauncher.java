@@ -16,6 +16,7 @@ import frc.robot.Constants.LauncherConstants;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
+import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
@@ -57,6 +58,9 @@ public class MoveAlgaeToLauncher extends SequentialCommandGroup {
    *                                       triggers a launch.
    */
   public MoveAlgaeToLauncher(
+      ArmSubsystem arm,
+      DoubleSupplier armIntakePosition,
+      double armTolerance,
       Launcher launcher,
       IntakeSubsystem intake,
       Indexer indexer,
@@ -92,14 +96,32 @@ public class MoveAlgaeToLauncher extends SequentialCommandGroup {
               && absBack <= absBackSetpoint + launcherBackTolerance);
     };
 
+    /*
+     * Supplier returns true when the arm position is within the tolerance.
+     */
+    BooleanSupplier armIntaking = () -> {
+      // Get absolute values
+      final double absPos = Math.abs(arm.getPosition()); // Front velocity
+      final double absSetpoint = Math.abs(armIntakePosition.getAsDouble()); // Back setpoint
+
+      // Condition: (setpoint - tolerance) <= velocity <= (setpoint + tolerance)
+      return
+
+      // Position
+      (absPos >= absSetpoint - armTolerance
+          && absPos <= absSetpoint + armTolerance);
+    };
+
     addCommands(
         /*
          * Move the algae towards the launcher while the launcher is revving up. This
          * ends when the launcher is fully revved, or the driver releases the trigger.
          */
         new ParallelCommandGroup(
+            /* If arm is in intaking position, run the intake. */
+            new IntakeSetVelocityManualCmd(intake, intakeVelocity).onlyWhile(armIntaking)
+                .until(() -> indexer.getLauncherSensor()),
             /* Move algae to launcher sensor */
-            new IntakeSetVelocityManualCmd(intake, intakeVelocity).until(() -> indexer.getLauncherSensor()),
             new IndexerSetVelocityManualCmd(indexer, indexerVelocity).until(() -> indexer.getLauncherSensor()),
 
             /* Run launcher in order to rev it up */

@@ -34,8 +34,6 @@ public class MoveAlgaeToIntake extends SequentialCommandGroup {
    *                         algae.
    * @param launcherVelocity The velocity (percent) to run the launcher
    *                         motors at
-   * @param intakeVelocity   The velocity (percent) to run the intake motors
-   *                         at
    * @param indexerVelocity  The velocity (percent) to run the indexer
    *                         motors
    *                         at
@@ -43,11 +41,10 @@ public class MoveAlgaeToIntake extends SequentialCommandGroup {
   public MoveAlgaeToIntake(
       ArmSubsystem arm,
       Launcher launcher,
-      IntakeSubsystem intake,
+      // IntakeSubsystem intake,
       Indexer indexer,
       double armMinSetpoint,
       DoubleSupplier launcherVelocity,
-      DoubleSupplier intakeVelocity,
       DoubleSupplier indexerVelocity) {
 
     addCommands(
@@ -67,12 +64,13 @@ public class MoveAlgaeToIntake extends SequentialCommandGroup {
         new WaitUntilCommand(() -> arm.getPosition() <= armMinSetpoint),
 
         /*
-         * Start the intake and keep it going until this command is interrupted.
+         * (Ignore this line) Start the intake and keep it going until this command is
+         * interrupted.
          * 
          * Keep running the indexer until the intake sensor no longer detects an
          * algae, or this command is interrupted.
          */
-        new IntakeSetVelocityManualCmd(intake, intakeVelocity).alongWith(
-            new IndexerSetVelocityManualCmd(indexer, indexerVelocity).until(() -> !indexer.getIntakeSensor())));
+        // new IntakeSetVelocityManualCmd(intake, intakeVelocity).alongWith(
+        new IndexerSetVelocityManualCmd(indexer, indexerVelocity).until(() -> !indexer.getIntakeSensor()));
   }
 }

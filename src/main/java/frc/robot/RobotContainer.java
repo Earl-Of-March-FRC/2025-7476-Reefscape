@@ -190,6 +190,9 @@ public class RobotContainer {
 
     driverController.rightBumper().onTrue(
         new MoveAlgaeToLauncher(
+            armSub,
+            () -> ArmConstants.kAngleGroundIntake,
+            1,
             launcherSub,
             intakeSub,
             indexerSub,
@@ -205,8 +208,7 @@ public class RobotContainer {
 
     );
     driverController.leftBumper().whileTrue(
-        new MoveAlgaeToIntake(armSub, launcherSub, intakeSub, indexerSub, ArmConstants.kAngleL2, () -> -1, () -> -1,
-            () -> -1));
+        new MoveAlgaeToIntake(armSub, launcherSub, indexerSub, ArmConstants.kAngleL2, () -> -1, () -> -1));
     driverController.leftStick().onTrue(
         Commands.run(() -> {
           driveSub.isFieldRelative = !driveSub.isFieldRelative;
