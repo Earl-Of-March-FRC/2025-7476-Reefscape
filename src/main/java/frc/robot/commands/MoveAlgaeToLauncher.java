@@ -39,10 +39,12 @@ public class MoveAlgaeToLauncher extends SequentialCommandGroup {
    * @param launcherBackReferenceVelocity  The velocity (PID) of the back rollers
    *                                       to
    *                                       launch the algae at
-   * @param launcherFrontTolerance         The PID tolerance of the launcher's
+   * @param launcherFrontTolerance         The PID tolerance (positive) of the
+   *                                       launcher's
    *                                       front
    *                                       roller
-   * @param launcherBackTolerance          The PID tolerance of the launcher's
+   * @param launcherBackTolerance          The PID tolerance (positive) of the
+   *                                       launcher's
    *                                       back roller
    * @param intakeVelocity                 The velocity (percent) to intake algae
    * @param indexerVelocity                The velocity (percent) to move algae

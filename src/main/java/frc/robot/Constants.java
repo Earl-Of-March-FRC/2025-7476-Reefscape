@@ -253,7 +253,7 @@ public final class Constants {
     public static final double kVelocityFront = 1575.63393661; // 165 rad/s
     public static final double kVelocityBack = 2435.07062931; // 255 rad/s
 
-    public static final double kVelocityTolerance = 10;
+    public static final double kVelocityTolerance = 5;
   }
 
   // PDP CAN IDs
