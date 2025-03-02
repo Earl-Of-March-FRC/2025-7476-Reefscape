@@ -18,6 +18,6 @@ public class BeamBreakSensor implements IndexerSensor {
 
   @Override
   public boolean triggered() {
-    return sensor.get();
+    return !sensor.get();
   }
 }
