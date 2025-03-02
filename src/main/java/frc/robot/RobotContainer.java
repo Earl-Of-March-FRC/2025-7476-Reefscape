@@ -194,17 +194,12 @@ public class RobotContainer {
 
     driverController.rightBumper().onTrue(
         new RevAndLaunchCmd(
-            armSub,
-            () -> ArmConstants.kAngleGroundIntake,
-            1,
             launcherSub,
-            intakeSub,
             indexerSub,
             () -> LauncherConstants.kVelocityFront,
             () -> LauncherConstants.kVelocityBack,
             LauncherConstants.kVelocityTolerance,
             LauncherConstants.kVelocityTolerance,
-            () -> 1,
             () -> 0.75,
             () -> !driverController.rightBumper().getAsBoolean(), // Signals a launch when the driver lets go of the
                                                                   // right bumper.

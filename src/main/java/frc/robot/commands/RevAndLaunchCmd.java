@@ -11,11 +11,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
-import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
-import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.indexer.Indexer;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
 
 /**
@@ -28,7 +25,6 @@ public class RevAndLaunchCmd extends SequentialCommandGroup {
    * Create a MoveAlgaeToLauncher command
    * 
    * @param launcher                       The launcher subsystem
-   * @param intake                         The intake subsystem
    * @param indexer                        The indexer subsystem
    * @param launcherFrontReferenceVelocity The velocity (PID) of the front rollers
    *                                       to
@@ -43,7 +39,6 @@ public class RevAndLaunchCmd extends SequentialCommandGroup {
    * @param launcherBackTolerance          The PID tolerance (positive) of the
    *                                       launcher's
    *                                       back roller
-   * @param intakeVelocity                 The velocity (percent) to intake algae
    * @param indexerVelocity                The velocity (percent) to move algae
    *                                       from the
    *                                       intake to the launcher
@@ -57,17 +52,12 @@ public class RevAndLaunchCmd extends SequentialCommandGroup {
    *                                       triggers a launch.
    */
   public RevAndLaunchCmd(
-      ArmSubsystem arm,
-      DoubleSupplier armIntakePosition,
-      double armTolerance,
       Launcher launcher,
-      IntakeSubsystem intake,
       Indexer indexer,
       DoubleSupplier launcherFrontReferenceVelocity,
       DoubleSupplier launcherBackReferenceVelocity,
       double launcherFrontTolerance,
       double launcherBackTolerance,
-      DoubleSupplier intakeVelocity,
       DoubleSupplier indexerVelocity,
       BooleanSupplier releaseSignal,
       double launchTimeout) {
@@ -83,23 +73,12 @@ public class RevAndLaunchCmd extends SequentialCommandGroup {
               launcherBackTolerance);
     };
 
-    /*
-     * Supplier returns true when the arm is in intaking position (within a
-     * tolerance)
-     */
-    BooleanSupplier armIsIntaking = () -> MathUtil.isNear(armIntakePosition.getAsDouble(), arm.getPosition(),
-        armTolerance);
-
     addCommands(
         /*
          * Move the algae towards the launcher while the launcher is revving up. This
          * ends when the launcher is fully revved, or the driver releases the trigger.
          */
         new ParallelCommandGroup(
-            /* If arm is in intaking position, run the intake. */
-            new IntakeSetVelocityManualCmd(intake, intakeVelocity)
-                .onlyIf(armIsIntaking)
-                .until(() -> indexer.getBothSensors()),
             /* Move algae to launcher sensor */
             new IndexerSetVelocityManualCmd(indexer, indexerVelocity).until(() -> indexer.getLauncherSensor()),
 
@@ -120,14 +99,6 @@ public class RevAndLaunchCmd extends SequentialCommandGroup {
          * launched.
          */
         new ParallelCommandGroup(
-            /*
-             * If the algae is still not at any sensor (for some reason), the
-             * intake will continue to run, in case the algae is still in the intake. This
-             * will end once the algae reaches the launcher sensor.
-             */
-            new IntakeSetVelocityManualCmd(intake, intakeVelocity).onlyIf(() -> !indexer.getLauncherSensor())
-                .until(() -> indexer.getBothSensors() && armIsIntaking.getAsBoolean()),
-
             /* Launch the algae. */
             new IndexerSetVelocityManualCmd(indexer, indexerVelocity),
             new LauncherSetVelocityPIDCmd(launcher, launcherFrontReferenceVelocity.getAsDouble(),
