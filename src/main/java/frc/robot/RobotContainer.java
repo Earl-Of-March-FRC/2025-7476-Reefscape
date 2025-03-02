@@ -23,11 +23,10 @@ import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.CalibrateCmd;
-import frc.robot.commands.DriveCmd;
 import frc.robot.commands.MoveAlgaeToIntake;
 import frc.robot.commands.MoveAlgaeToLauncher;
-import frc.robot.commands.TimedAutoDrive;
+import frc.robot.commands.drivetrain.*;
+import frc.robot.commands.GoToAlgaeCmd;
 import frc.robot.commands.arm.ArmResetEncoderCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
@@ -46,6 +45,7 @@ import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.sensors.BeamBreakSensor;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
+import frc.robot.subsystems.vision.AlgaeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -65,6 +65,7 @@ public class RobotContainer {
   private final IntakeSubsystem intakeSub;
   private final Indexer indexerSub;
   private final Launcher launcherSub;
+  private final AlgaeSubsystem algaeSubsystem;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
@@ -124,6 +125,8 @@ public class RobotContainer {
                     OIConstants.kDriverControllerRotAxis),
                 OIConstants.kDriveDeadband)));
 
+    algaeSubsystem = new AlgaeSubsystem(() -> driveSub.getPose());
+
     // indexerSub.setDefaultCommand(
     // new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
 
@@ -165,16 +168,17 @@ public class RobotContainer {
 
     // UNCOMMENT AFTER THE ARM IS TESTED
     operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
-        ArmConstants.kAngleStowed));
+        () -> ArmConstants.kAngleStowed - armSub.armOffset));
     operatorController.povDown().onTrue(
-        new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleGroundIntake));
-    // operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleL2));
-    // operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleL3));
-    // operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleProcessor));
-
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake - armSub.armOffset));
+    operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleL2 - armSub.armOffset));
+    operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleL3 - armSub.armOffset));
+    operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleProcessor - armSub.armOffset));
+    operatorController.button(8).onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleCoral - armSub.armOffset));
     operatorController.a()
         .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
 
@@ -221,6 +225,17 @@ public class RobotContainer {
         Commands.runOnce(() -> {
           armSub.isManual = true;
         }));
+    operatorController.leftBumper().onTrue(
+        Commands.runOnce(() -> {
+          armSub.armOffset += 2;
+        }));
+
+    operatorController.rightBumper().onTrue(
+        Commands.runOnce(() -> {
+          armSub.armOffset -= 2;
+        }));
+
+    driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub));
   }
 
   /**

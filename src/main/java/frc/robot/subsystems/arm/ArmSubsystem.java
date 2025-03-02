@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.RobotContainer;
 
 /**
  * The ArmSubsystem class represents the robot's arm subsystem. It uses PIDF to
@@ -28,6 +29,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final RelativeEncoder armEncoder;
   private final SparkClosedLoopController armClosedLoopController;
   public boolean isManual = false;
+  public double armOffset = 0;
 
   // Starting angle of the arm, in radians
   // Ex: arm starting position is 1 radian, then m_armAngularOffset is 1
@@ -55,6 +57,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     // Convert radians per second to RPM
     Logger.recordOutput("Intake/Arm/Measured/Velocity", getVelocity() / ArmConstants.kVelocityConversionFactor);
+    Logger.recordOutput("Intake/Arm/Measured/armOffset", this.armOffset);
   }
 
   /**
