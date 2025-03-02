@@ -21,13 +21,12 @@ import frc.robot.subsystems.launcher.Launcher;
  * to the intake for scoring in the processor. See comments in the code to view
  * the timeline of tasks being ran.
  */
-public class MoveAlgaeToIntake extends SequentialCommandGroup {
+public class IntakeScoreCmd extends SequentialCommandGroup {
   /**
    * Create a MoveAlgaeToIntake command
    * 
    * @param arm              The arm subsystem
    * @param launcher         The launcher subsystem
-   * @param intake           The intake subsystem
    * @param indexer          The indexer subsystem
    * @param armMinSetpoint   The minimum arm setpoint (in radians). This will be
    *                         used to determine if the arm is in the way of the
@@ -38,10 +37,9 @@ public class MoveAlgaeToIntake extends SequentialCommandGroup {
    *                         motors
    *                         at
    */
-  public MoveAlgaeToIntake(
+  public IntakeScoreCmd(
       ArmSubsystem arm,
       Launcher launcher,
-      // IntakeSubsystem intake,
       Indexer indexer,
       double armMinSetpoint,
       DoubleSupplier launcherVelocity,
@@ -64,13 +62,9 @@ public class MoveAlgaeToIntake extends SequentialCommandGroup {
         new WaitUntilCommand(() -> arm.getPosition() <= armMinSetpoint),
 
         /*
-         * (Ignore this line) Start the intake and keep it going until this command is
-         * interrupted.
-         * 
          * Keep running the indexer until the intake sensor no longer detects an
          * algae, or this command is interrupted.
          */
-        // new IntakeSetVelocityManualCmd(intake, intakeVelocity).alongWith(
         new IndexerSetVelocityManualCmd(indexer, indexerVelocity).until(() -> !indexer.getIntakeSensor()));
   }
 }

@@ -23,8 +23,8 @@ import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.MoveAlgaeToIntake;
-import frc.robot.commands.MoveAlgaeToLauncher;
+import frc.robot.commands.IntakeScoreCmd;
+import frc.robot.commands.RevAndLaunchCmd;
 import frc.robot.commands.drivetrain.*;
 import frc.robot.commands.GoToAlgaeCmd;
 import frc.robot.commands.arm.ArmResetEncoderCmd;
@@ -193,15 +193,15 @@ public class RobotContainer {
             -LauncherConstants.kVelocityBack));
 
     driverController.rightBumper().onTrue(
-        new MoveAlgaeToLauncher(
+        new RevAndLaunchCmd(
             armSub,
             () -> ArmConstants.kAngleGroundIntake,
             1,
             launcherSub,
             intakeSub,
             indexerSub,
-            LauncherConstants.kVelocityFront,
-            LauncherConstants.kVelocityBack,
+            () -> LauncherConstants.kVelocityFront,
+            () -> LauncherConstants.kVelocityBack,
             LauncherConstants.kVelocityTolerance,
             LauncherConstants.kVelocityTolerance,
             () -> 1,
@@ -212,7 +212,7 @@ public class RobotContainer {
 
     );
     driverController.leftBumper().whileTrue(
-        new MoveAlgaeToIntake(armSub, launcherSub, indexerSub, ArmConstants.kAngleL2, () -> -1, () -> -1));
+        new IntakeScoreCmd(armSub, launcherSub, indexerSub, ArmConstants.kAngleL2, () -> -1, () -> -1));
     driverController.leftStick().onTrue(
         Commands.run(() -> {
           driveSub.isFieldRelative = !driveSub.isFieldRelative;
