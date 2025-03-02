@@ -203,7 +203,7 @@ public class RobotContainer {
             () -> 0.75,
             () -> !driverController.rightBumper().getAsBoolean(), // Signals a launch when the driver lets go of the
                                                                   // right bumper.
-            3.0)
+            5.0)
 
     );
     driverController.leftBumper().whileTrue(
