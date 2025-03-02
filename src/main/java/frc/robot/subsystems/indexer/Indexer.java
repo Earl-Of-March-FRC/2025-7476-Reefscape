@@ -43,8 +43,6 @@ public class Indexer extends SubsystemBase {
   public void periodic() {
     intakeSensor.periodic();
     launcherSensor.periodic();
-    // Logger.recordOutput("Indexer/Measured/IntakeSensor", getIntakeSensor());
-    // Logger.recordOutput("Indexer/Measured/LauncherSensor", getLauncherSensor());
     Logger.recordOutput("Indexer/Measured/Velocity", getVelocity());
     Logger.recordOutput("Indexer/Measured/Voltage", getVoltage());
   }
@@ -60,7 +58,7 @@ public class Indexer extends SubsystemBase {
    * @see #setVoltage
    */
   public void setVelocity(double percent) {
-    Logger.recordOutput("Indexer/Setpoint/PercentVelocity", percent);
+    Logger.recordOutput("Indexer/Applied/PercentVelocity", percent);
     indexerSpark.set(percent * IndexerConstants.kDirectionConstant);
   };
 
@@ -81,7 +79,7 @@ public class Indexer extends SubsystemBase {
    * @see #setVelocity
    */
   public void setVoltage(double voltage) {
-    Logger.recordOutput("Indexer/Setpoint/Voltage", voltage);
+    Logger.recordOutput("Indexer/Applied/Voltage", voltage);
     indexerSpark.setVoltage(voltage * IndexerConstants.kDirectionConstant);
   };
 
@@ -98,7 +96,7 @@ public class Indexer extends SubsystemBase {
   /**
    * Get the value of the sensor near the intake.
    * 
-   * @return {@code true} if sensor is tripped or not connected, {@code false} if
+   * @return {@code true} if sensor is tripped, {@code false} if
    *         not tripped.
    * @see #getLauncherSensor
    */
@@ -109,11 +107,21 @@ public class Indexer extends SubsystemBase {
   /**
    * Get the value of the sensor near the launcher.
    * 
-   * @return {@code true} if sensor is tripped or not connected, {@code false} if
+   * @return {@code true} if sensor is tripped, {@code false} if
    *         not tripped.
    * @see #getIntakeSensor
    */
   public boolean getLauncherSensor() {
     return launcherSensor.triggered();
+  }
+
+  /**
+   * Get the value of both sensors.
+   * 
+   * @return {@code true} if the intake sensor or launcher sensor is tripped,
+   *         {@code false} if not.
+   */
+  public boolean getBothSensors() {
+    return getIntakeSensor() || getLauncherSensor();
   }
 }
