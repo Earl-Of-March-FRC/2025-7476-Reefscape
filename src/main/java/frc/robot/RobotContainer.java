@@ -108,7 +108,7 @@ public class RobotContainer {
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 
     driveSub.setDefaultCommand(
-        new DriveCmd(
+        new DriveSqrtCmd(
             driveSub,
             () -> MathUtil.applyDeadband(
                 -driverController.getRawAxis(
