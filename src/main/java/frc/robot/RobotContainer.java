@@ -110,7 +110,7 @@ public class RobotContainer {
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 
     driveSub.setDefaultCommand(
-        new DriveCmd(
+        new DriveSqrtCmd(
             driveSub,
             () -> MathUtil.applyDeadband(
                 -driverController.getRawAxis(
@@ -167,7 +167,7 @@ public class RobotContainer {
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
     // UNCOMMENT AFTER THE ARM IS TESTED
-    operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
+    operatorController.leftTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
         () -> ArmConstants.kAngleStowed - armSub.armOffset));
     operatorController.povDown().onTrue(
         new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake - armSub.armOffset));
@@ -177,7 +177,7 @@ public class RobotContainer {
         () -> ArmConstants.kAngleL3 - armSub.armOffset));
     operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
         () -> ArmConstants.kAngleProcessor - armSub.armOffset));
-    operatorController.button(8).onTrue(new ArmSetPositionPIDCmd(armSub,
+    operatorController.rightTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
         () -> ArmConstants.kAngleCoral - armSub.armOffset));
     operatorController.a()
         .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
@@ -186,7 +186,7 @@ public class RobotContainer {
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
     driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
     driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
-    driverController.rightTrigger().whileTrue(
+    driverController.rightTrigger().toggleOnTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
     driverController.leftTrigger().whileTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, -LauncherConstants.kVelocityFront,

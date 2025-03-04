@@ -112,21 +112,38 @@ public final class Configs {
   }
 
   public static final class LauncherConfigs {
-    public static final SparkMaxConfig launcherConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig frontLauncherConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig backLauncherConfig = new SparkMaxConfig();
 
     static {
-      launcherConfig
+      frontLauncherConfig
           .idleMode(IdleMode.kCoast)
           .smartCurrentLimit(50);
-      launcherConfig.encoder
+      frontLauncherConfig.encoder
           .positionConversionFactor(1)
           .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
-      launcherConfig.closedLoop
+      frontLauncherConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           .pidf(LauncherConstants.kPVelocityController,
               LauncherConstants.kIVelocityController,
               LauncherConstants.kDVelocityController,
-              LauncherConstants.kVelocityFF)
+              LauncherConstants.frontKVelocityFF)
+          .outputRange(-1, 1);
+    }
+
+    static {
+      backLauncherConfig
+          .idleMode(IdleMode.kCoast)
+          .smartCurrentLimit(50);
+      backLauncherConfig.encoder
+          .positionConversionFactor(1)
+          .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
+      backLauncherConfig.closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .pidf(LauncherConstants.kPVelocityController,
+              LauncherConstants.kIVelocityController,
+              LauncherConstants.kDVelocityController,
+              LauncherConstants.backKVelocityFF)
           .outputRange(-1, 1);
     }
   }

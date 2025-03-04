@@ -245,13 +245,14 @@ public final class Constants {
     public static final double kPVelocityController = 0;
     public static final double kIVelocityController = 0;
     public static final double kDVelocityController = 0;
-    public static final double kVelocityFF = 0.00195;
+    public static final double frontKVelocityFF = 0.0017;
+    public static final double backKVelocityFF = 0.00187;
 
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
-    public static final double kVelocityFront = 1575.63393661; // 165 rad/s
-    public static final double kVelocityBack = 2435.07062931; // 255 rad/s
+    public static final double kVelocityFront = 2196.338215; // 230 rad/s
+    public static final double kVelocityBack = 2721.549527; // 285 rad/s
 
     public static final double kVelocityTolerance = 5;
   }

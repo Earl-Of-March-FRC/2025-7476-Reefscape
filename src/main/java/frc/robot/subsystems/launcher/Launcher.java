@@ -41,9 +41,9 @@ public class Launcher extends SubsystemBase {
     this.backLauncherClosedLoopController = backLauncherSpark.getClosedLoopController();
 
     // Configure motors
-    frontLauncherSpark.configure(LauncherConfigs.launcherConfig, ResetMode.kResetSafeParameters,
+    frontLauncherSpark.configure(LauncherConfigs.frontLauncherConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    backLauncherSpark.configure(LauncherConfigs.launcherConfig.inverted(true), ResetMode.kResetSafeParameters,
+    backLauncherSpark.configure(LauncherConfigs.backLauncherConfig.inverted(true), ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
   }
 
