@@ -152,6 +152,9 @@ public final class Constants {
     public static final double kAngleL2 = -88.5;
     public static final double kAngleL3 = -150.5;
     public static final double kAngleProcessor = -186.5;
+
+    // Limit switch stuff
+    public static final int kLimitSwitchChannel = 6;
   }
 
   public static final class IntakeConstants {
