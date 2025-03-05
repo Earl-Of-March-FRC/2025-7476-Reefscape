@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.LauncherConfigs;
@@ -29,6 +30,8 @@ public class Launcher extends SubsystemBase {
   private final SparkMax backLauncherSpark;
   private final RelativeEncoder backLauncherEncoder;
   private final SparkClosedLoopController backLauncherClosedLoopController;
+
+  private double frontReferenceVelocity = 0.0, backReferenveVelocity = 0.0;
 
   /**
    * Constructs a new LauncherSubsystem and configures the launcher motors.
@@ -92,6 +95,9 @@ public class Launcher extends SubsystemBase {
     Logger.recordOutput("Launcher/Front/Setpoint/PercentVelocity", percent);
     Logger.recordOutput("Launcher/Back/Setpoint/PercentVelocity", percent);
 
+    SmartDashboard.putBoolean("LauncherFrontAtSetpoint", frontRollerAtSetpoint());
+    SmartDashboard.putBoolean("LauncherBackAtSetpoint", backRollerAtSetpoint());
+
     frontLauncherSpark.set(percent);
     backLauncherSpark.set(percent);
   }
@@ -112,6 +118,7 @@ public class Launcher extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setFrontReferenceVelocity(double referenceVelocity) {
+    frontReferenceVelocity = referenceVelocity;
     Logger.recordOutput("Launcher/Front/Setpoint/Velocity", referenceVelocity);
 
     // Converts RPM to radians per second
@@ -125,6 +132,7 @@ public class Launcher extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setBackReferenceVelocity(double referenceVelocity) {
+    backReferenveVelocity = referenceVelocity;
     Logger.recordOutput("Launcher/Back/Setpoint/Velocity", referenceVelocity);
 
     // Converts RPM to radians per second
@@ -155,5 +163,15 @@ public class Launcher extends SubsystemBase {
    */
   public double getPreferredBackVelocity() {
     return SmartDashboard.getNumber("LauncherBackVelocity", LauncherConstants.kVelocityBack);
+  }
+
+  public boolean frontRollerAtSetpoint() {
+    return MathUtil.isNear(frontReferenceVelocity, getFrontVelocity(),
+        LauncherConstants.kVelocityFrontTolerance);
+  }
+
+  public boolean backRollerAtSetpoint() {
+    return MathUtil.isNear(backReferenveVelocity, getBackVelocity(),
+        LauncherConstants.kVelocityBackTolerance);
   }
 }
