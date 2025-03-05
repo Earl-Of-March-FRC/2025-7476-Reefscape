@@ -32,6 +32,8 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 4.8; // Default 4.8 - Max net robot translational speed
     public static final double kMaxWheelSpeedMetersPerSecond = 4.8; // Max possible speed for wheel
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    public static final double kBalleyPopMetersPerSecond = 0.8; // Max net robot translational speed when intaking algae
+                                                                // stacked on coral
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(26.5);
