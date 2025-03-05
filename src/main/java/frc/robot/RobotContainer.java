@@ -66,8 +66,7 @@ public class RobotContainer {
   private final CommandXboxController operatorController = new CommandXboxController(
       OIConstants.kOperatorControllerPort);
 
-  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine",
-      AutoBuilder.buildAutoChooser());
+  private LoggedDashboardChooser<Command> autoChooser;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -228,6 +227,7 @@ public class RobotContainer {
    * Use this method to define the autonomous command.
    */
   private void configureAutos() {
+    autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
     autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
     SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
