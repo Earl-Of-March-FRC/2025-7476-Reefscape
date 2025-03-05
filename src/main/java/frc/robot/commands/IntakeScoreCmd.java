@@ -9,11 +9,9 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
-import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityManualCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.indexer.Indexer;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
 
 /**
