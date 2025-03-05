@@ -202,12 +202,12 @@ public class RobotContainer {
         Commands.runOnce(() -> {
           armSub.isManual = true;
         }));
-    operatorController.leftBumper().onTrue(
+    operatorController.leftBumper().whileTrue(
         Commands.runOnce(() -> {
           armSub.armOffset += 2;
         }));
 
-    operatorController.rightBumper().onTrue(
+    operatorController.rightBumper().whileTrue(
         Commands.runOnce(() -> {
           armSub.armOffset -= 2;
         }));
