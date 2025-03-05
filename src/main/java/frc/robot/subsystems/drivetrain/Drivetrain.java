@@ -184,6 +184,8 @@ public class Drivetrain extends SubsystemBase {
           new Rotation2d(visionPose.getRotation().getAngle()));
       odometry.addVisionMeasurement(estimatedPose, visionPose1.get().timestampSeconds);
       hasVisionData = true;
+    } else {
+      Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose2d());
     }
     if (visionPose2.isPresent()) {
       Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
@@ -192,6 +194,8 @@ public class Drivetrain extends SubsystemBase {
           new Rotation2d(visionPose.getRotation().getAngle()));
       odometry.addVisionMeasurement(estimatedPose, visionPose2.get().timestampSeconds);
       hasVisionData = true;
+    } else {
+      Logger.recordOutput("Vision/Photon2/EstimatedPose", new Pose2d());
     }
     SmartDashboard.putBoolean("HasVision", hasVisionData);
 
