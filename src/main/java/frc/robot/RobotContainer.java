@@ -190,9 +190,13 @@ public class RobotContainer {
         new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
     driverController.leftBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
-    driverController.leftStick().toggleOnTrue(
-        Commands.run(() -> {
-          driveSub.isFieldRelative = !driveSub.isFieldRelative;
+    driverController.leftStick().onTrue(
+        Commands.runOnce(() -> {
+          driveSub.isFieldRelative = true;
+        }));
+    driverController.rightStick().onTrue(
+        Commands.runOnce(() -> {
+          driveSub.isFieldRelative = false;
         }));
     operatorController.axisGreaterThan(OIConstants.kOperatorArmManualAxis, OIConstants.kArmDeadband).onTrue(
         Commands.runOnce(() -> {
