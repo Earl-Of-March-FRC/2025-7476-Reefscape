@@ -215,7 +215,7 @@ public class RobotContainer {
     driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub));
 
     // Arm calibration
-    new Trigger(() -> !armSub.getLimitSwitch()).onTrue(Commands.runOnce(() -> armSub.resetPosition()));
+    new Trigger(() -> armSub.getLimitSwitch()).onTrue(Commands.runOnce(() -> armSub.resetPosition()));
   }
 
   /**
