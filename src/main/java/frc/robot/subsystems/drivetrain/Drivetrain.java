@@ -19,6 +19,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -69,7 +70,7 @@ public class Drivetrain extends SubsystemBase {
   private final PhotonPoseEstimator photonPoseEstimator2;
 
   // Odometry class for tracking the robot's position on the field
-  SwerveDriveOdometry odometry = new SwerveDriveOdometry(
+  SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
       new Rotation2d(),
       new SwerveModulePosition[] {
@@ -167,6 +168,25 @@ public class Drivetrain extends SubsystemBase {
               modules[2].getPosition(), modules[3].getPosition()
           });
     }
+
+    Optional<EstimatedRobotPose> visionPose1 = getEstimatedGlobalPose1(pose);
+    Optional<EstimatedRobotPose> visionPose2 = getEstimatedGlobalPose2(pose);
+
+    if (visionPose1.isPresent()) {
+      Logger.recordOutput("Vision/Photon1/EstimatedPose", visionPose1.get().estimatedPose);
+      Pose3d visionPose = visionPose1.get().estimatedPose;
+      Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
+          new Rotation2d(visionPose.getRotation().getAngle()));
+      odometry.addVisionMeasurement(estimatedPose, visionPose1.get().timestampSeconds);
+    }
+    if (visionPose2.isPresent()) {
+      Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
+      Pose3d visionPose = visionPose2.get().estimatedPose;
+      Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
+          new Rotation2d(visionPose.getRotation().getAngle()));
+      odometry.addVisionMeasurement(estimatedPose, visionPose2.get().timestampSeconds);
+    }
+
     // Log the current pose to the logger
     Logger.recordOutput("Odometry", pose);
 
