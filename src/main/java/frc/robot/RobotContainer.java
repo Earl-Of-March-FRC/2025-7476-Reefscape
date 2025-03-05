@@ -175,7 +175,7 @@ public class RobotContainer {
         () -> ArmConstants.kAngleCoral - armSub.armOffset));
     operatorController.a()
         .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
-
+    operatorController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
     // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
     driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
