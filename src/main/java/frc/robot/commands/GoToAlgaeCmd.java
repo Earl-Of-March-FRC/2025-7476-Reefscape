@@ -27,7 +27,7 @@ public class GoToAlgaeCmd extends Command {
     timer.start(); // Start the timer
 
     // Switch to Algae pipeline
-    algaeSubsystem.setPipeline(Constants.PhotonConstants.kAlgaePipeline);
+    algaeSubsystem.setPipeline(Constants.Vision.PhotonConstants.kAlgaePipeline);
   }
 
   @Override
@@ -75,7 +75,7 @@ public class GoToAlgaeCmd extends Command {
     intakeSubsystem.stopIntake();
 
     // Switch back to the AprilTag pipeline =
-    algaeSubsystem.setPipeline(Constants.PhotonConstants.kAprilTagPipeline);
+    algaeSubsystem.setPipeline(Constants.Vision.PhotonConstants.kAprilTagPipeline);
   }
 
   @Override

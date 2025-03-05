@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.util.function.DoubleSupplier;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.revrobotics.spark.SparkMax;
@@ -27,15 +25,12 @@ import frc.robot.commands.IntakeScoreCmd;
 import frc.robot.commands.RevAndLaunchCmd;
 import frc.robot.commands.drivetrain.*;
 import frc.robot.commands.GoToAlgaeCmd;
-import frc.robot.commands.arm.ArmResetEncoderCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
 import frc.robot.commands.indexer.IndexToBeamBreakCmd;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
-import frc.robot.commands.intake.IntakeStopCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
-import frc.robot.commands.launcher.LauncherStopCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
@@ -72,7 +67,7 @@ public class RobotContainer {
   private final CommandXboxController operatorController = new CommandXboxController(
       OIConstants.kOperatorControllerPort);
 
-  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
+  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -96,7 +91,8 @@ public class RobotContainer {
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
 
-    armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType));
+    armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType),
+        ArmConstants.kLimitSwitchChannel);
 
     intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
 
@@ -110,7 +106,7 @@ public class RobotContainer {
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 
     driveSub.setDefaultCommand(
-        new DriveCmd(
+        new DriveSqrtCmd(
             driveSub,
             () -> MathUtil.applyDeadband(
                 -driverController.getRawAxis(
@@ -167,7 +163,7 @@ public class RobotContainer {
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
     // UNCOMMENT AFTER THE ARM IS TESTED
-    operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
+    operatorController.leftTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
         () -> ArmConstants.kAngleStowed - armSub.armOffset));
     operatorController.povDown().onTrue(
         new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake - armSub.armOffset));
@@ -177,7 +173,7 @@ public class RobotContainer {
         () -> ArmConstants.kAngleL3 - armSub.armOffset));
     operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
         () -> ArmConstants.kAngleProcessor - armSub.armOffset));
-    operatorController.button(8).onTrue(new ArmSetPositionPIDCmd(armSub,
+    operatorController.rightTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
         () -> ArmConstants.kAngleCoral - armSub.armOffset));
     operatorController.a()
         .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
@@ -186,7 +182,7 @@ public class RobotContainer {
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
     driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
     driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
-    driverController.rightTrigger().whileTrue(
+    driverController.rightTrigger().toggleOnTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
     driverController.leftTrigger().whileTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, -LauncherConstants.kVelocityFront,
@@ -231,6 +227,9 @@ public class RobotContainer {
         }));
 
     driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub));
+
+    // Arm calibration
+    new Trigger(() -> !armSub.getLimitSwitch()).onTrue(Commands.runOnce(() -> armSub.resetPosition()));
   }
 
   /**

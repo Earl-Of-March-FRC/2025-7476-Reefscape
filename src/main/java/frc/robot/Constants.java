@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -30,6 +32,8 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 4.8; // Default 4.8 - Max net robot translational speed
     public static final double kMaxWheelSpeedMetersPerSecond = 4.8; // Max possible speed for wheel
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    public static final double kBalleyPopMetersPerSecond = 0.8; // Max net robot translational speed when intaking algae
+                                                                // stacked on coral
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(26.5);
@@ -152,6 +156,9 @@ public final class Constants {
     public static final double kAngleL2 = -88.5;
     public static final double kAngleL3 = -150.5;
     public static final double kAngleProcessor = -186.5;
+
+    // Limit switch stuff
+    public static final int kLimitSwitchChannel = 6;
   }
 
   public static final class IntakeConstants {
@@ -178,37 +185,42 @@ public final class Constants {
     public static final boolean hasBorders = true;
   }
 
-  public static final class AlgaeConstants {
-    // public static final String kNetworkTableKey = "algae_vision";
-    public static final String kNetworkTableKey = "photonvision";
-    public static final double camera1X = 0.0;
-    public static final double camera1Z = 0.0;
+  public static final class Vision {
+    public static final class AlgaeConstants {
+      // public static final String kNetworkTableKey = "algae_vision";
+      public static final String kNetworkTableKey = "photonvision";
+      public static final int kUpperBound = 2;
+      public static final int kLowerBound = -2;
+    }
+
+    public static final class PhotonConstants {
+      public static final double camera1Roll = 0;
+      public static final double camera1Pitch = -10 * Math.PI / 180; // in rad
+      public static final double camera1Yaw = 0;
+      public static final double camera1X = 0.2921; // forward (pos)
+      public static final double camera1Y = 0.127; // left (pos)
+      public static final double camera1Z = 0.4699; // up (pos)
+
+      public static final double camera2Roll = 0;
+      public static final double camera2Pitch = -10 * Math.PI / 180; // in rad
+      public static final double camera2Yaw = 0;
+      public static final double camera2X = -0.2921;
+      public static final double camera2Y = 0;
+      public static final double camera2Z = 0.3175;
+
+      public static final int kAlgaePipeline = 1;
+      public static final int kAprilTagPipeline = 0;
+
+      public static final String kCamera1 = "camera1";
+      public static final String kCamera2 = "camera2";
+
+      public static Transform3d robotToCamera = new Transform3d(camera1X, camera1Y, camera1Z,
+          new Rotation3d(camera1Roll, camera1Pitch, camera1Yaw));
+    }
   }
 
   public static final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
-  }
-
-  public static final class PhotonConstants {
-    public static final double camera1Roll = 0;
-    public static final double camera1Pitch = 0;
-    public static final double camera1Yaw = 0;
-    public static final double camera1X = 0.29;
-    public static final double camera1Y = 0.21;
-    public static final double camera1Z = 0.52;
-
-    public static final double camera2Roll = -4.851 * Math.PI / 180;
-    public static final double camera2Pitch = 0;
-    public static final double camera2Yaw = Math.PI;
-    public static final double camera2X = 0.17;
-    public static final double camera2Y = 0.18;
-    public static final double camera2Z = 0.45;
-
-    public static final int kAlgaePipeline = 1;
-    public static final int kAprilTagPipeline = 0;
-
-    public static final String kCamera1 = "camera1";
-    public static final String kCamera2 = "camera2";
   }
 
   public static final class IndexerConstants {
@@ -245,13 +257,14 @@ public final class Constants {
     public static final double kPVelocityController = 0;
     public static final double kIVelocityController = 0;
     public static final double kDVelocityController = 0;
-    public static final double kVelocityFF = 0.00195;
+    public static final double frontKVelocityFF = 0.0017;
+    public static final double backKVelocityFF = 0.00187;
 
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
-    public static final double kVelocityFront = 1575.63393661; // 165 rad/s
-    public static final double kVelocityBack = 2435.07062931; // 255 rad/s
+    public static final double kVelocityFront = 2196.338215; // 230 rad/s
+    public static final double kVelocityBack = 2721.549527; // 285 rad/s
 
     public static final double kVelocityTolerance = 5;
   }

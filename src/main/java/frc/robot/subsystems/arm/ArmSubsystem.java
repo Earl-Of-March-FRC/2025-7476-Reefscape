@@ -15,10 +15,10 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.RobotContainer;
 
 /**
  * The ArmSubsystem class represents the robot's arm subsystem. It uses PIDF to
@@ -28,6 +28,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMax armSpark;
   private final RelativeEncoder armEncoder;
   private final SparkClosedLoopController armClosedLoopController;
+  private final DigitalInput limitSwitch;
   public boolean isManual = false;
   public double armOffset = 0;
 
@@ -38,8 +39,10 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * The constructor for the ArmSubsystem class configures the arm motor.
    */
-  public ArmSubsystem(SparkMax armSpark) {
+  public ArmSubsystem(SparkMax armSpark, int limitSwitchChannel) {
     this.armSpark = armSpark;
+
+    limitSwitch = new DigitalInput(limitSwitchChannel);
 
     armEncoder = armSpark.getEncoder();
     armClosedLoopController = armSpark.getClosedLoopController();
@@ -130,5 +133,14 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public void resetPosition() {
     armEncoder.setPosition(0);
+  }
+
+  /**
+   * Check if the calibration limit switches are triggered.
+   * 
+   * @return {@code true} if the limit switch is pressed, {@code false} if not.
+   */
+  public boolean getLimitSwitch() {
+    return !limitSwitch.get();
   }
 }
