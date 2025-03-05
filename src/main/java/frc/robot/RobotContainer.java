@@ -28,7 +28,6 @@ import frc.robot.commands.GoToAlgaeCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
 import frc.robot.commands.indexer.IndexToBeamBreakCmd;
-import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
