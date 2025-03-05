@@ -56,6 +56,7 @@ public class Drivetrain extends SubsystemBase {
   // Gyro sensor to get the robot's orientation
   public final Gyro gyro;
   public boolean gyroDisconnected;
+  public boolean hasVisionData = false;
   public boolean isFieldRelative = true;
   Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
@@ -175,12 +176,14 @@ public class Drivetrain extends SubsystemBase {
     Optional<EstimatedRobotPose> visionPose1 = getEstimatedGlobalPose1(pose);
     Optional<EstimatedRobotPose> visionPose2 = getEstimatedGlobalPose2(pose);
 
+    hasVisionData = false;
     if (visionPose1.isPresent()) {
       Logger.recordOutput("Vision/Photon1/EstimatedPose", visionPose1.get().estimatedPose);
       Pose3d visionPose = visionPose1.get().estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getAngle()));
       odometry.addVisionMeasurement(estimatedPose, visionPose1.get().timestampSeconds);
+      hasVisionData = true;
     }
     if (visionPose2.isPresent()) {
       Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
@@ -188,7 +191,9 @@ public class Drivetrain extends SubsystemBase {
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getAngle()));
       odometry.addVisionMeasurement(estimatedPose, visionPose2.get().timestampSeconds);
+      hasVisionData = true;
     }
+    SmartDashboard.putBoolean("HasVision", hasVisionData);
 
     // Log the current pose to the logger
     Logger.recordOutput("Odometry", pose);
