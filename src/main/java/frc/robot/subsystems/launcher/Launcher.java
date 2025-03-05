@@ -66,6 +66,8 @@ public class Launcher extends SubsystemBase {
         getFrontVelocity() / LauncherConstants.kVelocityConversionFactor);
     Logger.recordOutput("Launcher/Back/Measured/Velocity",
         getBackVelocity() / LauncherConstants.kVelocityConversionFactor);
+    SmartDashboard.putNumber("FrontVel", getFrontVelocity());
+    SmartDashboard.putNumber("BackVel", getBackVelocity());
   }
 
   /**
@@ -166,12 +168,12 @@ public class Launcher extends SubsystemBase {
   }
 
   public boolean frontRollerAtSetpoint() {
-    return MathUtil.isNear(frontReferenceVelocity, getFrontVelocity(),
+    return MathUtil.isNear(frontReferenceVelocity, getFrontVelocity() * LauncherConstants.kVelocityConversionFactor,
         LauncherConstants.kVelocityFrontTolerance);
   }
 
   public boolean backRollerAtSetpoint() {
-    return MathUtil.isNear(backReferenveVelocity, getBackVelocity(),
+    return MathUtil.isNear(backReferenveVelocity, getBackVelocity() * LauncherConstants.kVelocityConversionFactor,
         LauncherConstants.kVelocityBackTolerance);
   }
 }
