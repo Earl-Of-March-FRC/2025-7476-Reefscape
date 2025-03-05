@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.RobotContainer;
 
 /**
  * The ArmSubsystem class represents the robot's arm subsystem. It uses PIDF to

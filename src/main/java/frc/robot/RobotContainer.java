@@ -4,14 +4,11 @@
 
 package frc.robot;
 
-import java.util.function.DoubleSupplier;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -26,15 +23,12 @@ import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.drivetrain.*;
 import frc.robot.commands.GoToAlgaeCmd;
-import frc.robot.commands.arm.ArmResetEncoderCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
 import frc.robot.commands.indexer.IndexToBeamBreakCmd;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
-import frc.robot.commands.intake.IntakeStopCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
-import frc.robot.commands.launcher.LauncherStopCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;

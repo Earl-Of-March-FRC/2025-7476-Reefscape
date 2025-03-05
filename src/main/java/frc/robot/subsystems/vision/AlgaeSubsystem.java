@@ -21,8 +21,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -110,9 +108,6 @@ public class AlgaeSubsystem extends SubsystemBase {
    * Path will use two waypoints:
    * * Algae Position
    * * Algae Position + Overshoot
-   * TODO move constants to constant file
-   * TODO consider not using local variable "relativeToField"
-   * TODO call commands to intake
    * 
    * @return PathPlannerPath the path the robot should follow to eat the algae
    * @experimental
@@ -159,12 +154,10 @@ public class AlgaeSubsystem extends SubsystemBase {
 
         // Algae point: The algae's position, +-20cm
         // NOTE: the robot needs to rotate so that its intake faces the algae
-        // TODO make sure the swerve rotation is OK
         new Pose2d(relativeToField.getTranslation(), desiredAngle),
         // Overshoot point: The position after overshooting the algae
         overshootPose);
 
-    // TODO tune constraints
     PathConstraints constraints = new PathConstraints(2.0, 1.0, 2 * Math.PI, 4 * Math.PI);
 
     PathPlannerPath path = new PathPlannerPath(
@@ -174,16 +167,12 @@ public class AlgaeSubsystem extends SubsystemBase {
         null);
     // new GoalEndState(0.0, Rotation2d.fromDegrees(-90))
 
-    // TODO verify if 1.0 & 2.0 work as expected. Try waypoints.get(0),
     // waypoints.get(1) as a backup
-    // TODO add intake commands (replace fourth parameter of "null")
-    // TODO rename named command name ("Intake") to something meaningful
     path.getEventMarkers().add(new EventMarker("Intake", 1.0, 2.0, null));
 
     // Prevent the path from being flipped if the coordinates are already correct
     // (this was copy pasted from
     // https://pathplanner.dev/pplib-create-a-pat(h-on-the-fly.html)
-    // TODO verify if this is helpful
     path.preventFlipping = true;
 
     return path;

@@ -31,7 +31,6 @@ public class Robot extends LoggedRobot {
    * for any
    * initialization code.
    */
-  @SuppressWarnings("resource")
   public Robot() {
     Logger.recordMetadata("ProjectName", "2025-7576-reefscape");
 
