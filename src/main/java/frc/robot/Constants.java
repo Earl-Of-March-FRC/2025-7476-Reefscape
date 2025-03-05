@@ -203,7 +203,7 @@ public final class Constants {
 
       public static final double camera2Roll = 0;
       public static final double camera2Pitch = -10 * Math.PI / 180; // in rad
-      public static final double camera2Yaw = 0;
+      public static final double camera2Yaw = Math.PI;
       public static final double camera2X = -0.2921;
       public static final double camera2Y = 0;
       public static final double camera2Z = 0.3175;
