@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "To Reef Test"
+            "pathName": "Auto Coral L1"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }
