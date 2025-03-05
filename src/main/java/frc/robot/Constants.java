@@ -201,9 +201,9 @@ public final class Constants {
       public static final double camera2Roll = 0;
       public static final double camera2Pitch = -10 * Math.PI / 180; // in rad
       public static final double camera2Yaw = 0;
-      public static final double camera2X = 0.17;
+      public static final double camera2X = -0.2921;
       public static final double camera2Y = 0;
-      public static final double camera2Z = 0.45;
+      public static final double camera2Z = 0.3175;
 
       public static final int kAlgaePipeline = 1;
       public static final int kAprilTagPipeline = 0;
