@@ -158,7 +158,7 @@ public final class Constants {
     public static final double kAngleProcessor = -186.5;
 
     // Limit switch stuff
-    public static final int kLimitSwitchChannel = 6;
+    public static final int kLimitSwitchChannel = 9;
   }
 
   public static final class IntakeConstants {
@@ -257,6 +257,8 @@ public final class Constants {
     // Velocities in RPM
     public static final double kVelocityFront = 2196.338215; // 230 rad/s
     public static final double kVelocityBack = 2721.549527; // 285 rad/s
+    public static final double kVelocityFrontTolerance = 5;
+    public static final double kVelocityBackTolerance = 5;
   }
 
   public static class FieldConstants {

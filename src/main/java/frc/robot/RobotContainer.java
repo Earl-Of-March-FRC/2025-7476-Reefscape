@@ -175,16 +175,17 @@ public class RobotContainer {
         () -> ArmConstants.kAngleCoral - armSub.armOffset));
     operatorController.a()
         .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
-
+    operatorController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
     // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
     driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
     driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
     driverController.rightTrigger().toggleOnTrue(
-        new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
+            () -> launcherSub.getPreferredBackVelocity()));
     driverController.leftTrigger().whileTrue(
-        new LauncherSetVelocityPIDCmd(launcherSub, -LauncherConstants.kVelocityFront,
-            -LauncherConstants.kVelocityBack));
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
+            () -> -launcherSub.getPreferredBackVelocity()));
     driverController.rightBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
     driverController.leftBumper().whileTrue(
@@ -214,7 +215,7 @@ public class RobotContainer {
     driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub));
 
     // Arm calibration
-    new Trigger(() -> !armSub.getLimitSwitch()).onTrue(Commands.runOnce(() -> armSub.resetPosition()));
+    new Trigger(() -> armSub.getLimitSwitch()).onTrue(Commands.runOnce(() -> armSub.resetPosition()));
   }
 
   /**
