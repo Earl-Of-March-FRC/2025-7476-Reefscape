@@ -228,6 +228,7 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput("Drive/FieldRelative", isFieldRelative);
 
     Logger.recordOutput("Drive/GyroDisconnected", gyroDisconnected);
+    SmartDashboard.putBoolean("GyroDisconnected", gyroDisconnected);
   }
 
   /**
