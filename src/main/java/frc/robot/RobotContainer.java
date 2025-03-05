@@ -190,7 +190,7 @@ public class RobotContainer {
         new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
     driverController.leftBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
-    driverController.leftStick().onTrue(
+    driverController.leftStick().toggleOnTrue(
         Commands.run(() -> {
           driveSub.isFieldRelative = !driveSub.isFieldRelative;
         }));
