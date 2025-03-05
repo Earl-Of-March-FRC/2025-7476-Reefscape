@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -178,37 +180,42 @@ public final class Constants {
     public static final boolean hasBorders = true;
   }
 
-  public static final class AlgaeConstants {
-    // public static final String kNetworkTableKey = "algae_vision";
-    public static final String kNetworkTableKey = "photonvision";
-    public static final double camera1X = 0.0;
-    public static final double camera1Z = 0.0;
+  public static final class Vision {
+    public static final class AlgaeConstants {
+      // public static final String kNetworkTableKey = "algae_vision";
+      public static final String kNetworkTableKey = "photonvision";
+      public static final int kUpperBound = 2;
+      public static final int kLowerBound = -2;
+    }
+
+    public static final class PhotonConstants {
+      public static final double camera1Roll = 0;
+      public static final double camera1Pitch = -10 * Math.PI / 180; // in rad
+      public static final double camera1Yaw = 0;
+      public static final double camera1X = 0.2921; // forward (pos)
+      public static final double camera1Y = 0.127; // left (pos)
+      public static final double camera1Z = 0.4699; // up (pos)
+
+      public static final double camera2Roll = 0;
+      public static final double camera2Pitch = -10 * Math.PI / 180; // in rad
+      public static final double camera2Yaw = 0;
+      public static final double camera2X = 0.17;
+      public static final double camera2Y = 0;
+      public static final double camera2Z = 0.45;
+
+      public static final int kAlgaePipeline = 1;
+      public static final int kAprilTagPipeline = 0;
+
+      public static final String kCamera1 = "camera1";
+      public static final String kCamera2 = "camera2";
+
+      public static Transform3d robotToCamera = new Transform3d(camera1X, camera1Y, camera1Z,
+          new Rotation3d(camera1Roll, camera1Pitch, camera1Yaw));
+    }
   }
 
   public static final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
-  }
-
-  public static final class PhotonConstants {
-    public static final double camera1Roll = 0;
-    public static final double camera1Pitch = 0;
-    public static final double camera1Yaw = 0;
-    public static final double camera1X = 0.29;
-    public static final double camera1Y = 0.21;
-    public static final double camera1Z = 0.52;
-
-    public static final double camera2Roll = -4.851 * Math.PI / 180;
-    public static final double camera2Pitch = 0;
-    public static final double camera2Yaw = Math.PI;
-    public static final double camera2X = 0.17;
-    public static final double camera2Y = 0.18;
-    public static final double camera2Z = 0.45;
-
-    public static final int kAlgaePipeline = 1;
-    public static final int kAprilTagPipeline = 0;
-
-    public static final String kCamera1 = "camera1";
-    public static final String kCamera2 = "camera2";
   }
 
   public static final class IndexerConstants {

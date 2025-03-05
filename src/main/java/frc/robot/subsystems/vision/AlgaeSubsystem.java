@@ -41,7 +41,7 @@ public class AlgaeSubsystem extends SubsystemBase {
    *                               position
    */
   public AlgaeSubsystem(Supplier<Pose2d> drivetrainPoseSupplier) {
-    camera1 = new PhotonCamera(Constants.PhotonConstants.kCamera1);
+    camera1 = new PhotonCamera(Constants.Vision.PhotonConstants.kCamera1);
     this.drivetrainPoseSupplier = drivetrainPoseSupplier;
 
     relativeToRobot = new Pose2d();
@@ -62,13 +62,17 @@ public class AlgaeSubsystem extends SubsystemBase {
       PhotonTrackedTarget target = result.getBestTarget();
 
       double targetYaw = target.getYaw(); // in degrees (x angle)
-      Transform3d pose = target.bestCameraToTarget;
+      Transform3d cameraToTarget = target.bestCameraToTarget;
 
-      SmartDashboard.putBoolean("Algae Detected", targetYaw < 2 && targetYaw > -2);
+      Transform3d robotToAlgae = cameraToTarget.plus(Constants.Vision.PhotonConstants.robotToCamera);
+
+      SmartDashboard.putBoolean("Algae Detected",
+          targetYaw < Constants.Vision.AlgaeConstants.kUpperBound
+              && targetYaw > Constants.Vision.AlgaeConstants.kLowerBound);
 
       relativeToRobot = new Pose2d(
-          pose.getTranslation().getX(),
-          pose.getTranslation().getY(),
+          robotToAlgae.getTranslation().getX(),
+          robotToAlgae.getTranslation().getY(),
           Rotation2d.kZero);
 
       // Assuming we already have the robot's position on the field
