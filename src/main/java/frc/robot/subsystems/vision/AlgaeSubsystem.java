@@ -33,7 +33,7 @@ public class AlgaeSubsystem extends SubsystemBase {
   private PhotonCamera camera1;
 
   /**
-   * Creates a new AlgaeSubsystem
+   * Creates a new AlgaeSubsystem in which creates a new relative to robot object
    * 
    * @param drivetrainPoseSupplier Supplies the drivetrain's field-relative
    *                               position
