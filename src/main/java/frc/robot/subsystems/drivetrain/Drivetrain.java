@@ -35,6 +35,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
@@ -80,6 +81,8 @@ public class Drivetrain extends SubsystemBase {
           new SwerveModulePosition()
       },
       new Pose2d(0, 0, new Rotation2d()));
+
+  private final Field2d dashField = new Field2d();
 
   /**
    * Constructor for the Drivetrain class.
@@ -189,6 +192,8 @@ public class Drivetrain extends SubsystemBase {
 
     // Log the current pose to the logger
     Logger.recordOutput("Odometry", pose);
+    SmartDashboard.putData("Odometry", dashField);
+    dashField.setRobotPose(pose);
 
     // Create arrays to hold the states and positions of the swerve modules
     SwerveModuleState[] states = new SwerveModuleState[4];
