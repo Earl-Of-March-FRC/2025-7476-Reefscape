@@ -194,6 +194,8 @@ public class Drivetrain extends SubsystemBase {
 
     Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBardge);
     Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBardge);
+
+    Logger.recordOutput("Drive/FieldRelative", isFieldRelative);
   }
 
   /**
