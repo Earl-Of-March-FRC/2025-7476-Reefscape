@@ -259,6 +259,10 @@ public final class Constants {
     public static final double kVelocityBack = 2721.549527; // 285 rad/s
   }
 
+  public static class FieldConstants {
+    public static final double kBargeX = 8.774; // meters from drivestation wall
+  }
+
   // PDP CAN IDs
   public static final int kPDPCanId = 0;
 }

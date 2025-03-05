@@ -34,10 +34,12 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Vision.PhotonConstants;
+import frc.robot.Constants.FieldConstants;
 
 /**
  * The Drivetrain class represents the robot's drivetrain subsystem.
@@ -182,6 +184,16 @@ public class Drivetrain extends SubsystemBase {
     // Log the states and positions of the swerve modules to the logger
     Logger.recordOutput("Swerve/Module/State", states);
     Logger.recordOutput("Swerve/Module/Position", positions);
+
+    // Distance to barge
+    double distanceToBardge = distanceToBardge();
+    double xDistanceToBardge = getXDistanceToBarge();
+
+    SmartDashboard.putNumber("Distance to Barge", distanceToBardge);
+    SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBardge);
+
+    Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBardge);
+    Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBardge);
   }
 
   /**
@@ -324,5 +336,15 @@ public class Drivetrain extends SubsystemBase {
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
     photonPoseEstimator2.setReferencePose(prevEstimatedRobotPose);
     return photonPoseEstimator2.update(camera2.getLatestResult());
+  }
+
+  public double getXDistanceToBarge() {
+    double robotX = getPose().getTranslation().getX();
+    return Math.abs(robotX - FieldConstants.kBargeX);
+  }
+
+  public double distanceToBardge() {
+    double robotYaw = getPose().getRotation().getRadians();
+    return robotYaw > -Math.PI / 2 && robotYaw < Math.PI / 2 ? (getXDistanceToBarge() / Math.cos(robotYaw)) : -1;
   }
 }

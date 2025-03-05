@@ -31,6 +31,7 @@ public class AlgaeSubsystem extends SubsystemBase {
   private final Supplier<Pose2d> drivetrainPoseSupplier;
   private Pose2d relativeToRobot = new Pose2d(), relativeToField = new Pose2d(); // In m
   private PhotonCamera camera1;
+  private Pose2d robotPose2d;
 
   /**
    * Creates a new AlgaeSubsystem in which creates a new relative to robot object
@@ -41,7 +42,6 @@ public class AlgaeSubsystem extends SubsystemBase {
   public AlgaeSubsystem(Supplier<Pose2d> drivetrainPoseSupplier) {
     camera1 = new PhotonCamera(Constants.Vision.PhotonConstants.kCamera1);
     this.drivetrainPoseSupplier = drivetrainPoseSupplier;
-
     relativeToRobot = new Pose2d();
   }
 
