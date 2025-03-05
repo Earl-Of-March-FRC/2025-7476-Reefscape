@@ -31,7 +31,8 @@ public class Launcher extends SubsystemBase {
   private final RelativeEncoder backLauncherEncoder;
   private final SparkClosedLoopController backLauncherClosedLoopController;
 
-  private double frontReferenceVelocity = 0.0, backReferenveVelocity = 0.0;
+  private double frontReferenceVelocity = 0.0;
+  private double backReferenveVelocity = 0.0;
 
   /**
    * Constructs a new LauncherSubsystem and configures the launcher motors.
@@ -168,12 +169,12 @@ public class Launcher extends SubsystemBase {
   }
 
   public boolean frontRollerAtSetpoint() {
-    return MathUtil.isNear(frontReferenceVelocity, getFrontVelocity() * LauncherConstants.kVelocityConversionFactor,
+    return MathUtil.isNear(frontReferenceVelocity, getFrontVelocity() / LauncherConstants.kVelocityConversionFactor,
         LauncherConstants.kVelocityFrontTolerance);
   }
 
   public boolean backRollerAtSetpoint() {
-    return MathUtil.isNear(backReferenveVelocity, getBackVelocity() * LauncherConstants.kVelocityConversionFactor,
+    return MathUtil.isNear(backReferenveVelocity, getBackVelocity() / LauncherConstants.kVelocityConversionFactor,
         LauncherConstants.kVelocityBackTolerance);
   }
 }
