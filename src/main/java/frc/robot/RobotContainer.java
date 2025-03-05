@@ -181,10 +181,11 @@ public class RobotContainer {
     driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
     driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
     driverController.rightTrigger().toggleOnTrue(
-        new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
+            () -> launcherSub.getPreferredBackVelocity()));
     driverController.leftTrigger().whileTrue(
-        new LauncherSetVelocityPIDCmd(launcherSub, -LauncherConstants.kVelocityFront,
-            -LauncherConstants.kVelocityBack));
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
+            () -> -launcherSub.getPreferredBackVelocity()));
     driverController.rightBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
     driverController.leftBumper().whileTrue(

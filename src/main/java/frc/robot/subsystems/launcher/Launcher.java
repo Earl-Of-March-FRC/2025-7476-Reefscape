@@ -11,6 +11,8 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.LauncherConfigs;
 import frc.robot.Constants.LauncherConstants;
@@ -45,6 +47,9 @@ public class Launcher extends SubsystemBase {
         PersistMode.kPersistParameters);
     backLauncherSpark.configure(LauncherConfigs.backLauncherConfig.inverted(true), ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+
+    SmartDashboard.putNumber("LauncherFrontVelocity", LauncherConstants.kVelocityFront);
+    SmartDashboard.putNumber("LauncherBackVelocity", LauncherConstants.kVelocityBack);
   }
 
   /**
@@ -132,5 +137,23 @@ public class Launcher extends SubsystemBase {
    */
   public void stopLauncher() {
     setReferenceVelocity(0);
+  }
+
+  /**
+   * Get the preferred reference velocity for the front rollers.
+   * 
+   * @return Preferred velocity
+   */
+  public double getPreferredFrontVelocity() {
+    return SmartDashboard.getNumber("LauncherFrontVelocity", LauncherConstants.kVelocityFront);
+  }
+
+  /**
+   * Get the preferred reference velocity for the back rollers.
+   * 
+   * @return Preferred velocity
+   */
+  public double getPreferredBackVelocity() {
+    return SmartDashboard.getNumber("LauncherBackVelocity", LauncherConstants.kVelocityBack);
   }
 }
