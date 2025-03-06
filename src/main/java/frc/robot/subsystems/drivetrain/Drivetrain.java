@@ -261,6 +261,12 @@ public class Drivetrain extends SubsystemBase {
    */
   public void runVelocity(ChassisSpeeds speeds, Boolean isFieldRelative) {
     // If the speeds are field-relative, convert them to robot-relative speeds
+    Rotation2d rotation = pose.getRotation();
+    if (DriverStation.getAlliance().isEmpty()) {
+      rotation = gyro.getRotation2d();
+    } else if (DriverStation.getAlliance().get() == Alliance.Red) {
+      rotation = rotation.plus(new Rotation2d(Math.PI));
+    }
     if (isFieldRelative) {
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
           speeds.vxMetersPerSecond,
