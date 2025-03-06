@@ -272,7 +272,7 @@ public class Drivetrain extends SubsystemBase {
           speeds.vxMetersPerSecond,
           speeds.vyMetersPerSecond,
           speeds.omegaRadiansPerSecond,
-          pose.getRotation());
+          rotation);
     }
 
     // Convert the chassis speeds to swerve module states
