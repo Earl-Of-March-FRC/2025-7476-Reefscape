@@ -4,13 +4,17 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.path.PathConstraints;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -104,7 +108,7 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 2; // Default 4.8
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
     public static final double kMaxAngularSpeed = 2 * Math.PI;
 
     public static final double kPTranslationController = 1.5;
@@ -116,7 +120,14 @@ public final class Constants {
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-        kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+        kMaxAngularSpeedRadiansPerSecond, kMaxAngularAccelerationRadiansPerSecondSquared);
+
+    public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
+        kMaxAccelerationMetersPerSecondSquared, kMaxAngularSpeedRadiansPerSecond,
+        kMaxAngularAccelerationRadiansPerSecondSquared);
+
+    public static final Pose2d kLaunchPose = new Pose2d(new Translation2d(9.92, 2.74), new Rotation2d(0));
+
   }
 
   public static final class NeoMotorConstants {
