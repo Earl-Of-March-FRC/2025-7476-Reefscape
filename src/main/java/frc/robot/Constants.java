@@ -153,7 +153,7 @@ public final class Constants {
     public static final double kAngleStowed = -6.5;
     public static final double kAngleGroundIntake = -60.5;
     public static final double kAngleCoral = -98.5;
-    public static final double kAngleL2 = -88.5;
+    public static final double kAngleL2 = -108.5;
     public static final double kAngleL3 = -150.5;
     public static final double kAngleProcessor = -186.5;
 
