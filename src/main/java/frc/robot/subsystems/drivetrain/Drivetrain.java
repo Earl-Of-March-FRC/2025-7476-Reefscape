@@ -266,7 +266,7 @@ public class Drivetrain extends SubsystemBase {
           speeds.vxMetersPerSecond,
           speeds.vyMetersPerSecond,
           speeds.omegaRadiansPerSecond,
-          gyro.getRotation2d());
+          pose.getRotation());
     }
 
     // Convert the chassis speeds to swerve module states
