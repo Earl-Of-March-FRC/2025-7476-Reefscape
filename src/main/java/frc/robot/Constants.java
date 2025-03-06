@@ -257,8 +257,8 @@ public final class Constants {
     // Velocities in RPM
     public static final double kVelocityFront = 2196.338215; // 230 rad/s
     public static final double kVelocityBack = 2721.549527; // 285 rad/s
-    public static final double kVelocityFrontTolerance = 47.8;
-    public static final double kVelocityBackTolerance = 47.8;
+    public static final double kVelocityFrontTolerance = 247.8;
+    public static final double kVelocityBackTolerance = 247.8;
   }
 
   public static class FieldConstants {
