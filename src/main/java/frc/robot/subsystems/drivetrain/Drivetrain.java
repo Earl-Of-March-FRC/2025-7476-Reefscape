@@ -383,6 +383,9 @@ public class Drivetrain extends SubsystemBase {
 
   public double distanceToBardge() {
     double robotYaw = getPose().getRotation().getRadians();
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+      robotYaw = robotYaw + Math.PI;
+    }
     return robotYaw > -Math.PI / 2 && robotYaw < Math.PI / 2 ? (getXDistanceToBarge() / Math.cos(robotYaw)) : -1;
   }
 }
