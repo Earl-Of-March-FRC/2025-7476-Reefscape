@@ -268,7 +268,6 @@ public class Drivetrain extends SubsystemBase {
           speeds.omegaRadiansPerSecond,
           gyro.getRotation2d());
     }
-
     // Convert the chassis speeds to swerve module states
     SwerveModuleState[] states = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
 
