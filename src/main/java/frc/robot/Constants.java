@@ -195,14 +195,14 @@ public final class Constants {
 
     public static final class PhotonConstants {
       public static final double camera1Roll = 0;
-      public static final double camera1Pitch = -10 * Math.PI / 180; // in rad
+      public static final double camera1Pitch = 10 * Math.PI / 180; // in rad
       public static final double camera1Yaw = 0;
       public static final double camera1X = 0.2921; // forward (pos)
       public static final double camera1Y = 0.127; // left (pos)
       public static final double camera1Z = 0.4699; // up (pos)
 
       public static final double camera2Roll = 0;
-      public static final double camera2Pitch = -10 * Math.PI / 180; // in rad
+      public static final double camera2Pitch = 10 * Math.PI / 180; // in rad
       public static final double camera2Yaw = Math.PI;
       public static final double camera2X = -0.2921;
       public static final double camera2Y = 0;
