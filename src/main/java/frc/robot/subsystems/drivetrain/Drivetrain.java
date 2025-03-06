@@ -181,21 +181,21 @@ public class Drivetrain extends SubsystemBase {
       Logger.recordOutput("Vision/Photon1/EstimatedPose", visionPose1.get().estimatedPose);
       Pose3d visionPose = visionPose1.get().estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
-          new Rotation2d(visionPose.getRotation().getAngle()));
+          new Rotation2d(visionPose.getRotation().getZ()));
       odometry.addVisionMeasurement(estimatedPose, visionPose1.get().timestampSeconds);
       hasVisionData = true;
     } else {
-      Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose2d());
+      Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose3d());
     }
     if (visionPose2.isPresent()) {
       Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
       Pose3d visionPose = visionPose2.get().estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
-          new Rotation2d(visionPose.getRotation().getAngle()));
+          new Rotation2d(visionPose.getRotation().getZ()));
       odometry.addVisionMeasurement(estimatedPose, visionPose2.get().timestampSeconds);
       hasVisionData = true;
     } else {
-      Logger.recordOutput("Vision/Photon2/EstimatedPose", new Pose2d());
+      Logger.recordOutput("Vision/Photon2/EstimatedPose", new Pose3d());
     }
     SmartDashboard.putBoolean("HasVision", hasVisionData);
 
