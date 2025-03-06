@@ -126,7 +126,7 @@ public final class Constants {
         kMaxAccelerationMetersPerSecondSquared, kMaxAngularSpeedRadiansPerSecond,
         kMaxAngularAccelerationRadiansPerSecondSquared);
 
-    public static final Pose2d kLaunchPose = new Pose2d(new Translation2d(9.92, 2.74), new Rotation2d(0));
+    public static final Pose2d kLaunchPose = new Pose2d(new Translation2d(10.53, 2.68), new Rotation2d(0));
 
   }
 
