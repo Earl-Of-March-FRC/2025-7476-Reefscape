@@ -223,7 +223,8 @@ public class RobotContainer {
           armSub.armOffset -= 2;
         }));
 
-    driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub));
+    // driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem,
+    // intakeSub));
 
     driverController.a().whileTrue(new PathfindToLaunchSpotCmd());
 
