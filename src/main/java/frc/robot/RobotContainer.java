@@ -11,6 +11,7 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
@@ -82,6 +83,8 @@ public class RobotContainer {
   private final CommandXboxController operatorController = new CommandXboxController(
       OIConstants.kOperatorControllerPort);
 
+  // Register Named Commands
+
   private LoggedDashboardChooser<Command> autoChooser;
 
   /**
@@ -149,6 +152,9 @@ public class RobotContainer {
     launcherSub = new Launcher(
         new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
+
+    // Register named Commands
+    NamedCommands.registerCommand("Calibrate", new CalibrateCmd(driveSub));
 
     driveSub.setDefaultCommand(
         new DriveSqrtCmd(
