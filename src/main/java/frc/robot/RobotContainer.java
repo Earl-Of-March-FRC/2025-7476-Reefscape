@@ -245,7 +245,7 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
     autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
-    autoChooser.addOption("EncoderAutoDrive", new EncoderAutoDrive(driveSub, 2, 1, 0));
+    autoChooser.addOption("EncoderAutoDrive", new EncoderAutoDrive(driveSub));
     SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
   }
 

@@ -125,6 +125,11 @@ public final class Constants {
     public static final double kDTranslationController = 0.25;
     public static final double kDThetaController = 0;
 
+    public static final class EncoderAutoDriveConstants {
+      public static final double kLeaveZoneMeters = 0.5; // Distance to travel
+      public static final double kLeaveZoneVelocity = 0.5; // Velocity (Meters/S) to leave zone at
+    }
+
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularAccelerationRadiansPerSecondSquared);

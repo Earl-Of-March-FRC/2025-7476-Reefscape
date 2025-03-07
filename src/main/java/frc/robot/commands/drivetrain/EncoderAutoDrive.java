@@ -6,8 +6,8 @@ package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.AutoConstants.EncoderAutoDriveConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -22,7 +22,7 @@ public class EncoderAutoDrive extends Command {
   /**
    * Attempts to move the robot in a straight line given a x and y displacement.
    * 
-   * @param driveSub
+   * @param driveSub    Drivetrain subsystem
    * @param netVelocity Velocity (Meters-per-second)
    * @param xDis        Desired x-displacement in meters (robot-oriented)
    * @param yDis        Desired y-displacement in meters (robot-oriented)
@@ -43,6 +43,20 @@ public class EncoderAutoDrive extends Command {
     xVel = Math.sin(heading) * netVelocity; // Calculate required x-velocity to meet net velocity
     yVel = Math.cos(heading) * netVelocity; // Calculate required y-velocity to meet net velocity
 
+  }
+
+  /**
+   * Attempts to move the robot in a straight line given a x and y displacement.
+   * Using this constructor will default to robot moving out of zone.
+   * 
+   * @param driveSub Drivetrain subsystem
+   */
+  public EncoderAutoDrive(Drivetrain driveSub) {
+    this(driveSub, EncoderAutoDriveConstants.kLeaveZoneVelocity, EncoderAutoDriveConstants.kLeaveZoneMeters, 0); // Move
+                                                                                                                 // out
+                                                                                                                 // of
+                                                                                                                 // zone
+                                                                                                                 // auto
   }
 
   @Override
