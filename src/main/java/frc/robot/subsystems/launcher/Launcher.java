@@ -156,7 +156,9 @@ public class Launcher extends SubsystemBase {
    * @return Preferred velocity
    */
   public double getPreferredFrontVelocity() {
-    return SmartDashboard.getNumber("LauncherFrontVelocity", LauncherConstants.kVelocityFront);
+    return SmartDashboard.getNumber("LauncherFrontVelocity",
+        LauncherConstants.kVelocityFront / LauncherConstants.kVelocityConversionFactor)
+        / LauncherConstants.kVelocityConversionFactor;
   }
 
   /**
@@ -165,7 +167,9 @@ public class Launcher extends SubsystemBase {
    * @return Preferred velocity
    */
   public double getPreferredBackVelocity() {
-    return SmartDashboard.getNumber("LauncherBackVelocity", LauncherConstants.kVelocityBack);
+    return SmartDashboard.getNumber("LauncherBackVelocity",
+        LauncherConstants.kVelocityBack / LauncherConstants.kVelocityConversionFactor)
+        / LauncherConstants.kVelocityConversionFactor;
   }
 
   public boolean frontRollerAtSetpoint() {
