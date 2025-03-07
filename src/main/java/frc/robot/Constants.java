@@ -4,13 +4,17 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.path.PathConstraints;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -104,7 +108,7 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 2; // Default 4.8
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
     public static final double kMaxAngularSpeed = 2 * Math.PI;
 
     public static final double kPTranslationController = 1.5;
@@ -116,7 +120,15 @@ public final class Constants {
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-        kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+        kMaxAngularSpeedRadiansPerSecond, kMaxAngularAccelerationRadiansPerSecondSquared);
+
+    public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
+        kMaxAccelerationMetersPerSecondSquared, kMaxAngularSpeedRadiansPerSecond,
+        kMaxAngularAccelerationRadiansPerSecondSquared);
+
+    public static final Pose2d kLaunchPoseBlue = new Pose2d(new Translation2d(7.02, 5.37), new Rotation2d(0));
+    public static final Pose2d kLaunchPoseRed = new Pose2d(new Translation2d(10.53, 2.68), new Rotation2d(0));
+
   }
 
   public static final class NeoMotorConstants {
@@ -153,12 +165,12 @@ public final class Constants {
     public static final double kAngleStowed = -6.5;
     public static final double kAngleGroundIntake = -60.5;
     public static final double kAngleCoral = -98.5;
-    public static final double kAngleL2 = -88.5;
+    public static final double kAngleL2 = -108.5;
     public static final double kAngleL3 = -150.5;
     public static final double kAngleProcessor = -186.5;
 
     // Limit switch stuff
-    public static final int kLimitSwitchChannel = 6;
+    public static final int kLimitSwitchChannel = 9;
   }
 
   public static final class IntakeConstants {
@@ -195,15 +207,15 @@ public final class Constants {
 
     public static final class PhotonConstants {
       public static final double camera1Roll = 0;
-      public static final double camera1Pitch = -10 * Math.PI / 180; // in rad
+      public static final double camera1Pitch = 10 * Math.PI / 180; // in rad
       public static final double camera1Yaw = 0;
       public static final double camera1X = 0.2921; // forward (pos)
       public static final double camera1Y = 0.127; // left (pos)
       public static final double camera1Z = 0.4699; // up (pos)
 
       public static final double camera2Roll = 0;
-      public static final double camera2Pitch = -10 * Math.PI / 180; // in rad
-      public static final double camera2Yaw = 0;
+      public static final double camera2Pitch = 10 * Math.PI / 180; // in rad
+      public static final double camera2Yaw = Math.PI;
       public static final double camera2X = -0.2921;
       public static final double camera2Y = 0;
       public static final double camera2Z = 0.3175;
@@ -265,8 +277,12 @@ public final class Constants {
     // Velocities in RPM
     public static final double kVelocityFront = 2196.338215; // 230 rad/s
     public static final double kVelocityBack = 2721.549527; // 285 rad/s
+    public static final double kVelocityFrontTolerance = 247.8;
+    public static final double kVelocityBackTolerance = 247.8;
+  }
 
-    public static final double kVelocityTolerance = 5;
+  public static class FieldConstants {
+    public static final double kBargeX = 8.774; // meters from drivestation wall
   }
 
   // PDP CAN IDs

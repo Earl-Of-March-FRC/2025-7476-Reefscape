@@ -11,6 +11,9 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.LauncherConfigs;
 import frc.robot.Constants.LauncherConstants;
@@ -27,6 +30,9 @@ public class Launcher extends SubsystemBase {
   private final SparkMax backLauncherSpark;
   private final RelativeEncoder backLauncherEncoder;
   private final SparkClosedLoopController backLauncherClosedLoopController;
+
+  private double frontReferenceVelocity = 0.0;
+  private double backReferenveVelocity = 0.0;
 
   /**
    * Constructs a new LauncherSubsystem and configures the launcher motors.
@@ -45,6 +51,9 @@ public class Launcher extends SubsystemBase {
         PersistMode.kPersistParameters);
     backLauncherSpark.configure(LauncherConfigs.backLauncherConfig.inverted(true), ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+
+    SmartDashboard.putNumber("LauncherFrontVelocity", LauncherConstants.kVelocityFront);
+    SmartDashboard.putNumber("LauncherBackVelocity", LauncherConstants.kVelocityBack);
   }
 
   /**
@@ -58,6 +67,8 @@ public class Launcher extends SubsystemBase {
         getFrontVelocity() / LauncherConstants.kVelocityConversionFactor);
     Logger.recordOutput("Launcher/Back/Measured/Velocity",
         getBackVelocity() / LauncherConstants.kVelocityConversionFactor);
+    SmartDashboard.putNumber("FrontVel", getFrontVelocity());
+    SmartDashboard.putNumber("BackVel", getBackVelocity());
   }
 
   /**
@@ -87,6 +98,9 @@ public class Launcher extends SubsystemBase {
     Logger.recordOutput("Launcher/Front/Setpoint/PercentVelocity", percent);
     Logger.recordOutput("Launcher/Back/Setpoint/PercentVelocity", percent);
 
+    SmartDashboard.putBoolean("LauncherFrontAtSetpoint", frontRollerAtSetpoint());
+    SmartDashboard.putBoolean("LauncherBackAtSetpoint", backRollerAtSetpoint());
+
     frontLauncherSpark.set(percent);
     backLauncherSpark.set(percent);
   }
@@ -107,6 +121,7 @@ public class Launcher extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setFrontReferenceVelocity(double referenceVelocity) {
+    frontReferenceVelocity = referenceVelocity;
     Logger.recordOutput("Launcher/Front/Setpoint/Velocity", referenceVelocity);
 
     // Converts RPM to radians per second
@@ -120,6 +135,7 @@ public class Launcher extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setBackReferenceVelocity(double referenceVelocity) {
+    backReferenveVelocity = referenceVelocity;
     Logger.recordOutput("Launcher/Back/Setpoint/Velocity", referenceVelocity);
 
     // Converts RPM to radians per second
@@ -132,5 +148,33 @@ public class Launcher extends SubsystemBase {
    */
   public void stopLauncher() {
     setReferenceVelocity(0);
+  }
+
+  /**
+   * Get the preferred reference velocity for the front rollers.
+   * 
+   * @return Preferred velocity
+   */
+  public double getPreferredFrontVelocity() {
+    return SmartDashboard.getNumber("LauncherFrontVelocity", LauncherConstants.kVelocityFront);
+  }
+
+  /**
+   * Get the preferred reference velocity for the back rollers.
+   * 
+   * @return Preferred velocity
+   */
+  public double getPreferredBackVelocity() {
+    return SmartDashboard.getNumber("LauncherBackVelocity", LauncherConstants.kVelocityBack);
+  }
+
+  public boolean frontRollerAtSetpoint() {
+    return MathUtil.isNear(frontReferenceVelocity, getFrontVelocity() / LauncherConstants.kVelocityConversionFactor,
+        LauncherConstants.kVelocityFrontTolerance);
+  }
+
+  public boolean backRollerAtSetpoint() {
+    return MathUtil.isNear(backReferenveVelocity, getBackVelocity() / LauncherConstants.kVelocityConversionFactor,
+        LauncherConstants.kVelocityBackTolerance);
   }
 }

@@ -31,6 +31,12 @@ public class GyroNavX implements Gyro {
   }
 
   @Override
+  public void setAngle(Rotation2d angle) {
+    gyro.zeroYaw();
+    gyro.setAngleAdjustment(angle.getDegrees());
+  }
+
+  @Override
   public boolean isConnected() {
     return gyro.isConnected();
   }

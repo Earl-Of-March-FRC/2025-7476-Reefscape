@@ -10,6 +10,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.LauncherConstants;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
 import frc.robot.subsystems.indexer.Indexer;
@@ -60,10 +61,10 @@ public class RevAndLaunchCmd extends SequentialCommandGroup {
      * the range of their tolerances.
      */
     BooleanSupplier launcherIsRevved = () -> {
-      return MathUtil.isNear(launcherFrontReferenceVelocity.getAsDouble(), launcher.getFrontVelocity(),
-          launcherFrontTolerance)
-          && MathUtil.isNear(launcherBackReferenceVelocity.getAsDouble(), launcher.getBackVelocity(),
-              launcherBackTolerance);
+      return MathUtil.isNear(launcherFrontReferenceVelocity.getAsDouble(),
+          launcher.getFrontVelocity() / LauncherConstants.kVelocityConversionFactor, launcherFrontTolerance)
+          && MathUtil.isNear(launcherBackReferenceVelocity.getAsDouble(),
+              launcher.getBackVelocity() / LauncherConstants.kVelocityConversionFactor, launcherBackTolerance);
     };
 
     addCommands(
@@ -76,8 +77,8 @@ public class RevAndLaunchCmd extends SequentialCommandGroup {
             new IndexerSetVelocityManualCmd(indexer, indexerVelocity).until(() -> indexer.getLauncherSensor()),
 
             /* Run launcher in order to rev it up */
-            new LauncherSetVelocityPIDCmd(launcher, launcherFrontReferenceVelocity.getAsDouble(),
-                launcherBackReferenceVelocity.getAsDouble())
+            new LauncherSetVelocityPIDCmd(launcher, launcherFrontReferenceVelocity,
+                launcherBackReferenceVelocity)
 
         ).until(() -> releaseSignal.getAsBoolean()),
 
@@ -96,8 +97,8 @@ public class RevAndLaunchCmd extends SequentialCommandGroup {
         new ParallelCommandGroup(
             /* Launch the algae. */
             new IndexerSetVelocityManualCmd(indexer, indexerVelocity),
-            new LauncherSetVelocityPIDCmd(launcher, launcherFrontReferenceVelocity.getAsDouble(),
-                launcherBackReferenceVelocity.getAsDouble())
+            new LauncherSetVelocityPIDCmd(launcher, launcherFrontReferenceVelocity,
+                launcherBackReferenceVelocity)
 
         ).onlyIf(launcherIsRevved).until(() -> !indexer.getBothSensors()).withTimeout(launchTimeout));
   }

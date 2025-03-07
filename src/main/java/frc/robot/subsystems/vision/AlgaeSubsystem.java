@@ -12,6 +12,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.pathplanner.lib.path.EventMarker;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
@@ -31,9 +32,10 @@ public class AlgaeSubsystem extends SubsystemBase {
   private final Supplier<Pose2d> drivetrainPoseSupplier;
   private Pose2d relativeToRobot = new Pose2d(), relativeToField = new Pose2d(); // In m
   private PhotonCamera camera1;
+  private Pose2d robotPose2d;
 
   /**
-   * Creates a new AlgaeSubsystem
+   * Creates a new AlgaeSubsystem in which creates a new relative to robot object
    * 
    * @param drivetrainPoseSupplier Supplies the drivetrain's field-relative
    *                               position
@@ -41,7 +43,6 @@ public class AlgaeSubsystem extends SubsystemBase {
   public AlgaeSubsystem(Supplier<Pose2d> drivetrainPoseSupplier) {
     camera1 = new PhotonCamera(Constants.Vision.PhotonConstants.kCamera1);
     this.drivetrainPoseSupplier = drivetrainPoseSupplier;
-
     relativeToRobot = new Pose2d();
   }
 

@@ -13,5 +13,8 @@ public interface Gyro {
   public default void calibrate() {
   }
 
+  public default void setAngle(Rotation2d angle) {
+  }
+
   public boolean isConnected();
 }

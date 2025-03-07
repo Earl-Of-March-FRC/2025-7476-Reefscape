@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Testing 1"
+            "pathName": "Auto Coral L1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Testing 2"
+            "pathName": "Auto Leave Reef"
           }
         }
       ]

@@ -19,6 +19,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -34,10 +35,13 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Vision.PhotonConstants;
+import frc.robot.Constants.FieldConstants;
 
 /**
  * The Drivetrain class represents the robot's drivetrain subsystem.
@@ -52,6 +56,7 @@ public class Drivetrain extends SubsystemBase {
   // Gyro sensor to get the robot's orientation
   public final Gyro gyro;
   public boolean gyroDisconnected;
+  public boolean hasVisionData = false;
   public boolean isFieldRelative = true;
   Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
@@ -67,7 +72,7 @@ public class Drivetrain extends SubsystemBase {
   private final PhotonPoseEstimator photonPoseEstimator2;
 
   // Odometry class for tracking the robot's position on the field
-  SwerveDriveOdometry odometry = new SwerveDriveOdometry(
+  SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
       new Rotation2d(),
       new SwerveModulePosition[] {
@@ -77,6 +82,8 @@ public class Drivetrain extends SubsystemBase {
           new SwerveModulePosition()
       },
       new Pose2d(0, 0, new Rotation2d()));
+
+  private final Field2d dashField = new Field2d();
 
   /**
    * Constructor for the Drivetrain class.
@@ -165,8 +172,37 @@ public class Drivetrain extends SubsystemBase {
               modules[2].getPosition(), modules[3].getPosition()
           });
     }
+
+    Optional<EstimatedRobotPose> visionPose1 = getEstimatedGlobalPose1(pose);
+    Optional<EstimatedRobotPose> visionPose2 = getEstimatedGlobalPose2(pose);
+
+    hasVisionData = false;
+    if (visionPose1.isPresent()) {
+      Logger.recordOutput("Vision/Photon1/EstimatedPose", visionPose1.get().estimatedPose);
+      Pose3d visionPose = visionPose1.get().estimatedPose;
+      Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
+          new Rotation2d(visionPose.getRotation().getZ()));
+      odometry.addVisionMeasurement(estimatedPose, visionPose1.get().timestampSeconds);
+      hasVisionData = true;
+    } else {
+      Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose3d());
+    }
+    if (visionPose2.isPresent()) {
+      Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
+      Pose3d visionPose = visionPose2.get().estimatedPose;
+      Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
+          new Rotation2d(visionPose.getRotation().getZ()));
+      odometry.addVisionMeasurement(estimatedPose, visionPose2.get().timestampSeconds);
+      hasVisionData = true;
+    } else {
+      Logger.recordOutput("Vision/Photon2/EstimatedPose", new Pose3d());
+    }
+    SmartDashboard.putBoolean("HasVision", hasVisionData);
+
     // Log the current pose to the logger
     Logger.recordOutput("Odometry", pose);
+    SmartDashboard.putData("Odometry", dashField);
+    dashField.setRobotPose(pose);
 
     // Create arrays to hold the states and positions of the swerve modules
     SwerveModuleState[] states = new SwerveModuleState[4];
@@ -182,6 +218,21 @@ public class Drivetrain extends SubsystemBase {
     // Log the states and positions of the swerve modules to the logger
     Logger.recordOutput("Swerve/Module/State", states);
     Logger.recordOutput("Swerve/Module/Position", positions);
+
+    // Distance to barge
+    double distanceToBardge = distanceToBardge();
+    double xDistanceToBardge = getXDistanceToBarge();
+
+    SmartDashboard.putNumber("Distance to Barge", distanceToBardge);
+    SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBardge);
+
+    Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBardge);
+    Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBardge);
+
+    Logger.recordOutput("Drive/FieldRelative", isFieldRelative);
+
+    Logger.recordOutput("Drive/GyroDisconnected", gyroDisconnected);
+    SmartDashboard.putBoolean("GyroDisconnected", gyroDisconnected);
   }
 
   /**
@@ -217,7 +268,6 @@ public class Drivetrain extends SubsystemBase {
           speeds.omegaRadiansPerSecond,
           gyro.getRotation2d());
     }
-
     // Convert the chassis speeds to swerve module states
     SwerveModuleState[] states = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
 
@@ -324,5 +374,18 @@ public class Drivetrain extends SubsystemBase {
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
     photonPoseEstimator2.setReferencePose(prevEstimatedRobotPose);
     return photonPoseEstimator2.update(camera2.getLatestResult());
+  }
+
+  public double getXDistanceToBarge() {
+    double robotX = getPose().getTranslation().getX();
+    return Math.abs(robotX - FieldConstants.kBargeX);
+  }
+
+  public double distanceToBardge() {
+    double robotYaw = getPose().getRotation().getRadians();
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+      robotYaw = robotYaw + Math.PI;
+    }
+    return robotYaw > -Math.PI / 2 && robotYaw < Math.PI / 2 ? (getXDistanceToBarge() / Math.cos(robotYaw)) : -1;
   }
 }

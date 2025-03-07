@@ -28,7 +28,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMax armSpark;
   private final RelativeEncoder armEncoder;
   private final SparkClosedLoopController armClosedLoopController;
-  private final DigitalInput limitSwitch;
+  private final DigitalInput lowerLimitSwitch;
   public boolean isManual = false;
   public double armOffset = 0;
 
@@ -42,7 +42,7 @@ public class ArmSubsystem extends SubsystemBase {
   public ArmSubsystem(SparkMax armSpark, int limitSwitchChannel) {
     this.armSpark = armSpark;
 
-    limitSwitch = new DigitalInput(limitSwitchChannel);
+    lowerLimitSwitch = new DigitalInput(limitSwitchChannel);
 
     armEncoder = armSpark.getEncoder();
     armClosedLoopController = armSpark.getClosedLoopController();
@@ -61,6 +61,8 @@ public class ArmSubsystem extends SubsystemBase {
     // Convert radians per second to RPM
     Logger.recordOutput("Intake/Arm/Measured/Velocity", getVelocity() / ArmConstants.kVelocityConversionFactor);
     Logger.recordOutput("Intake/Arm/Measured/armOffset", this.armOffset);
+
+    Logger.recordOutput("Intake/Arm/Measured/limitSwitch", getLimitSwitch());
   }
 
   /**
@@ -141,6 +143,6 @@ public class ArmSubsystem extends SubsystemBase {
    * @return {@code true} if the limit switch is pressed, {@code false} if not.
    */
   public boolean getLimitSwitch() {
-    return !limitSwitch.get();
+    return !lowerLimitSwitch.get();
   }
 }
