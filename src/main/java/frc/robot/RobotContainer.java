@@ -131,7 +131,7 @@ public class RobotContainer {
           new SwerveModuleSim(swerveDriveSimulation.getModules()[1]),
           new SwerveModuleSim(swerveDriveSimulation.getModules()[2]),
           new SwerveModuleSim(swerveDriveSimulation.getModules()[3]),
-          gyro);
+          gyro, swerveDriveSimulation);
 
       SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
     }
