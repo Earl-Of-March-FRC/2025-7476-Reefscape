@@ -4,8 +4,9 @@
 
 package frc.robot.commands.arm;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
 /**
@@ -14,7 +15,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 public class ArmSetPositionPIDCmd extends Command {
 
   private ArmSubsystem armSub;
-  private double referenceAngle;
+  private DoubleSupplier referenceAngle;
 
   /**
    * Sets the reference value for the arm subsystem's closed-loop controller. It
@@ -23,7 +24,7 @@ public class ArmSetPositionPIDCmd extends Command {
    * @param armSub         The instance of the ArmSubsystem class to be used.
    * @param referenceAngle The goal angle for the arm to move to, in degrees.
    */
-  public ArmSetPositionPIDCmd(ArmSubsystem armSub, double referenceAngle) {
+  public ArmSetPositionPIDCmd(ArmSubsystem armSub, DoubleSupplier referenceAngle) {
 
     this.armSub = armSub;
     this.referenceAngle = referenceAngle;
@@ -34,13 +35,14 @@ public class ArmSetPositionPIDCmd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSub.setReferencePosition(referenceAngle);
+    armSub.armOffset = 0;
     armSub.isManual = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    armSub.setReferencePosition(referenceAngle.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
@@ -51,13 +53,14 @@ public class ArmSetPositionPIDCmd extends Command {
     // then set the current arm angle as the new reference angle using position PID
     // If it has already reached the setpoint, it should continue holding its
     // current position
-    if (Math.abs(
-        referenceAngle - armSub.getPosition() / ArmConstants.kAngleConversionFactor) > ArmConstants.kAngleTolerance) {
+    // if (Math.abs(
+    // referenceAngle - armSub.getPosition() / ArmConstants.kAngleConversionFactor)
+    // > ArmConstants.kAngleTolerance) {
 
-      // Convert the current position to degrees
-      armSub.setReferencePosition(armSub.getPosition() /
-          ArmConstants.kAngleConversionFactor);
-    }
+    // // Convert the current position to degrees
+    // armSub.setReferencePosition(armSub.getPosition() /
+    // ArmConstants.kAngleConversionFactor);
+    // }
   }
 
   // Returns true when the command should end.

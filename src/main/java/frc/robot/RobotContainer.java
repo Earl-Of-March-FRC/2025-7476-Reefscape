@@ -4,10 +4,9 @@
 
 package frc.robot;
 
-import java.util.function.DoubleSupplier;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
@@ -23,18 +22,14 @@ import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.CalibrateCmd;
-import frc.robot.commands.DriveCmd;
-import frc.robot.commands.TimedAutoDrive;
-import frc.robot.commands.arm.ArmResetEncoderCmd;
+import frc.robot.commands.drivetrain.*;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
-import frc.robot.commands.indexer.IndexToSubsystemCmd;
+import frc.robot.commands.indexer.IndexToBeamBreakCmd;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
-import frc.robot.commands.intake.IntakeStopCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
-import frc.robot.commands.launcher.LauncherStopCmd;
+import frc.robot.commands.vision.GoToAlgaeCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
@@ -44,6 +39,7 @@ import frc.robot.subsystems.indexer.BeamBreakSensor;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
+import frc.robot.subsystems.vision.AlgaeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -63,13 +59,14 @@ public class RobotContainer {
   private final IntakeSubsystem intakeSub;
   private final Indexer indexerSub;
   private final Launcher launcherSub;
+  private final AlgaeSubsystem algaeSubsystem;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
   private final CommandXboxController operatorController = new CommandXboxController(
       OIConstants.kOperatorControllerPort);
 
-  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");;
+  private LoggedDashboardChooser<Command> autoChooser;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -93,7 +90,8 @@ public class RobotContainer {
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
 
-    armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType));
+    armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType),
+        ArmConstants.kLimitSwitchChannel);
 
     intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
 
@@ -107,7 +105,7 @@ public class RobotContainer {
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 
     driveSub.setDefaultCommand(
-        new DriveCmd(
+        new DriveSqrtCmd(
             driveSub,
             () -> MathUtil.applyDeadband(
                 -driverController.getRawAxis(
@@ -121,6 +119,8 @@ public class RobotContainer {
                 -driverController.getRawAxis(
                     OIConstants.kDriverControllerRotAxis),
                 OIConstants.kDriveDeadband)));
+
+    algaeSubsystem = new AlgaeSubsystem(() -> driveSub.getPose());
 
     // indexerSub.setDefaultCommand(
     // new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
@@ -162,47 +162,74 @@ public class RobotContainer {
     driverController.b().onTrue(new CalibrateCmd(driveSub));
 
     // UNCOMMENT AFTER THE ARM IS TESTED
-    operatorController.button(7).onTrue(new ArmSetPositionPIDCmd(armSub,
-        ArmConstants.kAngleStowed));
+    operatorController.leftTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleStowed - armSub.armOffset));
     operatorController.povDown().onTrue(
-        new ArmSetPositionPIDCmd(armSub, ArmConstants.kAngleGroundIntake));
-    // operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleL2));
-    // operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleL3));
-    // operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
-    // ArmConstants.kAngleProcessor));
-
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake - armSub.armOffset));
+    operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleL2 - armSub.armOffset));
+    operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleL3 - armSub.armOffset));
+    operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleProcessor - armSub.armOffset));
+    operatorController.rightTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleCoral - armSub.armOffset));
     operatorController.a()
         .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
-
+    operatorController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
     // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
-    driverController.x().onTrue(new IndexToSubsystemCmd(indexerSub, () -> -1));
-    driverController.y().onTrue(new IndexToSubsystemCmd(indexerSub, () -> 0.75));
-    driverController.rightTrigger().whileTrue(
-        new LauncherSetVelocityPIDCmd(launcherSub, LauncherConstants.kVelocityFront, LauncherConstants.kVelocityBack));
+    driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
+    driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
+    driverController.rightTrigger().toggleOnTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
+            () -> launcherSub.getPreferredBackVelocity()));
     driverController.leftTrigger().whileTrue(
-        new LauncherSetVelocityPIDCmd(launcherSub, -LauncherConstants.kVelocityFront,
-            -LauncherConstants.kVelocityBack));
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
+            () -> -launcherSub.getPreferredBackVelocity()));
     driverController.rightBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
     driverController.leftBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
     driverController.leftStick().onTrue(
-        Commands.run(() -> {
-          driveSub.isFieldRelative = !driveSub.isFieldRelative;
+        Commands.runOnce(() -> {
+          driveSub.isFieldRelative = true;
+        }));
+    driverController.rightStick().onTrue(
+        Commands.runOnce(() -> {
+          driveSub.isFieldRelative = false;
         }));
     operatorController.axisGreaterThan(OIConstants.kOperatorArmManualAxis, OIConstants.kArmDeadband).onTrue(
-        Commands.run(() -> {
+        Commands.runOnce(() -> {
           armSub.isManual = true;
         }));
+    operatorController.axisLessThan(OIConstants.kOperatorArmManualAxis, -OIConstants.kArmDeadband).onTrue(
+        Commands.runOnce(() -> {
+          armSub.isManual = true;
+        }));
+    operatorController.leftBumper().whileTrue(
+        Commands.runOnce(() -> {
+          armSub.armOffset += 2;
+        }));
+
+    operatorController.rightBumper().whileTrue(
+        Commands.runOnce(() -> {
+          armSub.armOffset -= 2;
+        }));
+
+    driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub));
+
+    driverController.a().whileTrue(new PathfindToLaunchSpotCmd());
+
+    // Arm calibration
+    new Trigger(() -> armSub.getLimitSwitch()).onTrue(Commands.runOnce(() -> armSub.resetPosition()));
   }
 
   /**
    * Use this method to define the autonomous command.
    */
   private void configureAutos() {
+    autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
     autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
     SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());

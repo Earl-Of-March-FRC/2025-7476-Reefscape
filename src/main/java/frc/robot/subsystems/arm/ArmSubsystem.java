@@ -15,6 +15,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
@@ -27,7 +28,9 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMax armSpark;
   private final RelativeEncoder armEncoder;
   private final SparkClosedLoopController armClosedLoopController;
+  private final DigitalInput lowerLimitSwitch;
   public boolean isManual = false;
+  public double armOffset = 0;
 
   // Starting angle of the arm, in radians
   // Ex: arm starting position is 1 radian, then m_armAngularOffset is 1
@@ -36,8 +39,10 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * The constructor for the ArmSubsystem class configures the arm motor.
    */
-  public ArmSubsystem(SparkMax armSpark) {
+  public ArmSubsystem(SparkMax armSpark, int limitSwitchChannel) {
     this.armSpark = armSpark;
+
+    lowerLimitSwitch = new DigitalInput(limitSwitchChannel);
 
     armEncoder = armSpark.getEncoder();
     armClosedLoopController = armSpark.getClosedLoopController();
@@ -55,6 +60,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     // Convert radians per second to RPM
     Logger.recordOutput("Intake/Arm/Measured/Velocity", getVelocity() / ArmConstants.kVelocityConversionFactor);
+    Logger.recordOutput("Intake/Arm/Measured/armOffset", this.armOffset);
+
+    Logger.recordOutput("Intake/Arm/Measured/limitSwitch", getLimitSwitch());
   }
 
   /**
@@ -127,5 +135,14 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public void resetPosition() {
     armEncoder.setPosition(0);
+  }
+
+  /**
+   * Check if the calibration limit switches are triggered.
+   * 
+   * @return {@code true} if the limit switch is pressed, {@code false} if not.
+   */
+  public boolean getLimitSwitch() {
+    return !lowerLimitSwitch.get();
   }
 }
