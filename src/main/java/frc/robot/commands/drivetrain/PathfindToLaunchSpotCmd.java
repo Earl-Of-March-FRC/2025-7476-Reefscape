@@ -16,6 +16,7 @@ import frc.robot.Constants.DriveConstants;
 public class PathfindToLaunchSpotCmd extends SequentialCommandGroup {
   /** Creates a new PathfindToLaunchSpotCmd. */
   public PathfindToLaunchSpotCmd(Pose2d launchPose) {
+
     addCommands(
         AutoBuilder.pathfindToPose(launchPose, DriveConstants.kPathfindingConstraints));
   }
