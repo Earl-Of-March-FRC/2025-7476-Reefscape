@@ -123,7 +123,7 @@ public class RobotContainer {
           .withBumperSize(Units.Meters.of(0.75), Units.Meters.of(0.75));
       swerveDriveSimulation = new SwerveDriveSimulation(
           driveTrainSimulationConfig,
-          new Pose2d(2, 2, new Rotation2d(0)));
+          new Pose2d(7, 4, new Rotation2d(180)));
       gyro = new GyroSim(swerveDriveSimulation.getGyroSimulation());
 
       driveSub = new Drivetrain(
@@ -131,7 +131,7 @@ public class RobotContainer {
           new SwerveModuleSim(swerveDriveSimulation.getModules()[1]),
           new SwerveModuleSim(swerveDriveSimulation.getModules()[2]),
           new SwerveModuleSim(swerveDriveSimulation.getModules()[3]),
-          gyro);
+          gyro, swerveDriveSimulation);
 
       SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
     }
