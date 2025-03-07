@@ -38,6 +38,13 @@ public final class Constants {
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
     public static final double kBalleyPopMetersPerSecond = 0.8; // Max net robot translational speed when intaking algae
                                                                 // stacked on coral
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
+    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
+
+    public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
+        kMaxAccelerationMetersPerSecondSquared, kMaxAngularSpeedRadiansPerSecond,
+        kMaxAngularAccelerationRadiansPerSecondSquared);
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(26.5);
@@ -134,10 +141,6 @@ public final class Constants {
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularAccelerationRadiansPerSecondSquared);
-
-    public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
-        kMaxAccelerationMetersPerSecondSquared, kMaxAngularSpeedRadiansPerSecond,
-        kMaxAngularAccelerationRadiansPerSecondSquared);
 
     public static final Pose2d kLaunchPoseBlue = new Pose2d(new Translation2d(7.02, 5.37), new Rotation2d(0));
     public static final Pose2d kLaunchPoseRed = new Pose2d(new Translation2d(10.53, 2.68), new Rotation2d(0));
