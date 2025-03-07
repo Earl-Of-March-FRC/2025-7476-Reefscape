@@ -6,6 +6,7 @@ package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
@@ -38,7 +39,7 @@ public class EncoderAutoDrive extends Command {
     // Get the total net distance
     netdistance = Math.sqrt(Math.pow(xDis, 2) + Math.pow(yDis, 2));
 
-    double heading = Math.tan(xDis / yDis); // Angle (degrees): {Moving left < 0 < Moving right}
+    double heading = (yDis == 0 ? 0 : Math.tan(xDis / yDis)); // Angle (degrees): {Moving left < 0 < Moving right}
     xVel = Math.asin(heading) * netVelocity; // Calculate required x-velocity to meet net velocity
     yVel = Math.acos(heading) * netVelocity; // Calculate required y-velocity to meet net velocity
 
@@ -66,7 +67,8 @@ public class EncoderAutoDrive extends Command {
        * Get the position difference (regardless of positive or negative) and add to
        * average
        */
-      currentAverageDistance += Math.abs(currentPosition - initialPosition) / initialModulePositions.length;
+      currentAverageDistance += Math.abs(currentPosition - initialPosition) /
+          initialModulePositions.length;
     }
     return currentAverageDistance >= netdistance;
   }
