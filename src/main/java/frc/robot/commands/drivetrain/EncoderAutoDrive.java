@@ -39,9 +39,9 @@ public class EncoderAutoDrive extends Command {
     // Get the total net distance
     netdistance = Math.sqrt(Math.pow(xDis, 2) + Math.pow(yDis, 2));
 
-    double heading = (yDis == 0 ? 0 : Math.tan(xDis / yDis)); // Angle (degrees): {Moving left < 0 < Moving right}
-    xVel = Math.asin(heading) * netVelocity; // Calculate required x-velocity to meet net velocity
-    yVel = Math.acos(heading) * netVelocity; // Calculate required y-velocity to meet net velocity
+    double heading = (xDis == 0 ? 0 : Math.atan(xDis / yDis)); // Angle (degrees): {Moving left < 0 < Moving right}
+    xVel = Math.sin(heading) * netVelocity; // Calculate required x-velocity to meet net velocity
+    yVel = Math.cos(heading) * netVelocity; // Calculate required y-velocity to meet net velocity
 
   }
 
