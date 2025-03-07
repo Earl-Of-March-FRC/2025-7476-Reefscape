@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Calibrate"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Auto Leave Left"
