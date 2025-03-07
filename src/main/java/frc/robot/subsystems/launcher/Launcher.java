@@ -52,8 +52,10 @@ public class Launcher extends SubsystemBase {
     backLauncherSpark.configure(LauncherConfigs.backLauncherConfig.inverted(true), ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    SmartDashboard.putNumber("LauncherFrontVelocity", LauncherConstants.kVelocityFront);
-    SmartDashboard.putNumber("LauncherBackVelocity", LauncherConstants.kVelocityBack);
+    SmartDashboard.putNumber("LauncherFrontVelocity",
+        LauncherConstants.kVelocityFront * LauncherConstants.kVelocityConversionFactor);
+    SmartDashboard.putNumber("LauncherBackVelocity",
+        LauncherConstants.kVelocityBack * LauncherConstants.kVelocityConversionFactor);
   }
 
   /**
@@ -157,7 +159,7 @@ public class Launcher extends SubsystemBase {
    */
   public double getPreferredFrontVelocity() {
     return SmartDashboard.getNumber("LauncherFrontVelocity",
-        LauncherConstants.kVelocityFront / LauncherConstants.kVelocityConversionFactor)
+        LauncherConstants.kVelocityFront * LauncherConstants.kVelocityConversionFactor)
         / LauncherConstants.kVelocityConversionFactor;
   }
 
@@ -168,7 +170,7 @@ public class Launcher extends SubsystemBase {
    */
   public double getPreferredBackVelocity() {
     return SmartDashboard.getNumber("LauncherBackVelocity",
-        LauncherConstants.kVelocityBack / LauncherConstants.kVelocityConversionFactor)
+        LauncherConstants.kVelocityBack * LauncherConstants.kVelocityConversionFactor)
         / LauncherConstants.kVelocityConversionFactor;
   }
 

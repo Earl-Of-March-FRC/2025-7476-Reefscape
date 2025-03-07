@@ -30,17 +30,13 @@
               1
             ],
             "content": {
-              "_type": "Number Bar",
-              "_source0": "network_table:///SmartDashboard/Distance to Barge",
-              "_title": "Distance to Barge",
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/GyroDisconnected",
+              "_title": "GyroDisconnected",
               "_glyph": 148,
               "_showGlyph": false,
-              "Range/Min": 0.0,
-              "Range/Max": 3.6,
-              "Range/Center": 0.0,
-              "Visuals/Num tick marks": 5,
-              "Visuals/Show text": true,
-              "Visuals/Orientation": "HORIZONTAL"
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           },
           "0,1": {
@@ -149,21 +145,6 @@
               "Visuals/Show value": true
             }
           },
-          "1,3": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/GyroDisconnected",
-              "_title": "GyroDisconnected",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
           "1,0": {
             "size": [
               1,
@@ -175,25 +156,6 @@
               "_title": "Alerts",
               "_glyph": 148,
               "_showGlyph": false
-            }
-          },
-          "8,2": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Number Bar",
-              "_source0": "network_table:///SmartDashboard/Distance to Barge (x)",
-              "_title": "SmartDashboard/Distance to Barge (x)",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Range/Min": 0.0,
-              "Range/Max": 5.0,
-              "Range/Center": 0.0,
-              "Visuals/Num tick marks": 5,
-              "Visuals/Show text": true,
-              "Visuals/Orientation": "HORIZONTAL"
             }
           },
           "8,2": {
@@ -224,6 +186,32 @@
               "_type": "Alerts",
               "_source0": "network_table:///SmartDashboard/Alerts",
               "_title": "Alerts",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "8,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/LauncherFrontVelocity",
+              "_title": "LauncherFrontVelocity",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/LauncherBackVelocity",
+              "_title": "LauncherBackVelocity",
               "_glyph": 148,
               "_showGlyph": false
             }
