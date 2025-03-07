@@ -85,6 +85,19 @@ public final class Constants {
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
     public static final double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
         / kDrivingMotorReduction;
+
+    public static final double kDrivingPSim = 0.08;
+    public static final double kDrivingISim = 0;
+    public static final double kDrivingDSim = 0;
+    public static final double kDrivingFFSim = 1 / Constants.ModuleConstants.kDriveWheelFreeSpeedRps;
+
+    public static final double kTurningMinOutputSim = -1;
+    public static final double kTurningMaxOutputSIm = 1;
+
+    public static final double kTurningPSim = 8;
+    public static final double kTurningISim = 0;
+    public static final double kTurningDSim = 0;
+    public static final double kTurningFFSim = 0;
   }
 
   public static final class OIConstants {

@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -39,6 +40,8 @@ public class Robot extends LoggedRobot {
       Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
       Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
       Logger.registerURCL(URCL.startExternal());
+    } else {
+      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     }
 
     Logger.start();
@@ -138,10 +141,20 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
+    SimulatedArena.getInstance().resetFieldForAuto();
   }
 
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {
+    SimulatedArena.getInstance().simulationPeriodic();
+
+    Logger.recordOutput("FieldSimulation/Algae",
+        SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    Logger.recordOutput("FieldSimulation/Coral",
+        SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+
+    Logger.recordOutput("FieldSimulation/PhysicalRobotPose",
+        robotContainer.swerveDriveSimulation.getSimulatedDriveTrainPose());
   }
 }

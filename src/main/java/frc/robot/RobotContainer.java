@@ -4,12 +4,21 @@
 
 package frc.robot;
 
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -34,7 +43,9 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
 import frc.robot.subsystems.drivetrain.GyroNavX;
+import frc.robot.subsystems.drivetrain.GyroSim;
 import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import frc.robot.subsystems.drivetrain.SwerveModuleSim;
 import frc.robot.subsystems.indexer.BeamBreakSensor;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -60,6 +71,7 @@ public class RobotContainer {
   private final Indexer indexerSub;
   private final Launcher launcherSub;
   private final AlgaeSubsystem algaeSubsystem;
+  public final SwerveDriveSimulation swerveDriveSimulation;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
@@ -72,23 +84,53 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    gyro = new GyroNavX();
-    gyro.calibrate();
+    if (RobotBase.isReal()) {
+      gyro = new GyroNavX();
+      gyro.calibrate();
 
-    driveSub = new Drivetrain(
-        new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
-            DriveConstants.kFrontLeftTurningCanId,
-            DriveConstants.kFrontLeftChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
-            DriveConstants.kFrontRightTurningCanId,
-            DriveConstants.kFrontRightChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
-            DriveConstants.kRearLeftTurningCanId,
-            DriveConstants.kBackLeftChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
-            DriveConstants.kRearRightTurningCanId,
-            DriveConstants.kBackRightChassisAngularOffset),
-        gyro);
+      driveSub = new Drivetrain(
+          new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
+              DriveConstants.kFrontLeftTurningCanId,
+              DriveConstants.kFrontLeftChassisAngularOffset),
+          new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
+              DriveConstants.kFrontRightTurningCanId,
+              DriveConstants.kFrontRightChassisAngularOffset),
+          new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
+              DriveConstants.kRearLeftTurningCanId,
+              DriveConstants.kBackLeftChassisAngularOffset),
+          new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
+              DriveConstants.kRearRightTurningCanId,
+              DriveConstants.kBackRightChassisAngularOffset),
+          gyro);
+
+      swerveDriveSimulation = null;
+    } else {
+
+      DriveTrainSimulationConfig driveTrainSimulationConfig = DriveTrainSimulationConfig.Default()
+          .withGyro(COTS.ofGenericGyro())
+          .withSwerveModule(COTS.ofMAXSwerve(
+              DCMotor.getNEO(1),
+              DCMotor.getNeo550(1),
+              COTS.WHEELS.COLSONS.cof,
+              2))
+          .withTrackLengthTrackWidth(
+              Units.Meters.of(DriveConstants.kWheelBase),
+              Units.Meters.of(DriveConstants.kTrackWidth))
+          .withBumperSize(Units.Meters.of(0.75), Units.Meters.of(0.75));
+      swerveDriveSimulation = new SwerveDriveSimulation(
+          driveTrainSimulationConfig,
+          new Pose2d(2, 2, new Rotation2d(0)));
+      gyro = new GyroSim(swerveDriveSimulation.getGyroSimulation());
+
+      driveSub = new Drivetrain(
+          new SwerveModuleSim(swerveDriveSimulation.getModules()[0]),
+          new SwerveModuleSim(swerveDriveSimulation.getModules()[1]),
+          new SwerveModuleSim(swerveDriveSimulation.getModules()[2]),
+          new SwerveModuleSim(swerveDriveSimulation.getModules()[3]),
+          gyro);
+
+      SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
+    }
 
     armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType),
         ArmConstants.kLimitSwitchChannel);

@@ -19,7 +19,7 @@ public class PathfindToLaunchSpotCmd extends SequentialCommandGroup {
     // Determine launch pose to use based on alliance
     Pose2d launchPose;
 
-    if (DriverStation.getAlliance().get() == Alliance.Blue) {
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue) {
       launchPose = AutoConstants.kLaunchPoseBlue;
     } else {
       launchPose = AutoConstants.kLaunchPoseRed;

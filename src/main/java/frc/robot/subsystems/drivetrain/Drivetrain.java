@@ -51,7 +51,7 @@ import frc.robot.Constants.FieldConstants;
 public class Drivetrain extends SubsystemBase {
   // Array to hold the four swerve drive modules (front-left, front-right,
   // back-left, back-right)
-  private final MAXSwerveModule[] modules = new MAXSwerveModule[4]; // FL, FR, BL, BR
+  private final SwerveModule[] modules = new SwerveModule[4]; // FL, FR, BL, BR
 
   // Gyro sensor to get the robot's orientation
   public final Gyro gyro;
@@ -95,8 +95,8 @@ public class Drivetrain extends SubsystemBase {
    * @param moduleBR Back-right swerve module
    * @param gyro     Gyro sensor
    */
-  public Drivetrain(MAXSwerveModule moduleFL, MAXSwerveModule moduleFR, MAXSwerveModule moduleBL,
-      MAXSwerveModule moduleBR, Gyro gyro) {
+  public Drivetrain(SwerveModule moduleFL, SwerveModule moduleFR, SwerveModule moduleBL,
+      SwerveModule moduleBR, Gyro gyro) {
     modules[0] = moduleFL;
     modules[1] = moduleFR;
     modules[2] = moduleBL;
