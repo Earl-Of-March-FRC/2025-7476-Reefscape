@@ -31,7 +31,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto Leave Reef"
+            "pathName": "Intake Algae"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.7
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Shoot"
           }
         }
       ]

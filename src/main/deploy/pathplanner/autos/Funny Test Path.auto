@@ -33,6 +33,24 @@
           "data": {
             "pathName": "Auto Leave Reef"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HahahaFunny"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HEHEHE 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HAHAH 3"
+          }
         }
       ]
     }
