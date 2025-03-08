@@ -196,11 +196,13 @@
               1
             ],
             "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/LauncherFrontVelocity",
-              "_title": "LauncherFrontVelocity",
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/FarFromBargeLaunchingRange",
+              "_title": "FarFromBarge",
               "_glyph": 148,
-              "_showGlyph": false
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           },
           "9,3": {
@@ -209,11 +211,13 @@
               1
             ],
             "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/LauncherBackVelocity",
-              "_title": "LauncherBackVelocity",
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/WithinBargeLaunchingRange",
+              "_title": "Launch",
               "_glyph": 148,
-              "_showGlyph": false
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           }
         }
