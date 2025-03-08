@@ -18,15 +18,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class MoveToNearestBargeLaunchingZoneCmd extends InstantCommand {
+public class MoveToNearestBargeLaunchingZoneCmd extends Command {
   private final Drivetrain driveSub;
+  private Command followCommand;
 
   /** Creates a new MoveToNearestBargeLaunchingZoneCmd. */
   public MoveToNearestBargeLaunchingZoneCmd(
@@ -60,6 +60,15 @@ public class MoveToNearestBargeLaunchingZoneCmd extends InstantCommand {
     Logger.recordOutput("PathPlanner/GoToBarge/StartingPose", startingPose);
     Logger.recordOutput("PathPlanner/GoToBarge/TargetPose", targetPose);
 
-    AutoBuilder.followPath(path).schedule();
+    followCommand = AutoBuilder.followPath(path);
+    followCommand.schedule();
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    if (followCommand == null) {
+      return;
+    }
+    followCommand.cancel();
   }
 }
