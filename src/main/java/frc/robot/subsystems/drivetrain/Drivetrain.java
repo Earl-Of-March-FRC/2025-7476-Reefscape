@@ -199,7 +199,7 @@ public class Drivetrain extends SubsystemBase {
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getZ()));
       odometry.addVisionMeasurement(estimatedPose, visionPose1.get().timestampSeconds);
-      Logger.recordOutput("Vision/Photon1/Timestamp", visionPose2.get().timestampSeconds);
+      Logger.recordOutput("Vision/Photon1/Timestamp", visionPose1.get().timestampSeconds);
       hasVisionData = true;
     } else {
       Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose3d());
