@@ -404,6 +404,11 @@ public class Drivetrain extends SubsystemBase {
     return photonPoseEstimator2.update(camera2.getLatestResult());
   }
 
+  public boolean isOnBlueSide() {
+    double robotX = getPose().getTranslation().getX();
+    return robotX - FieldConstants.kBargeX < 0;
+  }
+
   public double getXDistanceToBarge() {
     double robotX = getPose().getTranslation().getX();
     return Math.abs(robotX - FieldConstants.kBargeX);
