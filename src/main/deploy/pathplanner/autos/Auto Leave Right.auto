@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "Auto Leave Right"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Calibrate"
@@ -14,12 +20,6 @@
           "type": "wait",
           "data": {
             "waitTime": 0.5
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Auto Leave Right"
           }
         }
       ]
