@@ -11,10 +11,14 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
 
+import com.pathplanner.lib.pathfinding.Pathfinder;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.utils.LocalADStarAK;
 
 /**
  * The methods in this class are called automatically corresponding to each
@@ -56,6 +60,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
+    Pathfinding.setPathfinder(new LocalADStarAK());
   }
 
   /**
