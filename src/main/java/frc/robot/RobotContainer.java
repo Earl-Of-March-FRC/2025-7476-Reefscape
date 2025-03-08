@@ -231,10 +231,13 @@ public class RobotContainer {
     // driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem,
     // intakeSub));
 
-    driverController.a().whileTrue(new ConditionalCommand(
-        new PathfindToLaunchSpotCmd(AutoConstants.kLaunchPoseBlue),
-        new PathfindToLaunchSpotCmd(AutoConstants.kLaunchPoseRed),
-        () -> DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue));
+    driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneCmd(driveSub));
+
+    // driverController.a().whileTrue(new ConditionalCommand(
+    // new PathfindToLaunchSpotCmd(AutoConstants.kLaunchPoseBlue),
+    // new PathfindToLaunchSpotCmd(AutoConstants.kLaunchPoseRed),
+    // () -> DriverStation.getAlliance().isPresent() &&
+    // DriverStation.getAlliance().get() == Alliance.Blue));
 
     // Arm calibration
     // new Trigger(() -> armSub.getLimitSwitch()).onTrue(Commands.runOnce(() ->
