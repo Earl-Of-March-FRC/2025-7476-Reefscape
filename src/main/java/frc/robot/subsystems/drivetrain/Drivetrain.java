@@ -61,7 +61,7 @@ public class Drivetrain extends SubsystemBase {
   Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   // Current pose of the robot
-  Pose2d pose;
+  Pose2d pose, visionlessPose;
 
   // Cameras & Photonvision variables
   private final PhotonCamera camera1;
@@ -73,6 +73,17 @@ public class Drivetrain extends SubsystemBase {
 
   // Odometry class for tracking the robot's position on the field
   SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(
+      DriveConstants.kDriveKinematics,
+      new Rotation2d(),
+      new SwerveModulePosition[] {
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition()
+      },
+      new Pose2d(0, 0, new Rotation2d()));
+
+  SwerveDrivePoseEstimator visionlessOdometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
       new Rotation2d(),
       new SwerveModulePosition[] {
@@ -166,11 +177,12 @@ public class Drivetrain extends SubsystemBase {
 
     // Update the robot's pose using the odometry class
     if (!gyroDisconnected) {
-      pose = odometry.update(gyroAngle,
-          new SwerveModulePosition[] {
-              modules[0].getPosition(), modules[1].getPosition(),
-              modules[2].getPosition(), modules[3].getPosition()
-          });
+      SwerveModulePosition[] positions = new SwerveModulePosition[] {
+          modules[0].getPosition(), modules[1].getPosition(),
+          modules[2].getPosition(), modules[3].getPosition()
+      };
+      pose = odometry.update(gyroAngle, positions);
+      visionlessPose = visionlessOdometry.update(gyroAngle, positions);
     }
 
     Optional<EstimatedRobotPose> visionPose1 = getEstimatedGlobalPose1(pose);
@@ -200,7 +212,8 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putBoolean("HasVision", hasVisionData);
 
     // Log the current pose to the logger
-    Logger.recordOutput("Odometry", pose);
+    Logger.recordOutput("Odometry/WithVisionInput", pose);
+    Logger.recordOutput("Odometry/WithoutVisionInput", visionlessPose);
     SmartDashboard.putData("Odometry", dashField);
     dashField.setRobotPose(pose);
 
