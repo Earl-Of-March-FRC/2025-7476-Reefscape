@@ -19,6 +19,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -40,6 +41,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.Constants.Vision.PhotonConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.LauncherConstants;
@@ -242,12 +244,13 @@ public class Drivetrain extends SubsystemBase {
     double xDistanceToBarge = getXDistanceToBarge();
 
     SmartDashboard.putNumber("Distance to Barge", distanceToBarge);
-    // SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBarge);
+    SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBarge);
 
-    SmartDashboard.putBoolean("Within Max Distance From Barge",
-        xDistanceToBarge <= LauncherConstants.kMaxMetersFromBarge);
-    SmartDashboard.putBoolean("Within Min Distance From Barge",
-        xDistanceToBarge >= LauncherConstants.kMinMetersFromBarge);
+    SmartDashboard.putBoolean("FarFromBargeLaunchingRange",
+        xDistanceToBarge > LaunchingDistances.kMetersFromBarge);
+    SmartDashboard.putBoolean("WithinBargeLaunchingRange",
+        MathUtil.isNear(xDistanceToBarge, LaunchingDistances.kMetersFromBarge,
+            LaunchingDistances.kToleranceMetersFromBarge));
 
     Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBarge);
     Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBarge);
