@@ -56,13 +56,13 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Intake/Arm/Measured/Position", new Rotation2d(getPosition()));
+    Logger.recordOutput("Arm/Measured/Position", new Rotation2d(getPosition()));
 
     // Convert radians per second to RPM
-    Logger.recordOutput("Intake/Arm/Measured/Velocity", getVelocity() / ArmConstants.kVelocityConversionFactor);
-    Logger.recordOutput("Intake/Arm/Measured/armOffset", this.armOffset);
+    Logger.recordOutput("Arm/Measured/Velocity", getVelocity() / ArmConstants.kVelocityConversionFactor);
+    Logger.recordOutput("Arm/Measured/armOffset", this.armOffset);
 
-    Logger.recordOutput("Intake/Arm/Measured/limitSwitch", getLimitSwitch());
+    Logger.recordOutput("Arm/Measured/limitSwitch", getLimitSwitch());
   }
 
   /**
@@ -90,7 +90,7 @@ public class ArmSubsystem extends SubsystemBase {
    * @param percent Percent output, from -1 to 1.
    */
   public void setVelocity(double percent) {
-    Logger.recordOutput("Intake/Arm/Setpoint/PercentVelocity", percent);
+    Logger.recordOutput("Arm/Setpoint/PercentVelocity", percent);
     armSpark.set(percent);
   }
 
@@ -118,7 +118,7 @@ public class ArmSubsystem extends SubsystemBase {
       closedLoopSlot = ClosedLoopSlot.kSlot1;
     }
 
-    Logger.recordOutput("Intake/Arm/Setpoint/Position",
+    Logger.recordOutput("Arm/Setpoint/Position",
         new Rotation2d(referenceAngle * ArmConstants.kAngleConversionFactor));
     armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition, closedLoopSlot);
   }

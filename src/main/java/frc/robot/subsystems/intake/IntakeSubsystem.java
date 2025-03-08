@@ -39,7 +39,7 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Convert radians per second to Rot per Minute
-    Logger.recordOutput("Intake/Rollers/Measured/Velocity",
+    Logger.recordOutput("Rollers/Measured/Velocity",
         getVelocity() / IntakeConstants.kVelocityConversionFactor);
     // Logger.recordOutput("Intake/Rollers/Measured/VelocityRad",
     // getVelocity());
@@ -60,7 +60,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * @param percent Percent output, from -1 to 1.
    */
   public void setVelocity(double percent) {
-    Logger.recordOutput("Intake/Rollers/Setpoint/PercentVelocity", percent);
+    Logger.recordOutput("Rollers/Setpoint/PercentVelocity", percent);
     intakeSpark.set(percent);
   }
 
