@@ -280,6 +280,9 @@ public final class Constants {
     public static final double kVelocityBack = 2485.817112; // 260 rad/s
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
+
+    public static final double kMinMetersFromBarge = 1.3;
+    public static final double kMaxMetersFromBarge = 1.4;
   }
 
   public static class FieldConstants {

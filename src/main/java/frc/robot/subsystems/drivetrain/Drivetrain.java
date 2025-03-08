@@ -42,6 +42,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Vision.PhotonConstants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.LauncherConstants;
 
 /**
  * The Drivetrain class represents the robot's drivetrain subsystem.
@@ -237,14 +238,19 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput("Swerve/Module/Position", positions);
 
     // Distance to barge
-    double distanceToBardge = distanceToBardge();
-    double xDistanceToBardge = getXDistanceToBarge();
+    double distanceToBarge = distanceToBardge();
+    double xDistanceToBarge = getXDistanceToBarge();
 
-    SmartDashboard.putNumber("Distance to Barge", distanceToBardge);
-    SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBardge);
+    SmartDashboard.putNumber("Distance to Barge", distanceToBarge);
+    // SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBarge);
 
-    Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBardge);
-    Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBardge);
+    SmartDashboard.putBoolean("Within Max Distance From Barge",
+        xDistanceToBarge <= LauncherConstants.kMaxMetersFromBarge);
+    SmartDashboard.putBoolean("Within Min Distance From Barge",
+        xDistanceToBarge >= LauncherConstants.kMinMetersFromBarge);
+
+    Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBarge);
+    Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBarge);
 
     Logger.recordOutput("Drive/FieldRelative", isFieldRelative);
 
