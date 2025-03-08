@@ -50,8 +50,8 @@
               "_title": "FrontVel",
               "_glyph": 148,
               "_showGlyph": false,
-              "Range/Min": 180.0,
-              "Range/Max": 280.0,
+              "Range/Min": 155.0,
+              "Range/Max": 255.0,
               "Range/Center": 0.0,
               "Visuals/Num tick marks": 5,
               "Visuals/Show text": true,
@@ -69,8 +69,8 @@
               "_title": "BackVel",
               "_glyph": 148,
               "_showGlyph": false,
-              "Range/Min": 235.0,
-              "Range/Max": 335.0,
+              "Range/Min": 210.0,
+              "Range/Max": 310.0,
               "Range/Center": 0.0,
               "Visuals/Num tick marks": 5,
               "Visuals/Show text": true,
@@ -114,7 +114,7 @@
               "Visuals/Show Outside Circles": false
             }
           },
-          "7,3": {
+          "7,2": {
             "size": [
               1,
               1
@@ -129,7 +129,7 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "7,2": {
+          "7,3": {
             "size": [
               1,
               1
@@ -170,7 +170,7 @@
               "_glyph": 148,
               "_showGlyph": false,
               "Range/Min": 0.0,
-              "Range/Max": 3.6,
+              "Range/Max": 2.6,
               "Range/Center": 0.0,
               "Visuals/Num tick marks": 5,
               "Visuals/Show text": true,
