@@ -4,38 +4,252 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.revrobotics.spark.SparkMax;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.IndexerConstants;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.LauncherConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.commands.drivetrain.*;
+import frc.robot.commands.arm.ArmSetPositionPIDCmd;
+import frc.robot.commands.arm.ArmSetVelocityManualCmd;
+import frc.robot.commands.indexer.IndexToBeamBreakCmd;
+import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
+import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
+import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
+import frc.robot.commands.vision.GoToAlgaeCmd;
+import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Gyro;
+import frc.robot.subsystems.drivetrain.GyroNavX;
+import frc.robot.subsystems.drivetrain.MAXSwerveModule;
+import frc.robot.subsystems.indexer.BeamBreakSensor;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.launcher.Launcher;
+import frc.robot.subsystems.vision.AlgaeSubsystem;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
 
-  private final CommandXboxController driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  public final Drivetrain driveSub;
+  public final Gyro gyro;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  private final ArmSubsystem armSub;
+  private final IntakeSubsystem intakeSub;
+  private final Indexer indexerSub;
+  private final Launcher launcherSub;
+  private final AlgaeSubsystem algaeSubsystem;
+
+  private final CommandXboxController driverController = new CommandXboxController(
+      OIConstants.kDriverControllerPort);
+  private final CommandXboxController operatorController = new CommandXboxController(
+      OIConstants.kOperatorControllerPort);
+
+  // Register Named Commands
+
+  private LoggedDashboardChooser<Command> autoChooser;
+
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
-    // Configure the trigger bindings
+    gyro = new GyroNavX();
+    gyro.calibrate();
+
+    driveSub = new Drivetrain(
+        new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
+            DriveConstants.kFrontLeftTurningCanId,
+            DriveConstants.kFrontLeftChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
+            DriveConstants.kFrontRightTurningCanId,
+            DriveConstants.kFrontRightChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
+            DriveConstants.kRearLeftTurningCanId,
+            DriveConstants.kBackLeftChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
+            DriveConstants.kRearRightTurningCanId,
+            DriveConstants.kBackRightChassisAngularOffset),
+        gyro);
+
+    armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType),
+        ArmConstants.kLimitSwitchChannel);
+
+    intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
+
+    indexerSub = new Indexer(
+        new SparkMax(IndexerConstants.kMotorCanId, IndexerConstants.kMotorType),
+        new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel),
+        new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel));
+
+    launcherSub = new Launcher(
+        new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
+        new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
+
+    // Register named Commands
+    NamedCommands.registerCommand("Calibrate", new CalibrateCmd(driveSub));
+
+    driveSub.setDefaultCommand(
+        new DriveSqrtCmd(
+            driveSub,
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerYAxis),
+                OIConstants.kDriveDeadband),
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerXAxis),
+                OIConstants.kDriveDeadband),
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerRotAxis),
+                OIConstants.kDriveDeadband)));
+
+    algaeSubsystem = new AlgaeSubsystem(() -> driveSub.getPose());
+
+    // indexerSub.setDefaultCommand(
+    // new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
+
+    configureAutos();
     configureBindings();
   }
 
   /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+   * Use this method to define your trigger->command mappings. Triggers can be
+   * created via the
+   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+   * an arbitrary
    * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+   * {@link
+   * CommandXboxController
+   * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+   * PS4} controllers or
+   * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
   private void configureBindings() {
+    // Manual arm control with
+    armSub.setDefaultCommand(
+        new ArmSetVelocityManualCmd(armSub, () -> MathUtil.applyDeadband(
+            operatorController.getRawAxis(
+                OIConstants.kOperatorArmManualAxis) * 0.5,
+            OIConstants.kArmDeadband)));
+
+    // Manual intake (arm roller) control with
+    intakeSub.setDefaultCommand(
+        new IntakeSetVelocityManualCmd(intakeSub,
+            () -> MathUtil.applyDeadband(
+                operatorController.getRawAxis(
+                    OIConstants.kOperatorIntakeManualAxis),
+                OIConstants.kIntakeDeadband)));
+
+    driverController.b().onTrue(new CalibrateCmd(driveSub));
+
+    // UNCOMMENT AFTER THE ARM IS TESTED
+    operatorController.leftTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleStowed - armSub.armOffset));
+    operatorController.povDown().onTrue(
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake - armSub.armOffset));
+    operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleL2 - armSub.armOffset));
+    operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleL3 - armSub.armOffset));
+    operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleProcessor - armSub.armOffset));
+    operatorController.rightTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
+        () -> ArmConstants.kAngleCoral - armSub.armOffset));
+    // operatorController.a()
+    // .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () ->
+    // IntakeConstants.kDefaultPercent));
+    operatorController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
+    // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
+    // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
+    driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
+    driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
+    driverController.rightTrigger().toggleOnTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
+            () -> launcherSub.getPreferredBackVelocity()));
+    driverController.leftTrigger().whileTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
+            () -> -launcherSub.getPreferredBackVelocity()));
+    driverController.rightBumper().whileTrue(
+        new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
+    driverController.leftBumper().whileTrue(
+        new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
+    driverController.leftStick().onTrue(
+        Commands.runOnce(() -> {
+          driveSub.isFieldRelative = true;
+        }));
+    driverController.rightStick().onTrue(
+        Commands.runOnce(() -> {
+          driveSub.isFieldRelative = false;
+        }));
+    operatorController.axisGreaterThan(OIConstants.kOperatorArmManualAxis, OIConstants.kArmDeadband).onTrue(
+        Commands.runOnce(() -> {
+          armSub.isManual = true;
+        }));
+    operatorController.axisLessThan(OIConstants.kOperatorArmManualAxis, -OIConstants.kArmDeadband).onTrue(
+        Commands.runOnce(() -> {
+          armSub.isManual = true;
+        }));
+    operatorController.leftBumper().whileTrue(
+        Commands.runOnce(() -> {
+          armSub.armOffset += 2;
+        }));
+
+    operatorController.rightBumper().whileTrue(
+        Commands.runOnce(() -> {
+          armSub.armOffset -= 2;
+        }));
+
+    // driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem,
+    // intakeSub));
+
+    driverController.a().whileTrue(new ConditionalCommand(
+        new PathfindToLaunchSpotCmd(AutoConstants.kLaunchPoseBlue),
+        new PathfindToLaunchSpotCmd(AutoConstants.kLaunchPoseRed),
+        () -> DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue));
+
+    // Arm calibration
+    // new Trigger(() -> armSub.getLimitSwitch()).onTrue(Commands.runOnce(() ->
+    // armSub.resetPosition()));
+  }
+
+  /**
+   * Use this method to define the autonomous command.
+   */
+  private void configureAutos() {
+    autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());
+    autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+    autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
+    autoChooser.addOption("EncoderAutoDrive", new EncoderAutoDrive(driveSub));
+    SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
   }
 
   /**
@@ -44,6 +258,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return null;
+    return autoChooser.get();
+  }
+
+  public CommandXboxController getOperatorController() {
+    return operatorController;
   }
 }
