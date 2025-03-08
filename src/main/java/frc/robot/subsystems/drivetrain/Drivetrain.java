@@ -4,11 +4,7 @@
 
 package frc.robot.subsystems.drivetrain;
 
-<<<<<<< Updated upstream
-=======
-import java.io.IOException;
 import java.util.List;
->>>>>>> Stashed changes
 import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
