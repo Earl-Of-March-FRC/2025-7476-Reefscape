@@ -226,8 +226,9 @@ public class RobotContainer {
         () -> ArmConstants.kAngleProcessor - armSub.armOffset));
     operatorController.rightTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
         () -> ArmConstants.kAngleCoral - armSub.armOffset));
-    operatorController.a()
-        .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () -> IntakeConstants.kDefaultPercent));
+    // operatorController.a()
+    // .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () ->
+    // IntakeConstants.kDefaultPercent));
     operatorController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
     // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
@@ -269,7 +270,8 @@ public class RobotContainer {
           armSub.armOffset -= 2;
         }));
 
-    driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem, intakeSub));
+    // driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem,
+    // intakeSub));
 
     driverController.a().whileTrue(new ConditionalCommand(
         new PathfindToLaunchSpotCmd(AutoConstants.kLaunchPoseBlue),
@@ -277,7 +279,8 @@ public class RobotContainer {
         () -> DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue));
 
     // Arm calibration
-    new Trigger(() -> armSub.getLimitSwitch()).onTrue(Commands.runOnce(() -> armSub.resetPosition()));
+    // new Trigger(() -> armSub.getLimitSwitch()).onTrue(Commands.runOnce(() ->
+    // armSub.resetPosition()));
   }
 
   /**

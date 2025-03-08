@@ -75,6 +75,11 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 8;
 
     public static final boolean kGyroReversed = false;
+
+    public static class LaunchingDistances {
+      public static final double kMetersFromBarge = 1.3;
+      public static final double kToleranceMetersFromBarge = 0.1;
+    }
   }
 
   public static final class ModuleConstants {
@@ -147,8 +152,9 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularAccelerationRadiansPerSecondSquared);
 
-    public static final Pose2d kLaunchPoseBlue = new Pose2d(new Translation2d(7.02, 5.37), Rotation2d.fromDegrees(180));
-    public static final Pose2d kLaunchPoseRed = new Pose2d(new Translation2d(10.53, 2.68), new Rotation2d(0));
+    public static final Pose2d kLaunchPoseBlue = new Pose2d(new Translation2d(7.475, 5.37),
+        Rotation2d.fromDegrees(180));
+    public static final Pose2d kLaunchPoseRed = new Pose2d(new Translation2d(10.075, 2.68), new Rotation2d(0));
 
   }
 
@@ -235,7 +241,7 @@ public final class Constants {
       public static final double camera1Z = 0.4699; // up (pos)
 
       public static final double camera2Roll = 0;
-      public static final double camera2Pitch = 10 * Math.PI / 180; // in rad
+      public static final double camera2Pitch = 0; // 10 * Math.PI / 180; // in rad
       public static final double camera2Yaw = Math.PI;
       public static final double camera2X = -0.2921;
       public static final double camera2Y = 0;
@@ -288,8 +294,8 @@ public final class Constants {
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
-    public static final double kVelocityFront = 2196.338215; // 230 rad/s
-    public static final double kVelocityBack = 2721.549527; // 285 rad/s
+    public static final double kVelocityFront = 1957.6058; // 205 rad/s
+    public static final double kVelocityBack = 2485.817112; // 260 rad/s
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
   }

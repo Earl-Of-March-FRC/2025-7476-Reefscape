@@ -24,6 +24,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -46,8 +47,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.Constants.Vision.PhotonConstants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.LauncherConstants;
 
 /**
  * The Drivetrain class represents the robot's drivetrain subsystem.
@@ -67,7 +70,7 @@ public class Drivetrain extends SubsystemBase {
   Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   // Current pose of the robot
-  Pose2d pose;
+  Pose2d pose, visionlessPose;
 
   // Cameras & Photonvision variables
   private PhotonCamera camera1;
@@ -86,6 +89,17 @@ public class Drivetrain extends SubsystemBase {
 
   // Odometry class for tracking the robot's position on the field
   SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(
+      DriveConstants.kDriveKinematics,
+      new Rotation2d(),
+      new SwerveModulePosition[] {
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition()
+      },
+      new Pose2d(0, 0, new Rotation2d()));
+
+  SwerveDrivePoseEstimator visionlessOdometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
       new Rotation2d(),
       new SwerveModulePosition[] {
@@ -228,11 +242,12 @@ public class Drivetrain extends SubsystemBase {
 
     // Update the robot's pose using the odometry class
     if (!gyroDisconnected) {
-      pose = odometry.update(gyroAngle,
-          new SwerveModulePosition[] {
-              modules[0].getPosition(), modules[1].getPosition(),
-              modules[2].getPosition(), modules[3].getPosition()
-          });
+      SwerveModulePosition[] positions = new SwerveModulePosition[] {
+          modules[0].getPosition(), modules[1].getPosition(),
+          modules[2].getPosition(), modules[3].getPosition()
+      };
+      pose = odometry.update(gyroAngle, positions);
+      visionlessPose = visionlessOdometry.update(gyroAngle, positions);
     }
 
     if (RobotBase.isSimulation()) {
@@ -245,28 +260,35 @@ public class Drivetrain extends SubsystemBase {
     hasVisionData = false;
     if (visionPose1.isPresent()) {
       Logger.recordOutput("Vision/Photon1/EstimatedPose", visionPose1.get().estimatedPose);
+      Logger.recordOutput("Vision/Photon1/TargetsUsed", visionPose1.get().targetsUsed.toString());
       Pose3d visionPose = visionPose1.get().estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getZ()));
       odometry.addVisionMeasurement(estimatedPose, visionPose1.get().timestampSeconds);
+      Logger.recordOutput("Vision/Photon1/Timestamp", visionPose1.get().timestampSeconds);
       hasVisionData = true;
     } else {
       Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose3d());
+      Logger.recordOutput("Vision/Photon1/Timestamp", -1);
     }
     if (visionPose2.isPresent()) {
       Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
+      Logger.recordOutput("Vision/Photon2/TargetsUsed", visionPose2.get().targetsUsed.toString());
       Pose3d visionPose = visionPose2.get().estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getZ()));
       odometry.addVisionMeasurement(estimatedPose, visionPose2.get().timestampSeconds);
+      Logger.recordOutput("Vision/Photon2/Timestamp", visionPose2.get().timestampSeconds);
       hasVisionData = true;
     } else {
       Logger.recordOutput("Vision/Photon2/EstimatedPose", new Pose3d());
+      Logger.recordOutput("Vision/Photon2/Timestamp", -1);
     }
     SmartDashboard.putBoolean("HasVision", hasVisionData);
 
     // Log the current pose to the logger
-    Logger.recordOutput("Odometry", pose);
+    Logger.recordOutput("Odometry/WithVisionInput", pose);
+    Logger.recordOutput("Odometry/WithoutVisionInput", visionlessPose);
     SmartDashboard.putData("Odometry", dashField);
     dashField.setRobotPose(pose);
 
@@ -286,14 +308,20 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput("Swerve/Module/Position", positions);
 
     // Distance to barge
-    double distanceToBardge = distanceToBardge();
-    double xDistanceToBardge = getXDistanceToBarge();
+    double distanceToBarge = distanceToBardge();
+    double xDistanceToBarge = getXDistanceToBarge();
 
-    SmartDashboard.putNumber("Distance to Barge", distanceToBardge);
-    SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBardge);
+    SmartDashboard.putNumber("Distance to Barge", distanceToBarge);
+    SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBarge);
 
-    Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBardge);
-    Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBardge);
+    SmartDashboard.putBoolean("FarFromBargeLaunchingRange",
+        xDistanceToBarge > LaunchingDistances.kMetersFromBarge);
+    SmartDashboard.putBoolean("WithinBargeLaunchingRange",
+        MathUtil.isNear(xDistanceToBarge, LaunchingDistances.kMetersFromBarge,
+            LaunchingDistances.kToleranceMetersFromBarge));
+
+    Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBarge);
+    Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBarge);
 
     Logger.recordOutput("Drive/FieldRelative", isFieldRelative);
 
@@ -440,6 +468,11 @@ public class Drivetrain extends SubsystemBase {
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
     photonPoseEstimator2.setReferencePose(prevEstimatedRobotPose);
     return photonPoseEstimator2.update(camera2.getLatestResult());
+  }
+
+  public boolean isOnBlueSide() {
+    double robotX = getPose().getTranslation().getX();
+    return robotX - FieldConstants.kBargeX < 0;
   }
 
   public double getXDistanceToBarge() {
