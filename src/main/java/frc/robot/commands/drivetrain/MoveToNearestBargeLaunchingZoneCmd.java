@@ -6,6 +6,8 @@ package frc.robot.commands.drivetrain;
 
 import java.util.List;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -47,13 +49,16 @@ public class MoveToNearestBargeLaunchingZoneCmd extends InstantCommand {
       targetRadians = startingPose.getRotation().getRadians();
     }
     Pose2d targetPose = new Pose2d(
-        FieldConstants.kBargeX + (onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge, startingPose.getX(),
+        FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge), startingPose.getX(),
         new Rotation2d(targetRadians));
 
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startingPose, targetPose);
     PathPlannerPath path = new PathPlannerPath(waypoints, DriveConstants.kPathfindingConstraints, null,
         new GoalEndState(0, Rotation2d.fromRadians(targetRadians)));
     path.preventFlipping = true;
+
+    Logger.recordOutput("PathPlanner/GoToBarge/StartingPose", startingPose);
+    Logger.recordOutput("PathPlanner/GoToBarge/TargetPose", targetPose);
 
     AutoBuilder.followPath(path).schedule();
   }
