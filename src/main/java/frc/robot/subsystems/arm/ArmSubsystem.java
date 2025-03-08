@@ -63,7 +63,7 @@ public class ArmSubsystem extends SubsystemBase {
     Logger.recordOutput("Arm/Measured/ArmOffset", this.armOffset);
 
     Logger.recordOutput("Arm/Measured/LimitSwitch", getLimitSwitch());
-    Logger.recordOutput("Arm/Measured/ArmOffset", armOffset);
+    Logger.recordOutput("Arm/Applied/ArmOffset", armOffset);
   }
 
   /**
