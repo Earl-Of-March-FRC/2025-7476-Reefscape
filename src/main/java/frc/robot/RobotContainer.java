@@ -205,28 +205,28 @@ public class RobotContainer {
     driverController.leftStick().onTrue(
         Commands.runOnce(() -> {
           driveSub.isFieldRelative = true;
-        }));
+        }, driveSub));
     driverController.rightStick().onTrue(
         Commands.runOnce(() -> {
           driveSub.isFieldRelative = false;
-        }));
+        }, driveSub));
     operatorController.axisGreaterThan(OIConstants.kOperatorArmManualAxis, OIConstants.kArmDeadband).onTrue(
         Commands.runOnce(() -> {
           armSub.isManual = true;
-        }));
+        }, armSub));
     operatorController.axisLessThan(OIConstants.kOperatorArmManualAxis, -OIConstants.kArmDeadband).onTrue(
         Commands.runOnce(() -> {
           armSub.isManual = true;
-        }));
+        }, armSub));
     operatorController.leftBumper().whileTrue(
         Commands.runOnce(() -> {
           armSub.armOffset += 2;
-        }));
+        }, armSub));
 
     operatorController.rightBumper().whileTrue(
         Commands.runOnce(() -> {
           armSub.armOffset -= 2;
-        }));
+        }, armSub));
 
     // driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem,
     // intakeSub));
