@@ -194,6 +194,7 @@ public class Drivetrain extends SubsystemBase {
     hasVisionData = false;
     if (visionPose1.isPresent()) {
       Logger.recordOutput("Vision/Photon1/EstimatedPose", visionPose1.get().estimatedPose);
+      Logger.recordOutput("Vision/Photon1/TargetsUsed", visionPose1.get().targetsUsed.toString());
       Pose3d visionPose = visionPose1.get().estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getZ()));
@@ -206,6 +207,7 @@ public class Drivetrain extends SubsystemBase {
     }
     if (visionPose2.isPresent()) {
       Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
+      Logger.recordOutput("Vision/Photon2/TargetsUsed", visionPose2.get().targetsUsed.toString());
       Pose3d visionPose = visionPose2.get().estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getZ()));
