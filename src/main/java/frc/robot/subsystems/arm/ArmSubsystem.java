@@ -60,9 +60,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     // Convert radians per second to RPM
     Logger.recordOutput("Arm/Measured/Velocity", getVelocity() / ArmConstants.kVelocityConversionFactor);
-    Logger.recordOutput("Arm/Measured/armOffset", this.armOffset);
+    Logger.recordOutput("Arm/Measured/ArmOffset", this.armOffset);
 
-    Logger.recordOutput("Arm/Measured/limitSwitch", getLimitSwitch());
+    Logger.recordOutput("Arm/Measured/LimitSwitch", getLimitSwitch());
   }
 
   /**
