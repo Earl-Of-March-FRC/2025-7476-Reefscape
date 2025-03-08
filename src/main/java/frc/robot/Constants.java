@@ -222,7 +222,7 @@ public final class Constants {
       public static final double camera1Z = 0.4699; // up (pos)
 
       public static final double camera2Roll = 0;
-      public static final double camera2Pitch = 10 * Math.PI / 180; // in rad
+      public static final double camera2Pitch = 0; // 10 * Math.PI / 180; // in rad
       public static final double camera2Yaw = Math.PI;
       public static final double camera2X = -0.2921;
       public static final double camera2Y = 0;
@@ -275,8 +275,8 @@ public final class Constants {
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
-    public static final double kVelocityFront = 2196.338215; // 230 rad/s
-    public static final double kVelocityBack = 2721.549527; // 285 rad/s
+    public static final double kVelocityFront = 1957.6058; // 205 rad/s
+    public static final double kVelocityBack = 2485.817112; // 260 rad/s
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
   }
