@@ -4,7 +4,10 @@
 
 package frc.robot.commands.drivetrain;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -51,6 +54,11 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
     rotationDirection = Math
         .signum(Wrapper.wrapRadian(
             targetRadians - Wrapper.wrapRadian(startingPose.getRotation().getRadians())));
+
+    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/StartingPose", startingPose);
+    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/TargetPose",
+        new Pose2d(targetX, startingPose.getY(), Rotation2d.fromRadians(targetRadians)));
+
   }
 
   @Override
