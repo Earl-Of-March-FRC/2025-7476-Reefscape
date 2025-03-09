@@ -4,17 +4,8 @@
 
 package frc.robot.commands.drivetrain;
 
-import java.util.List;
-
-import org.littletonrobotics.junction.Logger;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
-
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,11 +13,15 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.utils.Wrapper;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveToNearestBargeLaunchingZoneCmd extends Command {
   private final Drivetrain driveSub;
-  private Command followCommand;
+  private double translationDirection, rotationDirection,
+      targetX, targetRadians;
+
+  private boolean onSameSide;
 
   /** Creates a new MoveToNearestBargeLaunchingZoneCmd. */
   public MoveToNearestBargeLaunchingZoneCmd(
@@ -41,34 +36,50 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
   public void initialize() {
     Pose2d startingPose = driveSub.getPose();
     boolean onBlueSide = driveSub.isOnBlueSide();
-    double targetRadians;
+
+    targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
+    translationDirection = Math.signum(targetX - startingPose.getX());
+
     if (DriverStation.getAlliance().isPresent()) {
       Alliance alliance = DriverStation.getAlliance().get();
-      targetRadians = (onBlueSide == (alliance == Alliance.Blue)) ? 0 : Math.PI;
+      onSameSide = (onBlueSide == (alliance == Alliance.Blue));
+      targetRadians = onSameSide ? 0 : Math.PI;
     } else {
       targetRadians = startingPose.getRotation().getRadians();
+      onSameSide = true;
     }
-    Pose2d targetPose = new Pose2d(
-        FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge), startingPose.getX(),
-        new Rotation2d(targetRadians));
+    rotationDirection = Math
+        .signum(Wrapper.wrapRadian(
+            targetRadians - Wrapper.wrapRadian(startingPose.getRotation().getRadians())));
+  }
 
-    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startingPose, targetPose);
-    PathPlannerPath path = new PathPlannerPath(waypoints, DriveConstants.kPathfindingConstraints, null,
-        new GoalEndState(0, Rotation2d.fromRadians(targetRadians)));
-    path.preventFlipping = true;
+  @Override
+  public void execute() {
+    double xVel = 0, oVel = 0;
+    Pose2d currentPose = driveSub.getPose();
+    double currentRadian = Wrapper.wrapRadian(currentPose.getRotation().getRadians());
+    if ((translationDirection > 0) ? (currentPose.getX() < targetX) : (currentPose.getX() > targetX)) {
+      xVel = translationDirection * DriveConstants.kBangBangTranslationalVelocityMetersPerSecond;
+    }
+    if (onSameSide) {
+      if ((rotationDirection > 0) ? (currentRadian < targetRadians) : (currentRadian > targetRadians)) {
+        oVel = rotationDirection * DriveConstants.kBangBangRotationalVelocityRadiansPerSecond;
+      }
+    } else {
+      if ((rotationDirection > 0) ? (currentRadian >= 0) : (currentRadian <= 0)) {
+        oVel = rotationDirection * DriveConstants.kBangBangRotationalVelocityRadiansPerSecond;
+      }
+    }
 
-    Logger.recordOutput("PathPlanner/GoToBarge/StartingPose", startingPose);
-    Logger.recordOutput("PathPlanner/GoToBarge/TargetPose", targetPose);
-
-    followCommand = AutoBuilder.followPath(path);
-    followCommand.schedule();
+    driveSub.runVelocityFieldRelative(new ChassisSpeeds(xVel, 0, oVel));
   }
 
   @Override
   public void end(boolean interrupted) {
-    if (followCommand == null) {
-      return;
-    }
-    followCommand.cancel();
+  }
+
+  @Override
+  public boolean isFinished() {
+    return false;
   }
 }

@@ -5,6 +5,7 @@
 package frc.robot.subsystems.drivetrain;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -21,6 +22,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -44,6 +48,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
@@ -269,7 +274,7 @@ public class Drivetrain extends SubsystemBase {
       hasVisionData = true;
     } else {
       Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose3d());
-      Logger.recordOutput("Vision/Photon1/Timestamp", -1);
+      Logger.recordOutput("Vision/Photon1/Timestamp", -1.0);
     }
     if (visionPose2.isPresent()) {
       Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
@@ -282,7 +287,7 @@ public class Drivetrain extends SubsystemBase {
       hasVisionData = true;
     } else {
       Logger.recordOutput("Vision/Photon2/EstimatedPose", new Pose3d());
-      Logger.recordOutput("Vision/Photon2/Timestamp", -1);
+      Logger.recordOutput("Vision/Photon2/Timestamp", -1.0);
     }
     SmartDashboard.putBoolean("HasVision", hasVisionData);
 
@@ -486,5 +491,30 @@ public class Drivetrain extends SubsystemBase {
       robotYaw = robotYaw + Math.PI;
     }
     return robotYaw > -Math.PI / 2 && robotYaw < Math.PI / 2 ? (getXDistanceToBarge() / Math.cos(robotYaw)) : -1;
+  }
+
+  public Command moveToNearestBargeLaunchingZone() {
+    Pose2d startingPose = getPose();
+    boolean onBlueSide = isOnBlueSide();
+    double targetRadians;
+    if (DriverStation.getAlliance().isPresent()) {
+      Alliance alliance = DriverStation.getAlliance().get();
+      targetRadians = (onBlueSide == (alliance == Alliance.Blue)) ? 0 : Math.PI;
+    } else {
+      targetRadians = startingPose.getRotation().getRadians();
+    }
+    Pose2d targetPose = new Pose2d(
+        FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge), startingPose.getY(),
+        new Rotation2d(targetRadians));
+
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startingPose, targetPose);
+    PathPlannerPath path = new PathPlannerPath(waypoints, DriveConstants.kPathfindingConstraints, null,
+        new GoalEndState(0, Rotation2d.fromRadians(targetRadians)));
+    path.preventFlipping = true;
+
+    Logger.recordOutput("PathPlanner/GoToBarge/StartingPose", startingPose);
+    Logger.recordOutput("PathPlanner/GoToBarge/TargetPose", targetPose);
+
+    return AutoBuilder.followPath(path);
   }
 }

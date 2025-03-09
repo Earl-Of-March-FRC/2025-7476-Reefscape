@@ -39,11 +39,15 @@ public final class Constants {
     public static final double kBalleyPopMetersPerSecond = 0.8; // Max net robot translational speed when intaking algae
                                                                 // stacked on coral
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquaredPathfinding = 1;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
+    public static final double kBangBangTranslationalVelocityMetersPerSecond = 0.2;
+    public static final double kBangBangRotationalVelocityRadiansPerSecond = Math.PI / 5;
+
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
-        kMaxAccelerationMetersPerSecondSquared, kMaxAngularSpeedRadiansPerSecond,
+        kMaxAccelerationMetersPerSecondSquaredPathfinding, kMaxAngularSpeedRadiansPerSecond,
         kMaxAngularAccelerationRadiansPerSecondSquared);
 
     // Chassis configuration

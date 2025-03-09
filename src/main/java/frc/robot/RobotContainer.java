@@ -273,6 +273,8 @@ public class RobotContainer {
     // driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem,
     // intakeSub));
 
+    // driverController.a().whileTrue(new
+    // MoveToNearestBargeLaunchingZoneCmd(driveSub));
     driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneCmd(driveSub));
 
     // driverController.a().whileTrue(new ConditionalCommand(
