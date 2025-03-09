@@ -58,7 +58,8 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/StartingPose", startingPose);
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/TargetPose",
         new Pose2d(targetX, startingPose.getY(), Rotation2d.fromRadians(targetRadians)));
-
+    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/TranslationDirection", translationDirection);
+    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/RotationDirection", rotationDirection);
   }
 
   @Override
