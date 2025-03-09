@@ -285,8 +285,8 @@ public final class Constants {
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
-    public static final double kVelocityFront = 1957.6058; // 205 rad/s
-    public static final double kVelocityBack = 2485.817112; // 260 rad/s
+    public static final double kVelocityFront = 2100; // 220 rad/s
+    public static final double kVelocityBack = 2626.056561; // 275 rad/s
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
   }
