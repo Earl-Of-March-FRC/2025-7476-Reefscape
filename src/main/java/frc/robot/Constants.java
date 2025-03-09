@@ -83,7 +83,7 @@ public final class Constants {
     public static class LaunchingDistances {
       public static final double kMetersFromBarge = 1.3;
       public static final double kToleranceMetersFromBarge = 0.1;
-      public static final double kToleranceRadiansFromBarge = 20 * Math.PI / 180;
+      public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
     }
   }
 
