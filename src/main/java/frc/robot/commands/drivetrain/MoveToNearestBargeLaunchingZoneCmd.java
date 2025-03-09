@@ -33,7 +33,7 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
 
   private double targetX, targetRadians;
 
-  private boolean translationFinish = false, rotationFinish = false;
+  // private boolean translationFinish = false, rotationFinish = false;
 
   // private double translationDirection, rotationDirection,
   // targetX, targetRadians;
@@ -53,9 +53,6 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    translationFinish = false;
-    rotationFinish = false;
-
     Pose2d startingPose = driveSub.getPose();
     boolean onBlueSide = driveSub.isOnBlueSide();
 
@@ -118,22 +115,23 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
     double directionX = 0;
     double directionRot = 0;
 
-    if (!translationFinish) {
-      directionX = (translationController.calculate(currentPose.getX(), targetX) * 2) - 1;
-      if (DriverStation.getAlliance().isPresent()) {
-        Alliance alliance = DriverStation.getAlliance().get();
-        if (alliance == Alliance.Red) {
-          directionX *= -1;
-        }
+    // if (!translationFinish) {
+    // translationFinish = translationController.atSetpoint();
+    directionX = (translationController.calculate(currentPose.getX(), targetX) * 2) - 1;
+    if (DriverStation.getAlliance().isPresent()) {
+      Alliance alliance = DriverStation.getAlliance().get();
+      if (alliance == Alliance.Red) {
+        directionX *= -1;
       }
-      translationFinish = translationController.atSetpoint();
     }
-    if (!rotationFinish) {
-      double currentRotation = currentPose.getRotation().getRadians();
-      directionRot = (rotationController.calculate(currentRotation, targetRadians * Math.signum(currentRotation)) * 2)
-          - 1;
-      rotationFinish = rotationController.atSetpoint();
-    }
+
+    // }
+    // if (!rotationFinish) {
+    double currentRotation = currentPose.getRotation().getRadians();
+    // rotationFinish = rotationController.atSetpoint();
+    directionRot = (rotationController.calculate(currentRotation, targetRadians * Math.signum(currentRotation)) * 2)
+        - 1;
+    // }
 
     double xVel = DriveConstants.kBangBangTranslationalVelocityMetersPerSecond * directionX;
     double rotVel = DriveConstants.kBangBangRotationalVelocityRadiansPerSecond * directionRot;
