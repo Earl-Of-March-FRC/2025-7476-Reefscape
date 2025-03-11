@@ -216,7 +216,7 @@ public class Drivetrain extends SubsystemBase {
       Logger.recordOutput("Vision/Photon1/Timestamp", visionPose1.get().timestampSeconds);
       hasVisionData = true;
     } else {
-      Logger.recordOutput("Vision/Photon1/TargetsUsed", new int[] {});
+      Logger.recordOutput("Vision/Photon1/TargetsUsed", "No targets");
       Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose3d());
       Logger.recordOutput("Vision/Photon1/Timestamp", -1.0);
     }
@@ -237,7 +237,7 @@ public class Drivetrain extends SubsystemBase {
       Logger.recordOutput("Vision/Photon2/Timestamp", visionPose2.get().timestampSeconds);
       hasVisionData = true;
     } else {
-      Logger.recordOutput("Vision/Photon2/TargetsUsed", new int[] {});
+      Logger.recordOutput("Vision/Photon2/TargetsUsed", "No targets");
       Logger.recordOutput("Vision/Photon2/EstimatedPose", new Pose3d());
       Logger.recordOutput("Vision/Photon2/Timestamp", -1.0);
     }
