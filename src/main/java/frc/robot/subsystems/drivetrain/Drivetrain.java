@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.drivetrain;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -199,7 +201,14 @@ public class Drivetrain extends SubsystemBase {
     hasVisionData = false;
     if (visionPose1.isPresent()) {
       Logger.recordOutput("Vision/Photon1/EstimatedPose", visionPose1.get().estimatedPose);
-      Logger.recordOutput("Vision/Photon1/TargetsUsed", visionPose1.get().targetsUsed.toString());
+
+      // Logging targets
+      List<Integer> fiducialIds = new ArrayList<>();
+      for (PhotonTrackedTarget target : visionPose1.get().targetsUsed) {
+        fiducialIds.add((Integer) target.fiducialId);
+      }
+      Logger.recordOutput("Vision/Photon1/TargetsUsed", fiducialIds.toString());
+
       Pose3d visionPose = visionPose1.get().estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getZ()));
@@ -207,12 +216,20 @@ public class Drivetrain extends SubsystemBase {
       Logger.recordOutput("Vision/Photon1/Timestamp", visionPose1.get().timestampSeconds);
       hasVisionData = true;
     } else {
+      Logger.recordOutput("Vision/Photon1/TargetsUsed", new int[] {});
       Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose3d());
       Logger.recordOutput("Vision/Photon1/Timestamp", -1.0);
     }
     if (visionPose2.isPresent()) {
       Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
-      Logger.recordOutput("Vision/Photon2/TargetsUsed", visionPose2.get().targetsUsed.toString());
+
+      // Logging targets
+      List<Integer> fiducialIds = new ArrayList<>();
+      for (PhotonTrackedTarget target : visionPose1.get().targetsUsed) {
+        fiducialIds.add((Integer) target.fiducialId);
+      }
+      Logger.recordOutput("Vision/Photon1/TargetsUsed", fiducialIds.toString());
+
       Pose3d visionPose = visionPose2.get().estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getZ()));
@@ -220,6 +237,7 @@ public class Drivetrain extends SubsystemBase {
       Logger.recordOutput("Vision/Photon2/Timestamp", visionPose2.get().timestampSeconds);
       hasVisionData = true;
     } else {
+      Logger.recordOutput("Vision/Photon2/TargetsUsed", new int[] {});
       Logger.recordOutput("Vision/Photon2/EstimatedPose", new Pose3d());
       Logger.recordOutput("Vision/Photon2/Timestamp", -1.0);
     }
