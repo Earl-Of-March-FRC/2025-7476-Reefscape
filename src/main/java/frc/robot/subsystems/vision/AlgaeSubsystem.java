@@ -43,7 +43,6 @@ public class AlgaeSubsystem extends SubsystemBase {
   public AlgaeSubsystem(Supplier<Pose2d> drivetrainPoseSupplier) {
     camera1 = new PhotonCamera(Constants.Vision.PhotonConstants.kCamera1);
     this.drivetrainPoseSupplier = drivetrainPoseSupplier;
-    relativeToRobot = new Pose2d();
   }
 
   @Override
