@@ -225,7 +225,7 @@ public class Drivetrain extends SubsystemBase {
 
       // Logging targets
       List<Integer> fiducialIds = new ArrayList<>();
-      for (PhotonTrackedTarget target : visionPose1.get().targetsUsed) {
+      for (PhotonTrackedTarget target : visionPose2.get().targetsUsed) {
         fiducialIds.add((Integer) target.fiducialId);
       }
       Logger.recordOutput("Vision/Photon1/TargetsUsed", fiducialIds.toString());
