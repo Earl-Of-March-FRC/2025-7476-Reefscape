@@ -171,58 +171,6 @@ public class Drivetrain extends SubsystemBase {
         robotToCam1);
     photonPoseEstimator2 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToCam2);
-<<<<<<< Updated upstream
-=======
-
-    // Log april tag poses to logger
-    aprilTagFieldLayout.getTags()
-        .forEach((tag) -> Logger.recordOutput("FieldLayout/AprilTags/" + tag.ID, tag.pose));
-
-    // Setup cameras to see april tags. Wow! That makes me really happy.
-    camera1 = new PhotonCamera(PhotonConstants.kCamera1);
-    camera2 = new PhotonCamera(PhotonConstants.kCamera2);
-
-    if (RobotBase.isSimulation()) {
-      SimCameraProperties camera1Properties = new SimCameraProperties();
-      SimCameraProperties camera2Properties = new SimCameraProperties();
-
-      camera1Properties.setCalibration(1280, 720, Rotation2d.fromDegrees(49));
-      camera1Properties.setFPS(30);
-      camera1Properties.setAvgLatencyMs(35);
-      camera1Properties.setLatencyStdDevMs(5);
-
-      camera2Properties.setCalibration(1280, 720, Rotation2d.fromDegrees(59));
-      camera2Properties.setFPS(30);
-      camera2Properties.setAvgLatencyMs(35);
-      camera2Properties.setLatencyStdDevMs(5);
-
-      camera1Sim = new PhotonCameraSim(camera1, camera1Properties);
-      camera2Sim = new PhotonCameraSim(camera2, camera2Properties);
-
-      camera1Sim.enableProcessedStream(true);
-      camera2Sim.enableProcessedStream(true);
-
-      visionSim = new VisionSystemSim("main");
-
-      try {
-        AprilTagFieldLayout tagLayout = AprilTagFieldLayout
-            .loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
-        visionSim.addAprilTags(tagLayout);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-
-      visionSim.addCamera(camera1Sim, robotToCam1);
-      visionSim.addCamera(camera2Sim, robotToCam2);
-
-      camera1 = camera1Sim.getCamera();
-      camera2 = camera2Sim.getCamera();
-    } else {
-      camera1Sim = null;
-      camera2Sim = null;
-      visionSim = null;
-    }
->>>>>>> Stashed changes
   }
 
   /**
