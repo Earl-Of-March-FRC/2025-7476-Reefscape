@@ -43,8 +43,8 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 0.1;
-    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 20;
+    public static final double kBangBangTranslationalVelocityMetersPerSecond = 0.2;
+    public static final double kBangBangRotationalVelocityRadiansPerSecond = Math.PI / 5;
 
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
         kMaxAccelerationMetersPerSecondSquaredPathfinding, kMaxAngularSpeedRadiansPerSecond,
@@ -83,7 +83,6 @@ public final class Constants {
     public static class LaunchingDistances {
       public static final double kMetersFromBarge = 1.3;
       public static final double kToleranceMetersFromBarge = 0.1;
-      public static final double kToleranceRadiansFromBarge = 20 * Math.PI / 180;
     }
   }
 
@@ -299,8 +298,8 @@ public final class Constants {
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
-    public static final double kVelocityFront = 1957.6058; // 205 rad/s
-    public static final double kVelocityBack = 2485.817112; // 260 rad/s
+    public static final double kVelocityFront = 2100; // 220 rad/s
+    public static final double kVelocityBack = 2626.056561; // 275 rad/s
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
   }
