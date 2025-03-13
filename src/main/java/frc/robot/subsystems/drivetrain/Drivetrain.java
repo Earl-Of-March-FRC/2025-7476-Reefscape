@@ -171,6 +171,8 @@ public class Drivetrain extends SubsystemBase {
         robotToCam1);
     photonPoseEstimator2 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToCam2);
+<<<<<<< Updated upstream
+=======
 
     // Log april tag poses to logger
     aprilTagFieldLayout.getTags()
@@ -220,6 +222,7 @@ public class Drivetrain extends SubsystemBase {
       camera2Sim = null;
       visionSim = null;
     }
+>>>>>>> Stashed changes
   }
 
   /**
