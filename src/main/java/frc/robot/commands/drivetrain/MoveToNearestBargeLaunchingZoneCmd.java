@@ -51,28 +51,6 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
     translationFinish = false;
     rotationFinish = false;
 
-    Pose2d startingPose = driveSub.getPose();
-    boolean onBlueSide = driveSub.isOnBlueSide();
-
-    targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
-
-    if (DriverStation.getAlliance().isPresent()) {
-      Alliance alliance = DriverStation.getAlliance().get();
-      if (alliance == Alliance.Blue) {
-        targetRadians = (onBlueSide == (alliance == Alliance.Blue)) ? Math.PI : 0;
-      } else {
-        targetRadians = (onBlueSide == (alliance == Alliance.Blue)) ? 0 : Math.PI;
-      }
-    } else {
-      targetRadians = startingPose.getRotation().getRadians();
-    }
-
-    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/StartingPose",
-        startingPose);
-    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/TargetPose",
-        new Pose2d(targetX, startingPose.getY(),
-            Rotation2d.fromRadians(targetRadians)));
-
     // timer.restart();
 
     // Pose2d startingPose = driveSub.getPose();
@@ -109,6 +87,30 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
   @Override
   public void execute() {
     Pose2d currentPose = driveSub.getPose();
+
+    // Calculate target pose
+    boolean onBlueSide = driveSub.isOnBlueSide();
+
+    targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
+
+    if (DriverStation.getAlliance().isPresent()) {
+      Alliance alliance = DriverStation.getAlliance().get();
+      if (alliance == Alliance.Blue) {
+        targetRadians = (onBlueSide == (alliance == Alliance.Blue)) ? Math.PI : 0;
+      } else {
+        targetRadians = (onBlueSide == (alliance == Alliance.Blue)) ? 0 : Math.PI;
+      }
+    } else {
+      targetRadians = currentPose.getRotation().getRadians();
+    }
+
+    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/CurrentPose",
+        currentPose);
+    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/TargetPose",
+        new Pose2d(targetX, currentPose.getY(),
+            Rotation2d.fromRadians(targetRadians)));
+
+    // Making adjustments to the robot
 
     double directionX = 0;
     double directionRot = 0;

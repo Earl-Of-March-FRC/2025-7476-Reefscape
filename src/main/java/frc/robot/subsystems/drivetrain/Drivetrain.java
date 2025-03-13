@@ -289,6 +289,9 @@ public class Drivetrain extends SubsystemBase {
 
     Logger.recordOutput("Drive/GyroDisconnected", gyroDisconnected);
     SmartDashboard.putBoolean("GyroDisconnected", gyroDisconnected);
+
+    // Log which side the robot is on
+    Logger.recordOutput("Odometry/IsOnBlueSide", isOnBlueSide());
   }
 
   /**
