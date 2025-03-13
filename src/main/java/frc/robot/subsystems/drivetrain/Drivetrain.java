@@ -167,6 +167,10 @@ public class Drivetrain extends SubsystemBase {
         new Rotation3d(PhotonConstants.camera2Roll, PhotonConstants.camera2Pitch,
             PhotonConstants.camera2Yaw));
 
+    // Log april tag poses to logger
+    aprilTagFieldLayout.getTags()
+        .forEach((tag) -> Logger.recordOutput("FieldLayout/AprilTags/" + tag.ID, tag.pose));
+
     photonPoseEstimator1 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToCam1);
     photonPoseEstimator2 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
