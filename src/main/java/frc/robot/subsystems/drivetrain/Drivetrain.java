@@ -23,6 +23,7 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
@@ -170,6 +171,58 @@ public class Drivetrain extends SubsystemBase {
         robotToCam1);
     photonPoseEstimator2 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToCam2);
+<<<<<<< Updated upstream
+=======
+
+    // Log april tag poses to logger
+    aprilTagFieldLayout.getTags()
+        .forEach((tag) -> Logger.recordOutput("FieldLayout/AprilTags/" + tag.ID, tag.pose));
+
+    // Setup cameras to see april tags. Wow! That makes me really happy.
+    camera1 = new PhotonCamera(PhotonConstants.kCamera1);
+    camera2 = new PhotonCamera(PhotonConstants.kCamera2);
+
+    if (RobotBase.isSimulation()) {
+      SimCameraProperties camera1Properties = new SimCameraProperties();
+      SimCameraProperties camera2Properties = new SimCameraProperties();
+
+      camera1Properties.setCalibration(1280, 720, Rotation2d.fromDegrees(49));
+      camera1Properties.setFPS(30);
+      camera1Properties.setAvgLatencyMs(35);
+      camera1Properties.setLatencyStdDevMs(5);
+
+      camera2Properties.setCalibration(1280, 720, Rotation2d.fromDegrees(59));
+      camera2Properties.setFPS(30);
+      camera2Properties.setAvgLatencyMs(35);
+      camera2Properties.setLatencyStdDevMs(5);
+
+      camera1Sim = new PhotonCameraSim(camera1, camera1Properties);
+      camera2Sim = new PhotonCameraSim(camera2, camera2Properties);
+
+      camera1Sim.enableProcessedStream(true);
+      camera2Sim.enableProcessedStream(true);
+
+      visionSim = new VisionSystemSim("main");
+
+      try {
+        AprilTagFieldLayout tagLayout = AprilTagFieldLayout
+            .loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
+        visionSim.addAprilTags(tagLayout);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+      visionSim.addCamera(camera1Sim, robotToCam1);
+      visionSim.addCamera(camera2Sim, robotToCam2);
+
+      camera1 = camera1Sim.getCamera();
+      camera2 = camera2Sim.getCamera();
+    } else {
+      camera1Sim = null;
+      camera2Sim = null;
+      visionSim = null;
+    }
+>>>>>>> Stashed changes
   }
 
   /**
@@ -199,15 +252,15 @@ public class Drivetrain extends SubsystemBase {
     Optional<EstimatedRobotPose> visionPose2 = getEstimatedGlobalPose2(pose);
 
     hasVisionData = false;
+    List<Integer> fiducialIds1 = new ArrayList<>();
+    List<Integer> fiducialIds2 = new ArrayList<>();
     if (visionPose1.isPresent()) {
       Logger.recordOutput("Vision/Photon1/EstimatedPose", visionPose1.get().estimatedPose);
 
-      // Logging targets
-      List<Integer> fiducialIds = new ArrayList<>();
+      // Add targets to list
       for (PhotonTrackedTarget target : visionPose1.get().targetsUsed) {
-        fiducialIds.add((Integer) target.fiducialId);
+        fiducialIds1.add(target.fiducialId);
       }
-      Logger.recordOutput("Vision/Photon1/TargetsUsed", fiducialIds.toString());
 
       Pose3d visionPose = visionPose1.get().estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
@@ -216,19 +269,16 @@ public class Drivetrain extends SubsystemBase {
       Logger.recordOutput("Vision/Photon1/Timestamp", visionPose1.get().timestampSeconds);
       hasVisionData = true;
     } else {
-      Logger.recordOutput("Vision/Photon1/TargetsUsed", "No targets");
       Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose3d());
       Logger.recordOutput("Vision/Photon1/Timestamp", -1.0);
     }
     if (visionPose2.isPresent()) {
       Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
 
-      // Logging targets
-      List<Integer> fiducialIds = new ArrayList<>();
+      // Add targets to list
       for (PhotonTrackedTarget target : visionPose2.get().targetsUsed) {
-        fiducialIds.add((Integer) target.fiducialId);
+        fiducialIds2.add(target.fiducialId);
       }
-      Logger.recordOutput("Vision/Photon1/TargetsUsed", fiducialIds.toString());
 
       Pose3d visionPose = visionPose2.get().estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
@@ -237,11 +287,14 @@ public class Drivetrain extends SubsystemBase {
       Logger.recordOutput("Vision/Photon2/Timestamp", visionPose2.get().timestampSeconds);
       hasVisionData = true;
     } else {
-      Logger.recordOutput("Vision/Photon2/TargetsUsed", "No targets");
       Logger.recordOutput("Vision/Photon2/EstimatedPose", new Pose3d());
       Logger.recordOutput("Vision/Photon2/Timestamp", -1.0);
     }
     SmartDashboard.putBoolean("HasVision", hasVisionData);
+
+    // Log april tags to the logger
+    Logger.recordOutput("Vision/Photon1/TargetIds", fiducialIds1.toString());
+    Logger.recordOutput("Vision/Photon2/TargetIds", fiducialIds2.toString());
 
     // Log the current pose to the logger
     Logger.recordOutput("Odometry/WithVisionInput", pose);
