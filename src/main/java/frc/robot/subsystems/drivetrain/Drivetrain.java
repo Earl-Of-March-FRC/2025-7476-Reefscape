@@ -42,6 +42,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -175,6 +176,9 @@ public class Drivetrain extends SubsystemBase {
         robotToCam1);
     photonPoseEstimator2 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToCam2);
+
+    photonPoseEstimator1.setMultiTagFallbackStrategy(PoseStrategy.CONSTRAINED_SOLVEPNP);
+    photonPoseEstimator2.setMultiTagFallbackStrategy(PoseStrategy.CONSTRAINED_SOLVEPNP);
   }
 
   /**
@@ -199,6 +203,11 @@ public class Drivetrain extends SubsystemBase {
       pose = odometry.update(gyroAngle, positions);
       visionlessPose = visionlessOdometry.update(gyroAngle, positions);
     }
+
+    photonPoseEstimator1.addHeadingData(Timer.getFPGATimestamp(), gyroAngle);
+    photonPoseEstimator2.addHeadingData(Timer.getFPGATimestamp(), gyroAngle);
+    photonPoseEstimator1.setReferencePose(pose);
+    photonPoseEstimator2.setReferencePose(pose);
 
     Optional<EstimatedRobotPose> visionPose1 = getEstimatedGlobalPose1(pose);
     Optional<EstimatedRobotPose> visionPose2 = getEstimatedGlobalPose2(pose);
@@ -428,7 +437,6 @@ public class Drivetrain extends SubsystemBase {
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(PhotonPoseEstimator poseEstimator, PhotonCamera camera,
       Pose2d prevEstimatedRobotPose) {
-    poseEstimator.setReferencePose(prevEstimatedRobotPose);
     return poseEstimator.update(camera.getLatestResult());
   }
 
