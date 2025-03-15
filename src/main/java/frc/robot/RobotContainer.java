@@ -187,7 +187,7 @@ public class RobotContainer {
     // operatorController.a()
     // .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () ->
     // IntakeConstants.kDefaultPercent));
-    operatorController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
+    operatorController.b().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
     // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
     // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
     driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
@@ -198,10 +198,12 @@ public class RobotContainer {
     driverController.leftTrigger().whileTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
             () -> -launcherSub.getPreferredBackVelocity()));
+
     driverController.rightBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
     driverController.leftBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
+
     driverController.leftStick().onTrue(
         Commands.runOnce(() -> {
           driveSub.isFieldRelative = true;
