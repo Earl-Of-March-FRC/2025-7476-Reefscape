@@ -81,9 +81,6 @@ public class Drivetrain extends SubsystemBase {
   private final PhotonPoseEstimator photonPoseEstimator1;
   private final PhotonPoseEstimator photonPoseEstimator2;
 
-  private final Transform3d robotToCam1;
-  private final Transform3d robotToCam2;
-
   // Odometry class for tracking the robot's position on the field
   SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
@@ -157,16 +154,6 @@ public class Drivetrain extends SubsystemBase {
     // Setup cameras to see april tags. Wow! That makes me really happy.
     camera1 = new PhotonCamera(PhotonConstants.kCamera1);
     camera2 = new PhotonCamera(PhotonConstants.kCamera2);
-    robotToCam1 = new Transform3d(
-        new Translation3d(PhotonConstants.camera1X, PhotonConstants.camera1Y,
-            PhotonConstants.camera1Z),
-        new Rotation3d(PhotonConstants.camera1Roll, PhotonConstants.camera1Pitch,
-            PhotonConstants.camera1Yaw));
-    robotToCam2 = new Transform3d(
-        new Translation3d(PhotonConstants.camera2X, PhotonConstants.camera2Y,
-            PhotonConstants.camera2Z),
-        new Rotation3d(PhotonConstants.camera2Roll, PhotonConstants.camera2Pitch,
-            PhotonConstants.camera2Yaw));
 
     // Log april tag poses to logger
     FieldConstants.kfieldLayout.getTags()
@@ -174,10 +161,10 @@ public class Drivetrain extends SubsystemBase {
 
     photonPoseEstimator1 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        robotToCam1);
+        PhotonConstants.kRobotToCam1);
     photonPoseEstimator2 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        robotToCam2);
+        PhotonConstants.kRobotToCam2);
 
     photonPoseEstimator1.setMultiTagFallbackStrategy(PoseStrategy.CONSTRAINED_SOLVEPNP);
     photonPoseEstimator2.setMultiTagFallbackStrategy(PoseStrategy.CONSTRAINED_SOLVEPNP);
@@ -548,11 +535,11 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public List<EstimatedRobotPose> getEstimatedGlobalPose1(Pose2d prevEstimatedRobotPose) {
-    return getEstimatedGlobalPose(photonPoseEstimator1, camera1, robotToCam1, prevEstimatedRobotPose);
+    return getEstimatedGlobalPose(photonPoseEstimator1, camera1, PhotonConstants.kRobotToCam1, prevEstimatedRobotPose);
   }
 
   public List<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
-    return getEstimatedGlobalPose(photonPoseEstimator2, camera2, robotToCam2, prevEstimatedRobotPose);
+    return getEstimatedGlobalPose(photonPoseEstimator2, camera2, PhotonConstants.kRobotToCam2, prevEstimatedRobotPose);
   }
 
   public boolean isInField(Pose3d pose) {
