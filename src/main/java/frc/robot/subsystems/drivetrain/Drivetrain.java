@@ -426,14 +426,18 @@ public class Drivetrain extends SubsystemBase {
     return new Pose2d(x, y, rot);
   }
 
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(PhotonPoseEstimator poseEstimator, PhotonCamera camera,
+      Pose2d prevEstimatedRobotPose) {
+    poseEstimator.setReferencePose(prevEstimatedRobotPose);
+    return poseEstimator.update(camera.getLatestResult());
+  }
+
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose1(Pose2d prevEstimatedRobotPose) {
-    photonPoseEstimator1.setReferencePose(prevEstimatedRobotPose);
-    return photonPoseEstimator1.update(camera1.getLatestResult());
+    return getEstimatedGlobalPose(photonPoseEstimator1, camera1, prevEstimatedRobotPose);
   }
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
-    photonPoseEstimator2.setReferencePose(prevEstimatedRobotPose);
-    return photonPoseEstimator2.update(camera2.getLatestResult());
+    return getEstimatedGlobalPose(photonPoseEstimator2, camera2, prevEstimatedRobotPose);
   }
 
   public boolean isOnBlueSide() {
