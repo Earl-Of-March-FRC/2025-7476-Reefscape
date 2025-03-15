@@ -165,7 +165,6 @@ public class Drivetrain extends SubsystemBase {
     photonPoseEstimator2 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         PhotonConstants.kRobotToCam2);
-
     photonPoseEstimator1.setMultiTagFallbackStrategy(PoseStrategy.CONSTRAINED_SOLVEPNP);
     photonPoseEstimator2.setMultiTagFallbackStrategy(PoseStrategy.CONSTRAINED_SOLVEPNP);
   }
@@ -518,17 +517,55 @@ public class Drivetrain extends SubsystemBase {
           continue;
         }
 
-        // average the valid poses
-        Pose3d averagePose = new Pose3d();
-        for (Pose3d validPose : validPoses) {
-          Transform3d validTransform = new Transform3d(validPose.getTranslation(), validPose.getRotation());
-          averagePose = averagePose.plus(validTransform);
-        }
-        averagePose = averagePose.times(1.0 / validPoses.size());
+        // BAD ORIGINAL APPROACH:
+
+        // Pose3d averagePose = new Pose3d();
+        // for (Pose3d validPose : validPoses) {
+        // Transform3d validTransform = new Transform3d(validPose.getTranslation(),
+        // validPose.getRotation());
+        // averagePose = averagePose.plus(validTransform);
+        // }
+        // averagePose = averagePose.times(1.0 / validPoses.size());
+        //
+        // WHY THIS WAS WRONG:
+        // Transform composition (plus()) doesn't average positions - it stacks
+        // transformations.
+        // This creates what I would call nonsense results when combining multiple
+        // poses, especially with rotations.
 
         // add the average pose to the results
+
+        // FIXED APPROACH: Component averaging
+
+        double totalX = 0;
+        double totalY = 0;
+        double totalZRot = 0;
+
+        // If you dont like this method, we can also just stream the results instead of
+        // a for each loop.
+        // Some people just dont know what array streaming is...(Wilson you should
+        // learn)
+
+        for (Pose3d pose : validPoses) {
+          totalX += pose.getX();
+          totalY += pose.getY();
+
+          // Only consider Z rotation since we're operating in 2D plane (I think judging
+          // by previous code...)
+          totalZRot += pose.getRotation().getZ();
+        }
+
+        final int count = validPoses.size();
+        Pose3d averagePose = new Pose3d(
+            totalX / count, // X average
+            totalY / count, // Y average
+            0, // Z forced to 0 (validated by isOnGround)
+            new Rotation3d(0, 0, totalZRot / count) // Average Z rotation
+        );
+
         results
             .add(new EstimatedRobotPose(averagePose, timestamp, targetsUsed, PoseStrategy.CLOSEST_TO_REFERENCE_POSE));
+
       }
     }
     return results;
@@ -551,8 +588,13 @@ public class Drivetrain extends SubsystemBase {
     return pose.getZ() <= PhotonConstants.kHeightTolerance && pose.getZ() >= -PhotonConstants.kHeightTolerance;
   }
 
+  // Calculates 2D planar distance (ignores Z-axis since FRC robots operate on a
+  // flat plane)
+  // Just use hypot instead of the Pythagorean theorem, it makes the code cleaner
   public double distanceBetween(Pose3d pose1, Pose3d pose2) {
-    return Math.sqrt(Math.pow(pose1.getX() - pose2.getX(), 2) + Math.pow(pose1.getY() - pose2.getY(), 2));
+    return Math.hypot(
+        pose1.getX() - pose2.getX(),
+        pose1.getY() - pose2.getY());
   }
 
   public boolean isOnBlueSide() {
