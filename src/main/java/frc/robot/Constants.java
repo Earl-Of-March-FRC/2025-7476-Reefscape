@@ -7,6 +7,8 @@ package frc.robot;
 import com.pathplanner.lib.path.PathConstraints;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -245,8 +247,9 @@ public final class Constants {
       public static final String kCamera1 = "camera1";
       public static final String kCamera2 = "camera2";
 
-      public static Transform3d robotToCamera = new Transform3d(camera1X, camera1Y, camera1Z,
-          new Rotation3d(camera1Roll, camera1Pitch, camera1Yaw));
+      public static final int kHeightTolerance = 1; // meters above and below ground
+      public static final double kAmbiguityDiscardThreshold = 0.7; // ignore targets above this value
+      public static final double kAmbiguityThreshold = 0.3; // targets above this need to be checked
     }
   }
 
@@ -293,7 +296,12 @@ public final class Constants {
   }
 
   public static class FieldConstants {
-    public static final double kBargeX = 8.774; // meters from drivestation wall
+    public static final AprilTagFieldLayout kfieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    public static final double kFieldLengthX = kfieldLayout.getFieldLength(); // meters from drivestation wall to
+                                                                              // drivestation wall
+    public static final double kFieldWidthY = kfieldLayout.getFieldWidth(); // meters of parallel distance from
+                                                                            // processor to processor
+    public static final double kBargeX = kFieldLengthX; // meters from drivestation wall to middle of barge
   }
 
   // PDP CAN IDs

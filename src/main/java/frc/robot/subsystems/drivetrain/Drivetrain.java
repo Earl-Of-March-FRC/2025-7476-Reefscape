@@ -13,6 +13,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -23,9 +24,6 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
@@ -82,6 +80,9 @@ public class Drivetrain extends SubsystemBase {
   // Photonvision -> Guess where the robot is on the field
   private final PhotonPoseEstimator photonPoseEstimator1;
   private final PhotonPoseEstimator photonPoseEstimator2;
+
+  private final Transform3d robotToCam1;
+  private final Transform3d robotToCam2;
 
   // Odometry class for tracking the robot's position on the field
   SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(
@@ -156,25 +157,26 @@ public class Drivetrain extends SubsystemBase {
     // Setup cameras to see april tags. Wow! That makes me really happy.
     camera1 = new PhotonCamera(PhotonConstants.kCamera1);
     camera2 = new PhotonCamera(PhotonConstants.kCamera2);
-    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-    Transform3d robotToCam1 = new Transform3d(
+    robotToCam1 = new Transform3d(
         new Translation3d(PhotonConstants.camera1X, PhotonConstants.camera1Y,
             PhotonConstants.camera1Z),
         new Rotation3d(PhotonConstants.camera1Roll, PhotonConstants.camera1Pitch,
             PhotonConstants.camera1Yaw));
-    Transform3d robotToCam2 = new Transform3d(
+    robotToCam2 = new Transform3d(
         new Translation3d(PhotonConstants.camera2X, PhotonConstants.camera2Y,
             PhotonConstants.camera2Z),
         new Rotation3d(PhotonConstants.camera2Roll, PhotonConstants.camera2Pitch,
             PhotonConstants.camera2Yaw));
 
     // Log april tag poses to logger
-    aprilTagFieldLayout.getTags()
+    FieldConstants.kfieldLayout.getTags()
         .forEach((tag) -> Logger.recordOutput("FieldLayout/AprilTags/" + tag.ID, tag.pose));
 
-    photonPoseEstimator1 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+    photonPoseEstimator1 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
+        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToCam1);
-    photonPoseEstimator2 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+    photonPoseEstimator2 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
+        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToCam2);
 
     photonPoseEstimator1.setMultiTagFallbackStrategy(PoseStrategy.CONSTRAINED_SOLVEPNP);
@@ -209,45 +211,48 @@ public class Drivetrain extends SubsystemBase {
     photonPoseEstimator1.setReferencePose(pose);
     photonPoseEstimator2.setReferencePose(pose);
 
-    Optional<EstimatedRobotPose> visionPose1 = getEstimatedGlobalPose1(pose);
-    Optional<EstimatedRobotPose> visionPose2 = getEstimatedGlobalPose2(pose);
+    List<EstimatedRobotPose> visionPoses1 = getEstimatedGlobalPose1(pose);
+    List<EstimatedRobotPose> visionPoses2 = getEstimatedGlobalPose2(pose);
 
     hasVisionData = false;
     List<Integer> fiducialIds1 = new ArrayList<>();
     List<Integer> fiducialIds2 = new ArrayList<>();
-    if (visionPose1.isPresent()) {
-      Logger.recordOutput("Vision/Photon1/EstimatedPose", visionPose1.get().estimatedPose);
+    for (EstimatedRobotPose visionPose1 : visionPoses1) {
+      Logger.recordOutput("Vision/Photon1/EstimatedPose", visionPose1.estimatedPose);
 
       // Add targets to list
-      for (PhotonTrackedTarget target : visionPose1.get().targetsUsed) {
+      for (PhotonTrackedTarget target : visionPose1.targetsUsed) {
         fiducialIds1.add(target.fiducialId);
       }
 
-      Pose3d visionPose = visionPose1.get().estimatedPose;
+      Pose3d visionPose = visionPose1.estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getZ()));
-      odometry.addVisionMeasurement(estimatedPose, visionPose1.get().timestampSeconds);
-      Logger.recordOutput("Vision/Photon1/Timestamp", visionPose1.get().timestampSeconds);
+      odometry.addVisionMeasurement(estimatedPose, visionPose1.timestampSeconds);
+      Logger.recordOutput("Vision/Photon1/Timestamp", visionPose1.timestampSeconds);
       hasVisionData = true;
-    } else {
-      Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose3d());
+    }
+    if (visionPoses1.isEmpty()) {
+      Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose3d(-1, -1, -1, new Rotation3d()));
       Logger.recordOutput("Vision/Photon1/Timestamp", -1.0);
     }
-    if (visionPose2.isPresent()) {
-      Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
+
+    for (EstimatedRobotPose visionPose2 : visionPoses2) {
+      Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.estimatedPose);
 
       // Add targets to list
-      for (PhotonTrackedTarget target : visionPose2.get().targetsUsed) {
+      for (PhotonTrackedTarget target : visionPose2.targetsUsed) {
         fiducialIds2.add(target.fiducialId);
       }
 
-      Pose3d visionPose = visionPose2.get().estimatedPose;
+      Pose3d visionPose = visionPose2.estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getZ()));
-      odometry.addVisionMeasurement(estimatedPose, visionPose2.get().timestampSeconds);
-      Logger.recordOutput("Vision/Photon2/Timestamp", visionPose2.get().timestampSeconds);
+      odometry.addVisionMeasurement(estimatedPose, visionPose2.timestampSeconds);
+      Logger.recordOutput("Vision/Photon2/Timestamp", visionPose2.timestampSeconds);
       hasVisionData = true;
-    } else {
+    }
+    if (visionPoses2.isEmpty()) {
       Logger.recordOutput("Vision/Photon2/EstimatedPose", new Pose3d());
       Logger.recordOutput("Vision/Photon2/Timestamp", -1.0);
     }
@@ -285,11 +290,9 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Distance to Barge", distanceToBarge);
     SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBarge);
 
-    SmartDashboard.putBoolean("FarFromBargeLaunchingRange",
-        xDistanceToBarge > LaunchingDistances.kMetersFromBarge);
-    SmartDashboard.putBoolean("WithinBargeLaunchingRange",
-        MathUtil.isNear(xDistanceToBarge, LaunchingDistances.kMetersFromBarge,
-            LaunchingDistances.kToleranceMetersFromBarge));
+    SmartDashboard.putBoolean("FarFromBargeLaunchingRange", xDistanceToBarge > LaunchingDistances.kMetersFromBarge);
+    SmartDashboard.putBoolean("WithinBargeLaunchingRange", MathUtil.isNear(xDistanceToBarge,
+        LaunchingDistances.kMetersFromBarge, LaunchingDistances.kToleranceMetersFromBarge));
 
     Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBarge);
     Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBarge);
@@ -300,7 +303,9 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putBoolean("GyroDisconnected", gyroDisconnected);
 
     // Log which side the robot is on
-    Logger.recordOutput("Odometry/IsOnBlueSide", isOnBlueSide());
+    Logger.recordOutput("Odometry/IsOnBlueSide",
+
+        isOnBlueSide());
   }
 
   /**
@@ -435,17 +440,132 @@ public class Drivetrain extends SubsystemBase {
     return new Pose2d(x, y, rot);
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(PhotonPoseEstimator poseEstimator, PhotonCamera camera,
+  public List<EstimatedRobotPose> getEstimatedGlobalPose(PhotonPoseEstimator poseEstimator, PhotonCamera camera,
+      Transform3d robotToCam,
       Pose2d prevEstimatedRobotPose) {
-    return poseEstimator.update(camera.getLatestResult());
+    List<EstimatedRobotPose> results = new ArrayList<>();
+    List<PhotonPipelineResult> camResults = camera.getAllUnreadResults();
+
+    for (PhotonPipelineResult camResult : camResults) {
+      // check if the built in pose estimator pose is reasonable
+      Optional<EstimatedRobotPose> optionalEstimation = poseEstimator.update(camResult);
+      if (optionalEstimation.isPresent()) {
+        EstimatedRobotPose estimation = optionalEstimation.get();
+        if (isInField(estimation.estimatedPose) && isOnGround(estimation.estimatedPose)) {
+          results.add(estimation);
+          continue;
+        }
+      }
+
+      double timestamp = camResult.getTimestampSeconds();
+      List<PhotonTrackedTarget> targetsUsed = new ArrayList<>();
+
+      // if the built in pose estimator is not reasonable, compute it ourselves
+      if (camResult.hasTargets()) {
+        List<PhotonTrackedTarget> targets = camResult.getTargets();
+        List<Pose3d> validPoses = new ArrayList<>();
+        for (PhotonTrackedTarget target : targets) {
+
+          // ignore targets with high pose ambiguity
+          if (target.getPoseAmbiguity() > PhotonConstants.kAmbiguityDiscardThreshold) {
+            continue;
+          }
+
+          int targetId = target.fiducialId;
+          Optional<Pose3d> optionalTagPose = FieldConstants.kfieldLayout.getTagPose(targetId);
+          // it should never be empty, but just in case
+          if (optionalTagPose.isEmpty()) {
+            continue;
+          }
+          Pose3d tagPose = optionalTagPose.get();
+          Transform3d tagTransForm = new Transform3d(tagPose.getTranslation(), tagPose.getRotation());
+
+          // if the ambiguity is high, only use the pose that is reasonable
+          if (target.getPoseAmbiguity() > PhotonConstants.kAmbiguityThreshold) {
+            Transform3d bestCamToTarget = target.getBestCameraToTarget();
+            Transform3d altCamToTarget = target.getAlternateCameraToTarget();
+
+            // robotTransform = tagTransform - camToTarget - robotToCam
+            Transform3d bestRobotTransform = tagTransForm.plus(bestCamToTarget.inverse()).plus(robotToCam.inverse());
+            Pose3d bestRobotPose = new Pose3d(bestRobotTransform.getTranslation(), bestRobotTransform.getRotation());
+            Transform3d altRobotTransform = tagTransForm.plus(altCamToTarget.inverse()).plus(robotToCam.inverse());
+            Pose3d altRobotPose = new Pose3d(altRobotTransform.getTranslation(), altRobotTransform.getRotation());
+
+            // check if they are reasonable
+            boolean isBestPoseValid = isInField(bestRobotPose) && isOnGround(bestRobotPose);
+            boolean isAltPoseValid = isInField(altRobotPose) && isOnGround(altRobotPose);
+            if (isBestPoseValid && isAltPoseValid) {
+              targetsUsed.add(target);
+              // if both are valid, use the one that is closer to the previous estimation
+              double bestDistance = distanceBetween(bestRobotPose, new Pose3d(prevEstimatedRobotPose));
+              double altDistance = distanceBetween(altRobotPose, new Pose3d(prevEstimatedRobotPose));
+              if (bestDistance < altDistance) {
+                validPoses.add(bestRobotPose);
+              } else {
+                validPoses.add(altRobotPose);
+              }
+            } else if (isBestPoseValid) {
+              targetsUsed.add(target);
+              validPoses.add(bestRobotPose);
+            } else if (isAltPoseValid) {
+              targetsUsed.add(target);
+              validPoses.add(altRobotPose);
+            }
+            continue;
+          }
+
+          // if the ambiguity is low, use the pose directly
+          Transform3d camToTarget = target.getBestCameraToTarget();
+          // robotTransform = tagTransform - camToTarget - robotToCam
+          Transform3d robotTransform = tagTransForm.plus(camToTarget.inverse()).plus(robotToCam.inverse());
+          Pose3d robotPose = new Pose3d(robotTransform.getTranslation(), robotTransform.getRotation());
+          // check if the pose is reasonable
+          if (isInField(robotPose) && isOnGround(robotPose)) {
+            validPoses.add(robotPose);
+            targetsUsed.add(target);
+          }
+        }
+
+        // if there are no valid poses, ignore this frame
+        if (validPoses.isEmpty()) {
+          continue;
+        }
+
+        // average the valid poses
+        Pose3d averagePose = new Pose3d();
+        for (Pose3d validPose : validPoses) {
+          Transform3d validTransform = new Transform3d(validPose.getTranslation(), validPose.getRotation());
+          averagePose = averagePose.plus(validTransform);
+        }
+        averagePose = averagePose.times(1.0 / validPoses.size());
+
+        // add the average pose to the results
+        results
+            .add(new EstimatedRobotPose(averagePose, timestamp, targetsUsed, PoseStrategy.CLOSEST_TO_REFERENCE_POSE));
+      }
+    }
+    return results;
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose1(Pose2d prevEstimatedRobotPose) {
-    return getEstimatedGlobalPose(photonPoseEstimator1, camera1, prevEstimatedRobotPose);
+  public List<EstimatedRobotPose> getEstimatedGlobalPose1(Pose2d prevEstimatedRobotPose) {
+    return getEstimatedGlobalPose(photonPoseEstimator1, camera1, robotToCam1, prevEstimatedRobotPose);
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
-    return getEstimatedGlobalPose(photonPoseEstimator2, camera2, prevEstimatedRobotPose);
+  public List<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
+    return getEstimatedGlobalPose(photonPoseEstimator2, camera2, robotToCam2, prevEstimatedRobotPose);
+  }
+
+  public boolean isInField(Pose3d pose) {
+    return pose.getX() >= 0 && pose.getX() <= FieldConstants.kFieldLengthX && pose.getY() >= 0
+        && pose.getY() <= FieldConstants.kFieldWidthY;
+  }
+
+  public boolean isOnGround(Pose3d pose) {
+    return pose.getZ() <= PhotonConstants.kHeightTolerance && pose.getZ() >= -PhotonConstants.kHeightTolerance;
+  }
+
+  public double distanceBetween(Pose3d pose1, Pose3d pose2) {
+    return Math.sqrt(Math.pow(pose1.getX() - pose2.getX(), 2) + Math.pow(pose1.getY() - pose2.getY(), 2));
   }
 
   public boolean isOnBlueSide() {
