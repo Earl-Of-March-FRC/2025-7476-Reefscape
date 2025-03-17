@@ -91,15 +91,18 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
     // Calculate target pose
     boolean onBlueSide = driveSub.isOnBlueSide();
 
+    // Calculate target translation
+    // (0,0) is ALWAYS on the blue alliance side
     targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
 
+    // Calculate target rotation
+    // For both alliances, 0 rad points away from our driver station
     if (DriverStation.getAlliance().isPresent()) {
       Alliance alliance = DriverStation.getAlliance().get();
-      if (alliance == Alliance.Blue) {
-        targetRadians = (onBlueSide == (alliance == Alliance.Blue)) ? Math.PI : 0;
-      } else {
-        targetRadians = (onBlueSide == (alliance == Alliance.Blue)) ? 0 : Math.PI;
-      }
+
+      // Check if robot is currently on the same side of field as the alliance
+      // If yes, then target angle is 0 rad; otherwise, pi rad
+      targetRadians = (onBlueSide == (alliance == Alliance.Blue)) ? 0 : Math.PI;
     } else {
       targetRadians = currentPose.getRotation().getRadians();
     }
@@ -110,33 +113,45 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
         new Pose2d(targetX, currentPose.getY(),
             Rotation2d.fromRadians(targetRadians)));
 
-    // Making adjustments to the robot
-
+    // Make adjustments to the robot
     double directionX = 0;
     double directionRot = 0;
 
+    // Calculate translation from bang bang controller
     if (!translationFinish) {
+      // Bang bang controller returns 0 or 1
+      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
       directionX = (translationController.calculate(currentPose.getX(), targetX) * 2) - 1;
+
+      // Reverse direction if on red alliance
       if (DriverStation.getAlliance().isPresent()) {
         Alliance alliance = DriverStation.getAlliance().get();
         if (alliance == Alliance.Red) {
           directionX *= -1;
         }
       }
+
       translationFinish = translationController.atSetpoint();
     }
+
+    // Calculate rotation from bang bang controller
     if (!rotationFinish) {
       double currentRotation = currentPose.getRotation().getRadians();
+
+      // Bang bang controller returns 0 or 1
+      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
       directionRot = (rotationController.calculate(currentRotation, targetRadians * Math.signum(currentRotation)) * 2)
           - 1;
+
       rotationFinish = rotationController.atSetpoint();
     }
 
+    // Convert calculated value to velocity
     double xVel = DriveConstants.kBangBangTranslationalVelocityMetersPerSecond * directionX;
     double rotVel = DriveConstants.kBangBangRotationalVelocityRadiansPerSecond * directionRot;
 
+    // Set drivetrain to run at calculated velocity
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel, 0, rotVel);
-
     driveSub.runVelocityFieldRelative(chassisSpeeds);
 
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/OutputDirectionX", directionX);
