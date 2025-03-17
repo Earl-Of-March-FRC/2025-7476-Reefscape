@@ -165,7 +165,6 @@ public class Drivetrain extends SubsystemBase {
     photonPoseEstimator2 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         PhotonConstants.kRobotToCam2);
-
     photonPoseEstimator1.setMultiTagFallbackStrategy(PoseStrategy.CONSTRAINED_SOLVEPNP);
     photonPoseEstimator2.setMultiTagFallbackStrategy(PoseStrategy.CONSTRAINED_SOLVEPNP);
   }
@@ -518,17 +517,29 @@ public class Drivetrain extends SubsystemBase {
           continue;
         }
 
-        // average the valid poses
-        Pose3d averagePose = new Pose3d();
-        for (Pose3d validPose : validPoses) {
-          Transform3d validTransform = new Transform3d(validPose.getTranslation(), validPose.getRotation());
-          averagePose = averagePose.plus(validTransform);
-        }
-        averagePose = averagePose.times(1.0 / validPoses.size());
+        double totalX = 0;
+        double totalY = 0;
+        double totalZRot = 0;
 
-        // add the average pose to the results
+        for (Pose3d pose : validPoses) {
+          totalX += pose.getX();
+          totalY += pose.getY();
+
+          // Only consider Z rotation since we're operating in 2D plane
+          totalZRot += pose.getRotation().getZ();
+        }
+
+        final int count = validPoses.size();
+        Pose3d averagePose = new Pose3d(
+            totalX / count, // X average
+            totalY / count, // Y average
+            0, // Z forced to 0 (validated by isOnGround)
+            new Rotation3d(0, 0, totalZRot / count) // Average Z rotation
+        );
+
         results
             .add(new EstimatedRobotPose(averagePose, timestamp, targetsUsed, PoseStrategy.CLOSEST_TO_REFERENCE_POSE));
+
       }
     }
     return results;
