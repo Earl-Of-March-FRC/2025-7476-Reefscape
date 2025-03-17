@@ -309,7 +309,7 @@ public final class Constants {
                                                                               // drivestation wall
     public static final double kFieldWidthY = kfieldLayout.getFieldWidth(); // meters of parallel distance from
                                                                             // processor to processor
-    public static final double kBargeX = kFieldLengthX; // meters from drivestation wall to middle of barge
+    public static final double kBargeX = kFieldLengthX / 2; // meters from drivestation wall to middle of barge
   }
 
   // PDP CAN IDs
