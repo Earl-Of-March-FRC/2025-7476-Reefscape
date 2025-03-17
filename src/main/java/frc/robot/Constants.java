@@ -255,9 +255,10 @@ public final class Constants {
           new Translation3d(PhotonConstants.camera2X, PhotonConstants.camera2Y, PhotonConstants.camera2Z),
           new Rotation3d(PhotonConstants.camera2Roll, PhotonConstants.camera2Pitch, PhotonConstants.camera2Yaw));
 
-      public static final int kHeightTolerance = 1; // meters above and below ground
+      public static final double kHeightTolerance = 0.5; // meters above and below ground
       public static final double kAmbiguityDiscardThreshold = 0.7; // ignore targets above this value
       public static final double kAmbiguityThreshold = 0.3; // targets above this need to be checked
+      public static final double kMinSingleTagArea = 0.3;
     }
   }
 
