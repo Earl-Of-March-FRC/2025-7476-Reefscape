@@ -161,13 +161,15 @@ public final class Constants {
     public static final int kMotorCanId = 10;
     public static final MotorType kMotorType = MotorType.kBrushless;
 
-    public static final double kPUpPositionController = 1.5;
+    // public static final double kPUpPositionController = 1.5;
+    public static final double kPUpPositionController = 0;
     public static final double kIUpPositionController = 0;
     public static final double kDUpPositionController = 0;
     public static final double kUpPositionFF = 0;
     public static final double kGainFF = 0;
 
-    public static final double kPDownPositionController = 1.5;
+    // public static final double kPDownPositionController = 1.5;
+    public static final double kPDownPositionController = 0;
     public static final double kIDownPositionController = 0;
     public static final double kDDownPositionController = 0;
     public static final double kDownPositionFF = 0;
