@@ -31,7 +31,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final DigitalInput lowerLimitSwitch;
   public boolean isManual = false;
   public double armOffset = 0;
-
+  public double CurrentSetpoint;
   // Starting angle of the arm, in radians
   // Ex: arm starting position is 1 radian, then m_armAngularOffset is 1
   private double m_armAngularOffset = 0;
@@ -64,6 +64,11 @@ public class ArmSubsystem extends SubsystemBase {
 
     Logger.recordOutput("Arm/Measured/LimitSwitch", getLimitSwitch());
     Logger.recordOutput("Arm/Applied/ArmOffset", armOffset);
+
+    if (!isManual) {
+      armClosedLoopController.setReference(CurrentSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0,
+          ArmConstants.kGainFF * Math.sin(getPosition()));
+    }
   }
 
   /**

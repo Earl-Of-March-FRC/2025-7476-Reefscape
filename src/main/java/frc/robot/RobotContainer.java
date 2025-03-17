@@ -112,7 +112,7 @@ public class RobotContainer {
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 
     // Register named Commands
-    NamedCommands.registerCommand("Calibrate", new CalibrateCmd(driveSub));
+    NamedCommands.registerCommand("Calibrate Gyro", new CalibrateGyroCmd(driveSub));
 
     driveSub.setDefaultCommand(
         new DriveSqrtCmd(
