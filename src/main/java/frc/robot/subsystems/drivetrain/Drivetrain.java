@@ -562,13 +562,8 @@ public class Drivetrain extends SubsystemBase {
     return pose.getZ() <= PhotonConstants.kHeightTolerance && pose.getZ() >= -PhotonConstants.kHeightTolerance;
   }
 
-  // Calculates 2D planar distance (ignores Z-axis since FRC robots operate on a
-  // flat plane)
-  // Just use hypot instead of the Pythagorean theorem, it makes the code cleaner
   public double distanceBetween(Pose3d pose1, Pose3d pose2) {
-    return Math.hypot(
-        pose1.getX() - pose2.getX(),
-        pose1.getY() - pose2.getY());
+    return Math.sqrt(Math.pow(pose1.getX() - pose2.getX(), 2) + Math.pow(pose1.getY() - pose2.getY(), 2));
   }
 
   public boolean isOnBlueSide() {
