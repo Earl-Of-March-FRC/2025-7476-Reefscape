@@ -517,41 +517,15 @@ public class Drivetrain extends SubsystemBase {
           continue;
         }
 
-        // BAD ORIGINAL APPROACH:
-
-        // Pose3d averagePose = new Pose3d();
-        // for (Pose3d validPose : validPoses) {
-        // Transform3d validTransform = new Transform3d(validPose.getTranslation(),
-        // validPose.getRotation());
-        // averagePose = averagePose.plus(validTransform);
-        // }
-        // averagePose = averagePose.times(1.0 / validPoses.size());
-        //
-        // WHY THIS WAS WRONG:
-        // Transform composition (plus()) doesn't average positions - it stacks
-        // transformations.
-        // This creates what I would call nonsense results when combining multiple
-        // poses, especially with rotations.
-
-        // add the average pose to the results
-
-        // FIXED APPROACH: Component averaging
-
         double totalX = 0;
         double totalY = 0;
         double totalZRot = 0;
-
-        // If you dont like this method, we can also just stream the results instead of
-        // a for each loop.
-        // Some people just dont know what array streaming is...(Wilson you should
-        // learn)
 
         for (Pose3d pose : validPoses) {
           totalX += pose.getX();
           totalY += pose.getY();
 
-          // Only consider Z rotation since we're operating in 2D plane (I think judging
-          // by previous code...)
+          // Only consider Z rotation since we're operating in 2D plane
           totalZRot += pose.getRotation().getZ();
         }
 
