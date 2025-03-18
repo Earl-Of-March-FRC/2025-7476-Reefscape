@@ -77,6 +77,7 @@ public final class Configs {
           // Upward position PID controller is slot 0
           .pidf(ArmConstants.kPPositionController, ArmConstants.kIPositionController,
               ArmConstants.kDPositionController, ArmConstants.kPositionFF, ClosedLoopSlot.kSlot0)
+
           // Downward position PID controller is slot 1
           // .pidf(ArmConstants.kPDownPositionController,
           // ArmConstants.kIDownPositionController,
