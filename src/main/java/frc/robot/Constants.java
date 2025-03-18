@@ -7,11 +7,14 @@ package frc.robot;
 import com.pathplanner.lib.path.PathConstraints;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
@@ -43,8 +46,8 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 0.2;
-    public static final double kBangBangRotationalVelocityRadiansPerSecond = Math.PI / 5;
+    public static final double kBangBangTranslationalVelocityMetersPerSecond = 0.1;
+    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 20;
 
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
         kMaxAccelerationMetersPerSecondSquaredPathfinding, kMaxAngularSpeedRadiansPerSecond,
@@ -83,6 +86,7 @@ public final class Constants {
     public static class LaunchingDistances {
       public static final double kMetersFromBarge = 1.3;
       public static final double kToleranceMetersFromBarge = 0.1;
+      public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
     }
   }
 
@@ -170,12 +174,15 @@ public final class Constants {
     public static final int kMotorCanId = 10;
     public static final MotorType kMotorType = MotorType.kBrushless;
 
-    public static final double kPUpPositionController = 1.5;
+    // public static final double kPUpPositionController = 1.5;
+    public static final double kPUpPositionController = 0;
     public static final double kIUpPositionController = 0;
     public static final double kDUpPositionController = 0;
     public static final double kUpPositionFF = 0;
+    public static final double kGainFF = 0;
 
-    public static final double kPDownPositionController = 1.5;
+    // public static final double kPDownPositionController = 1.5;
+    public static final double kPDownPositionController = 0;
     public static final double kIDownPositionController = 0;
     public static final double kDDownPositionController = 0;
     public static final double kDownPositionFF = 0;
@@ -257,8 +264,17 @@ public final class Constants {
       public static final String kCamera1 = "camera1";
       public static final String kCamera2 = "camera2";
 
-      public static Transform3d robotToCamera = new Transform3d(camera1X, camera1Y, camera1Z,
-          new Rotation3d(camera1Roll, camera1Pitch, camera1Yaw));
+      public static final Transform3d kRobotToCam1 = new Transform3d(
+          new Translation3d(PhotonConstants.camera1X, PhotonConstants.camera1Y, PhotonConstants.camera1Z),
+          new Rotation3d(PhotonConstants.camera1Roll, PhotonConstants.camera1Pitch, PhotonConstants.camera1Yaw));
+      public static final Transform3d kRobotToCam2 = new Transform3d(
+          new Translation3d(PhotonConstants.camera2X, PhotonConstants.camera2Y, PhotonConstants.camera2Z),
+          new Rotation3d(PhotonConstants.camera2Roll, PhotonConstants.camera2Pitch, PhotonConstants.camera2Yaw));
+
+      public static final double kHeightTolerance = 0.5; // meters above and below ground
+      public static final double kAmbiguityDiscardThreshold = 0.7; // ignore targets above this value
+      public static final double kAmbiguityThreshold = 0.3; // targets above this need to be checked
+      public static final double kMinSingleTagArea = 0.3;
     }
   }
 
@@ -305,7 +321,12 @@ public final class Constants {
   }
 
   public static class FieldConstants {
-    public static final double kBargeX = 8.774; // meters from drivestation wall
+    public static final AprilTagFieldLayout kfieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    public static final double kFieldLengthX = kfieldLayout.getFieldLength(); // meters from drivestation wall to
+                                                                              // drivestation wall
+    public static final double kFieldWidthY = kfieldLayout.getFieldWidth(); // meters of parallel distance from
+                                                                            // processor to processor
+    public static final double kBargeX = kFieldLengthX / 2; // meters from drivestation wall to middle of barge
   }
 
   // PDP CAN IDs

@@ -43,6 +43,7 @@ public class ArmSetPositionPIDCmd extends Command {
   @Override
   public void execute() {
     armSub.setReferencePosition(referenceAngle.getAsDouble());
+    armSub.CurrentSetpoint = referenceAngle.getAsDouble();
   }
 
   // Called once the command ends or is interrupted.

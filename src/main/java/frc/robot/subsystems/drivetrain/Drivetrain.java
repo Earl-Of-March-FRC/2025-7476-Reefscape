@@ -15,9 +15,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
-import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -28,8 +26,6 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
@@ -39,15 +35,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,9 +50,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
-import frc.robot.Constants.Vision.PhotonConstants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.LauncherConstants;
+import frc.robot.Constants.Vision.PhotonConstants;
 
 /**
  * The Drivetrain class represents the robot's drivetrain subsystem.
@@ -171,67 +165,20 @@ public class Drivetrain extends SubsystemBase {
         },
         this);
 
-    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-    Transform3d robotToCam1 = new Transform3d(
-        new Translation3d(PhotonConstants.camera1X, PhotonConstants.camera1Y,
-            PhotonConstants.camera1Z),
-        new Rotation3d(PhotonConstants.camera1Roll, PhotonConstants.camera1Pitch,
-            PhotonConstants.camera1Yaw));
-    Transform3d robotToCam2 = new Transform3d(
-        new Translation3d(PhotonConstants.camera2X, PhotonConstants.camera2Y,
-            PhotonConstants.camera2Z),
-        new Rotation3d(PhotonConstants.camera2Roll, PhotonConstants.camera2Pitch,
-            PhotonConstants.camera2Yaw));
-
-    photonPoseEstimator1 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        robotToCam1);
-    photonPoseEstimator2 = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        robotToCam2);
-
     // Setup cameras to see april tags. Wow! That makes me really happy.
     camera1 = new PhotonCamera(PhotonConstants.kCamera1);
     camera2 = new PhotonCamera(PhotonConstants.kCamera2);
 
-    if (RobotBase.isSimulation()) {
-      SimCameraProperties camera1Properties = new SimCameraProperties();
-      SimCameraProperties camera2Properties = new SimCameraProperties();
+    // Log april tag poses to logger
+    FieldConstants.kfieldLayout.getTags()
+        .forEach((tag) -> Logger.recordOutput("FieldLayout/AprilTags/" + tag.ID, tag.pose));
 
-      camera1Properties.setCalibration(1280, 720, Rotation2d.fromDegrees(49));
-      camera1Properties.setFPS(30);
-      camera1Properties.setAvgLatencyMs(35);
-      camera1Properties.setLatencyStdDevMs(5);
-
-      camera2Properties.setCalibration(1280, 720, Rotation2d.fromDegrees(59));
-      camera2Properties.setFPS(30);
-      camera2Properties.setAvgLatencyMs(35);
-      camera2Properties.setLatencyStdDevMs(5);
-
-      camera1Sim = new PhotonCameraSim(camera1, camera1Properties);
-      camera2Sim = new PhotonCameraSim(camera2, camera2Properties);
-
-      camera1Sim.enableProcessedStream(true);
-      camera2Sim.enableProcessedStream(true);
-
-      visionSim = new VisionSystemSim("main");
-
-      try {
-        AprilTagFieldLayout tagLayout = AprilTagFieldLayout
-            .loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
-        visionSim.addAprilTags(tagLayout);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-
-      visionSim.addCamera(camera1Sim, robotToCam1);
-      visionSim.addCamera(camera2Sim, robotToCam2);
-
-      camera1 = camera1Sim.getCamera();
-      camera2 = camera2Sim.getCamera();
-    } else {
-      camera1Sim = null;
-      camera2Sim = null;
-      visionSim = null;
-    }
+    photonPoseEstimator1 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
+        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+        PhotonConstants.kRobotToCam1);
+    photonPoseEstimator2 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
+        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+        PhotonConstants.kRobotToCam2);
   }
 
   /**
@@ -261,53 +208,61 @@ public class Drivetrain extends SubsystemBase {
       visionSim.update(swerveDriveSimulation.getSimulatedDriveTrainPose());
     }
 
-    Optional<EstimatedRobotPose> visionPose1 = getEstimatedGlobalPose1(pose);
-    Optional<EstimatedRobotPose> visionPose2 = getEstimatedGlobalPose2(pose);
+    photonPoseEstimator1.addHeadingData(Timer.getFPGATimestamp(), gyroAngle);
+    photonPoseEstimator2.addHeadingData(Timer.getFPGATimestamp(), gyroAngle);
+    photonPoseEstimator1.setReferencePose(pose);
+    photonPoseEstimator2.setReferencePose(pose);
+
+    List<EstimatedRobotPose> visionPoses1 = getEstimatedGlobalPose1(pose);
+    List<EstimatedRobotPose> visionPoses2 = getEstimatedGlobalPose2(pose);
 
     hasVisionData = false;
-    if (visionPose1.isPresent()) {
-      Logger.recordOutput("Vision/Photon1/EstimatedPose", visionPose1.get().estimatedPose);
+    List<Integer> fiducialIds1 = new ArrayList<>();
+    List<Integer> fiducialIds2 = new ArrayList<>();
+    for (EstimatedRobotPose visionPose1 : visionPoses1) {
+      Logger.recordOutput("Vision/" + camera1.getName() + "/EstimatedPose", visionPose1.estimatedPose);
 
-      // Logging targets
-      List<Integer> fiducialIds = new ArrayList<>();
-      for (PhotonTrackedTarget target : visionPose1.get().targetsUsed) {
-        fiducialIds.add((Integer) target.fiducialId);
+      // Add targets to list
+      for (PhotonTrackedTarget target : visionPose1.targetsUsed) {
+        fiducialIds1.add(target.fiducialId);
       }
-      Logger.recordOutput("Vision/Photon1/TargetsUsed", fiducialIds.toString());
 
-      Pose3d visionPose = visionPose1.get().estimatedPose;
+      Pose3d visionPose = visionPose1.estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getZ()));
-      odometry.addVisionMeasurement(estimatedPose, visionPose1.get().timestampSeconds);
-      Logger.recordOutput("Vision/Photon1/Timestamp", visionPose1.get().timestampSeconds);
+      odometry.addVisionMeasurement(estimatedPose, visionPose1.timestampSeconds);
+      Logger.recordOutput("Vision/" + camera1.getName() + "/Timestamp", visionPose1.timestampSeconds);
       hasVisionData = true;
-    } else {
-      Logger.recordOutput("Vision/Photon1/TargetsUsed", "No targets");
-      Logger.recordOutput("Vision/Photon1/EstimatedPose", new Pose3d());
-      Logger.recordOutput("Vision/Photon1/Timestamp", -1.0);
     }
-    if (visionPose2.isPresent()) {
-      Logger.recordOutput("Vision/Photon2/EstimatedPose", visionPose2.get().estimatedPose);
+    if (visionPoses1.isEmpty()) {
+      Logger.recordOutput("Vision/" + camera1.getName() + "/EstimatedPose", new Pose3d(-1, -1, -1, new Rotation3d()));
+      Logger.recordOutput("Vision/" + camera1.getName() + "/Timestamp", -1.0);
+    }
 
-      // Logging targets
-      List<Integer> fiducialIds = new ArrayList<>();
-      for (PhotonTrackedTarget target : visionPose1.get().targetsUsed) {
-        fiducialIds.add((Integer) target.fiducialId);
+    for (EstimatedRobotPose visionPose2 : visionPoses2) {
+      Logger.recordOutput("Vision/" + camera2.getName() + "/EstimatedPose", visionPose2.estimatedPose);
+
+      // Add targets to list
+      for (PhotonTrackedTarget target : visionPose2.targetsUsed) {
+        fiducialIds2.add(target.fiducialId);
       }
-      Logger.recordOutput("Vision/Photon1/TargetsUsed", fiducialIds.toString());
 
-      Pose3d visionPose = visionPose2.get().estimatedPose;
+      Pose3d visionPose = visionPose2.estimatedPose;
       Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
           new Rotation2d(visionPose.getRotation().getZ()));
-      odometry.addVisionMeasurement(estimatedPose, visionPose2.get().timestampSeconds);
-      Logger.recordOutput("Vision/Photon2/Timestamp", visionPose2.get().timestampSeconds);
+      odometry.addVisionMeasurement(estimatedPose, visionPose2.timestampSeconds);
+      Logger.recordOutput("Vision/" + camera2.getName() + "/Timestamp", visionPose2.timestampSeconds);
       hasVisionData = true;
-    } else {
-      Logger.recordOutput("Vision/Photon2/TargetsUsed", "No targets");
-      Logger.recordOutput("Vision/Photon2/EstimatedPose", new Pose3d());
-      Logger.recordOutput("Vision/Photon2/Timestamp", -1.0);
+    }
+    if (visionPoses2.isEmpty()) {
+      Logger.recordOutput("Vision/" + camera2.getName() + "/EstimatedPose", new Pose3d());
+      Logger.recordOutput("Vision/" + camera2.getName() + "/Timestamp", -1.0);
     }
     SmartDashboard.putBoolean("HasVision", hasVisionData);
+
+    // Log april tags to the logger
+    Logger.recordOutput("Vision/" + camera1.getName() + "/TargetIds", fiducialIds1.toString());
+    Logger.recordOutput("Vision/" + camera2.getName() + "/TargetIds", fiducialIds2.toString());
 
     // Log the current pose to the logger
     Logger.recordOutput("Odometry/WithVisionInput", pose);
@@ -337,11 +292,9 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Distance to Barge", distanceToBarge);
     SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBarge);
 
-    SmartDashboard.putBoolean("FarFromBargeLaunchingRange",
-        xDistanceToBarge > LaunchingDistances.kMetersFromBarge);
-    SmartDashboard.putBoolean("WithinBargeLaunchingRange",
-        MathUtil.isNear(xDistanceToBarge, LaunchingDistances.kMetersFromBarge,
-            LaunchingDistances.kToleranceMetersFromBarge));
+    SmartDashboard.putBoolean("FarFromBargeLaunchingRange", xDistanceToBarge > LaunchingDistances.kMetersFromBarge);
+    SmartDashboard.putBoolean("WithinBargeLaunchingRange", MathUtil.isNear(xDistanceToBarge,
+        LaunchingDistances.kMetersFromBarge, LaunchingDistances.kToleranceMetersFromBarge));
 
     Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBarge);
     Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBarge);
@@ -350,6 +303,11 @@ public class Drivetrain extends SubsystemBase {
 
     Logger.recordOutput("Drive/GyroDisconnected", gyroDisconnected);
     SmartDashboard.putBoolean("GyroDisconnected", gyroDisconnected);
+
+    // Log which side the robot is on
+    Logger.recordOutput("Odometry/IsOnBlueSide",
+
+        isOnBlueSide());
   }
 
   /**
@@ -450,6 +408,7 @@ public class Drivetrain extends SubsystemBase {
 
   public void setOdometry(Pose2d pose) {
     odometry.resetPosition(gyro.getRotation2d(), getModulePositions(), pose);
+    visionlessOdometry.resetPosition(gyro.getRotation2d(), getModulePositions(), pose);
   }
 
   public void resetOdometry() {
@@ -483,14 +442,166 @@ public class Drivetrain extends SubsystemBase {
     return new Pose2d(x, y, rot);
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose1(Pose2d prevEstimatedRobotPose) {
-    photonPoseEstimator1.setReferencePose(prevEstimatedRobotPose);
-    return photonPoseEstimator1.update(camera1.getLatestResult());
+  public List<EstimatedRobotPose> getEstimatedGlobalPose(PhotonPoseEstimator poseEstimator, PhotonCamera camera,
+      Transform3d robotToCam,
+      Pose2d prevEstimatedRobotPose) {
+    List<EstimatedRobotPose> results = new ArrayList<>();
+    List<PhotonPipelineResult> camResults = camera.getAllUnreadResults();
+
+    for (PhotonPipelineResult camResult : camResults) {
+      if (!camResult.hasTargets()) {
+        continue;
+      }
+
+      // check if the built in pose estimator pose is reasonable
+      Optional<EstimatedRobotPose> optionalEstimation = poseEstimator.update(camResult);
+      if (optionalEstimation.isPresent()) {
+        EstimatedRobotPose estimation = optionalEstimation.get();
+
+        Logger.recordOutput("Vision/" + camera.getName() + "/RawEstimatedPose", estimation.estimatedPose);
+
+        if (isInField(estimation.estimatedPose) &&
+            isOnGround(estimation.estimatedPose)) {
+
+          // ignore the result if it only has one tag and the tag is too small
+          if (camResult.getTargets().size() == 1
+              && camResult.getTargets().get(0).area <= PhotonConstants.kMinSingleTagArea) {
+            continue;
+          }
+
+          results.add(estimation);
+          continue;
+        }
+      }
+
+      double timestamp = camResult.getTimestampSeconds();
+      List<PhotonTrackedTarget> targetsUsed = new ArrayList<>();
+
+      // if the built in pose estimator is not reasonable, compute it ourselves
+      if (camResult.hasTargets()) {
+        List<PhotonTrackedTarget> targets = camResult.getTargets();
+        List<Pose3d> validPoses = new ArrayList<>();
+        for (PhotonTrackedTarget target : targets) {
+
+          // ignore targets with high pose ambiguity
+          if (target.getPoseAmbiguity() > PhotonConstants.kAmbiguityDiscardThreshold) {
+            continue;
+          }
+
+          int targetId = target.fiducialId;
+          Optional<Pose3d> optionalTagPose = FieldConstants.kfieldLayout.getTagPose(targetId);
+          // it should never be empty, but just in case
+          if (optionalTagPose.isEmpty()) {
+            continue;
+          }
+          Pose3d tagPose = optionalTagPose.get();
+
+          // if the ambiguity is high, only use the pose that is reasonable
+          if (target.getPoseAmbiguity() > PhotonConstants.kAmbiguityThreshold) {
+            Transform3d bestCamToTarget = target.getBestCameraToTarget();
+            Transform3d altCamToTarget = target.getAlternateCameraToTarget();
+
+            // robotTransform = tagTransform - camToTarget - robotToCam
+            Pose3d bestRobotPose = tagPose.transformBy(bestCamToTarget.inverse())
+                .transformBy(robotToCam.inverse());
+            Pose3d altRobotPose = tagPose.transformBy(altCamToTarget.inverse()).transformBy(robotToCam.inverse());
+
+            Logger.recordOutput("Vision/" + camera.getName() + "/FallbackBestPose", bestRobotPose);
+            Logger.recordOutput("Vision/" + camera.getName() + "/FallbackAltPose", altRobotPose);
+
+            // check if they are reasonable
+            boolean isBestPoseValid = isInField(bestRobotPose) &&
+                isOnGround(bestRobotPose);
+            boolean isAltPoseValid = isInField(altRobotPose) && isOnGround(altRobotPose);
+            if (isBestPoseValid && isAltPoseValid) {
+              targetsUsed.add(target);
+              // if both are valid, use the one that is closer to the previous estimation
+              double bestDistance = distanceBetween(bestRobotPose, new Pose3d(prevEstimatedRobotPose));
+              double altDistance = distanceBetween(altRobotPose, new Pose3d(prevEstimatedRobotPose));
+              if (bestDistance < altDistance) {
+                validPoses.add(bestRobotPose);
+              } else {
+                validPoses.add(altRobotPose);
+              }
+            } else if (isBestPoseValid) {
+              targetsUsed.add(target);
+              validPoses.add(bestRobotPose);
+            } else if (isAltPoseValid) {
+              targetsUsed.add(target);
+              validPoses.add(altRobotPose);
+            }
+            continue;
+          }
+
+          // if the ambiguity is low, use the pose directly
+          Transform3d camToTarget = target.getBestCameraToTarget();
+          // robotTransform = tagTransform - camToTarget - robotToCam
+          Pose3d robotPose = tagPose.transformBy(camToTarget.inverse()).transformBy(robotToCam.inverse());
+          // check if the pose is reasonable
+          if (isInField(robotPose) && isOnGround(robotPose)) {
+            validPoses.add(robotPose);
+            targetsUsed.add(target);
+          }
+        }
+
+        // if there are no valid poses, ignore this frame
+        if (validPoses.isEmpty()) {
+          continue;
+        }
+
+        double totalX = 0;
+        double totalY = 0;
+        double totalZRot = 0;
+
+        for (Pose3d pose : validPoses) {
+          totalX += pose.getX();
+          totalY += pose.getY();
+
+          totalZRot += pose.getRotation().getZ();
+        }
+
+        final int count = validPoses.size();
+        Pose3d averagePose = new Pose3d(
+            totalX / count, // X average
+            totalY / count, // Y average
+            0, // Z forced to 0 (validated by isOnGround)
+            new Rotation3d(0, 0, totalZRot / count) // Average Z rotation
+        );
+
+        Logger.recordOutput("Vision/" + camera.getName() + "/FallbackPose", averagePose);
+
+        // ignore the result if it only has one tag and the tag is too small
+        if (camResult.getTargets().size() == 1
+            && camResult.getTargets().get(0).area <= PhotonConstants.kMinSingleTagArea) {
+          continue;
+        }
+        results
+            .add(new EstimatedRobotPose(averagePose, timestamp, targetsUsed,
+                PoseStrategy.CLOSEST_TO_REFERENCE_POSE));
+      }
+    }
+    return results;
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
-    photonPoseEstimator2.setReferencePose(prevEstimatedRobotPose);
-    return photonPoseEstimator2.update(camera2.getLatestResult());
+  public List<EstimatedRobotPose> getEstimatedGlobalPose1(Pose2d prevEstimatedRobotPose) {
+    return getEstimatedGlobalPose(photonPoseEstimator1, camera1, PhotonConstants.kRobotToCam1, prevEstimatedRobotPose);
+  }
+
+  public List<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
+    return getEstimatedGlobalPose(photonPoseEstimator2, camera2, PhotonConstants.kRobotToCam2, prevEstimatedRobotPose);
+  }
+
+  public boolean isInField(Pose3d pose) {
+    return pose.getX() >= 0 && pose.getX() <= FieldConstants.kFieldLengthX && pose.getY() >= 0
+        && pose.getY() <= FieldConstants.kFieldWidthY;
+  }
+
+  public boolean isOnGround(Pose3d pose) {
+    return pose.getZ() <= PhotonConstants.kHeightTolerance && pose.getZ() >= -PhotonConstants.kHeightTolerance;
+  }
+
+  public double distanceBetween(Pose3d pose1, Pose3d pose2) {
+    return Math.sqrt(Math.pow(pose1.getX() - pose2.getX(), 2) + Math.pow(pose1.getY() - pose2.getY(), 2));
   }
 
   public boolean isOnBlueSide() {

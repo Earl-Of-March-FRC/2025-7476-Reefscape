@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.Vision.PhotonConstants;
 
 public class AlgaeSubsystem extends SubsystemBase {
   // private Drivetrain drivetrain;
@@ -61,7 +62,7 @@ public class AlgaeSubsystem extends SubsystemBase {
 
     PhotonTrackedTarget target = result.getBestTarget();
     double targetYaw = target.getYaw();
-    Transform3d robotToAlgae = target.bestCameraToTarget.plus(Constants.Vision.PhotonConstants.robotToCamera);
+    Transform3d robotToAlgae = target.bestCameraToTarget.plus(PhotonConstants.kRobotToCam1);
 
     SmartDashboard.putBoolean("Algae Detected",
         targetYaw < Constants.Vision.AlgaeConstants.kUpperBound
