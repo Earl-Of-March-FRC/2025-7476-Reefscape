@@ -32,7 +32,7 @@ public class Launcher extends SubsystemBase {
   private final SparkClosedLoopController backLauncherClosedLoopController;
 
   private double frontReferenceVelocity = 0.0;
-  private double backReferenveVelocity = 0.0;
+  private double backReferenceVelocity = 0.0;
 
   /**
    * Constructs a new LauncherSubsystem and configures the launcher motors.
@@ -137,7 +137,7 @@ public class Launcher extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setBackReferenceVelocity(double referenceVelocity) {
-    backReferenveVelocity = referenceVelocity;
+    backReferenceVelocity = referenceVelocity;
     Logger.recordOutput("Launcher/Back/Setpoint/Velocity", referenceVelocity);
 
     // Converts RPM to radians per second
@@ -180,7 +180,7 @@ public class Launcher extends SubsystemBase {
   }
 
   public boolean backRollerAtSetpoint() {
-    return MathUtil.isNear(backReferenveVelocity, getBackVelocity() / LauncherConstants.kVelocityConversionFactor,
+    return MathUtil.isNear(backReferenceVelocity, getBackVelocity() / LauncherConstants.kVelocityConversionFactor,
         LauncherConstants.kVelocityBackTolerance);
   }
 }
