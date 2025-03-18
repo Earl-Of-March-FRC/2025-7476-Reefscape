@@ -33,9 +33,6 @@ public class ArmSubsystem extends SubsystemBase {
   public double armOffset = 0;
   public double currentSetpoint;
   public boolean pidRunning = false;
-  // Starting angle of the arm, in radians
-  // Ex: arm starting position is 1 radian, then m_armAngularOffset is 1
-  private double m_armAngularOffset = 0;
 
   /**
    * The constructor for the ArmSubsystem class configures the arm motor.
@@ -82,7 +79,7 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public double getPosition() {
     // Adds the angular offset
-    return armEncoder.getPosition() + m_armAngularOffset;
+    return armEncoder.getPosition();
   }
 
   /**
@@ -111,7 +108,7 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public void setReferencePosition(double referenceAngle) {
     // Convert to radians, then subtract angular offset
-    double refAngleWithOffset = referenceAngle * ArmConstants.kAngleConversionFactor - m_armAngularOffset;
+    double refAngleWithOffset = referenceAngle * ArmConstants.kAngleConversionFactor;
     currentSetpoint = refAngleWithOffset;
     // Determine whether arm needs to move up or down
     // ClosedLoopSlot closedLoopSlot;
@@ -131,7 +128,7 @@ public class ArmSubsystem extends SubsystemBase {
     Logger.recordOutput("Arm/Setpoint/Position",
         new Rotation2d(referenceAngle * ArmConstants.kAngleConversionFactor));
     armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition,
-        ClosedLoopSlot.kSlot0, ArmConstants.kGainFF * Math.sin(getPosition() - m_armAngularOffset));
+        ClosedLoopSlot.kSlot0, ArmConstants.kGainFF * Math.sin(getPosition()));
   }
 
   /**
