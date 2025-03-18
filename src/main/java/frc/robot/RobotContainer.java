@@ -99,6 +99,7 @@ public class RobotContainer {
 
     armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType),
         ArmConstants.kLimitSwitchChannel);
+    armSub.calibrate();
 
     intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
 

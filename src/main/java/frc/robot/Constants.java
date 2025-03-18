@@ -180,6 +180,9 @@ public final class Constants {
     // Tolerance of arm position PID in degrees
     public static final double kAngleTolerance = 3;
 
+    // Arm starting position in degrees
+    public static final double kAngleStart = 0;
+
     // Angles need to be set in degrees
     public static final double kAngleStowed = -6.5;
     public static final double kAngleGroundIntake = -60.5;

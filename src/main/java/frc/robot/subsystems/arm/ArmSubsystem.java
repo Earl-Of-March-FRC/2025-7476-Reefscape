@@ -149,6 +149,13 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   /**
+   * Calibrates the arm encoder to the starting angle.
+   */
+  public void calibrate() {
+    armEncoder.setPosition(ArmConstants.kAngleStart);
+  }
+
+  /**
    * Check if the calibration limit switches are triggered.
    * 
    * @return {@code true} if the limit switch is pressed, {@code false} if not.
