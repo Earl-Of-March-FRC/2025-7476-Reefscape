@@ -96,18 +96,16 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
     targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
 
     // Calculate target rotation
-    targetRadians = onBlueSide ? Math.PI : 0;
-
     // For both alliances, 0 rad points away from our driver station
-    // if (DriverStation.getAlliance().isPresent()) {
-    // Alliance alliance = DriverStation.getAlliance().get();
+    if (DriverStation.getAlliance().isPresent()) {
+      Alliance alliance = DriverStation.getAlliance().get();
 
-    // // Check if robot is currently on the same side of field as the alliance
-    // // If yes, then target angle is 0 rad; otherwise, pi rad
-    // targetRadians = (onBlueSide == (alliance == Alliance.Blue)) ? 0 : Math.PI;
-    // } else {
-    // targetRadians = currentPose.getRotation().getRadians();
-    // }
+      // Check if robot is currently on the same side of field as the alliance
+      // If yes, then target angle is 0 rad; otherwise, pi rad
+      targetRadians = (onBlueSide == (alliance == Alliance.Blue)) ? 0 : Math.PI;
+    } else {
+      targetRadians = currentPose.getRotation().getRadians();
+    }
 
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/CurrentPose",
         currentPose);
