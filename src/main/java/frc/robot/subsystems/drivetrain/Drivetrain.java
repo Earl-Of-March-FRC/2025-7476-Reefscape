@@ -15,6 +15,9 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -26,6 +29,8 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
@@ -35,6 +40,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -165,10 +171,6 @@ public class Drivetrain extends SubsystemBase {
         },
         this);
 
-    // Setup cameras to see april tags. Wow! That makes me really happy.
-    camera1 = new PhotonCamera(PhotonConstants.kCamera1);
-    camera2 = new PhotonCamera(PhotonConstants.kCamera2);
-
     // Log april tag poses to logger
     FieldConstants.kfieldLayout.getTags()
         .forEach((tag) -> Logger.recordOutput("FieldLayout/AprilTags/" + tag.ID, tag.pose));
@@ -179,6 +181,51 @@ public class Drivetrain extends SubsystemBase {
     photonPoseEstimator2 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         PhotonConstants.kRobotToCam2);
+
+    // Setup cameras to see april tags. Wow! That makes me really happy.
+    camera1 = new PhotonCamera(PhotonConstants.kCamera1);
+    camera2 = new PhotonCamera(PhotonConstants.kCamera2);
+
+    if (RobotBase.isSimulation()) {
+      SimCameraProperties camera1Properties = new SimCameraProperties();
+      SimCameraProperties camera2Properties = new SimCameraProperties();
+
+      camera1Properties.setCalibration(1280, 720, Rotation2d.fromDegrees(49));
+      camera1Properties.setFPS(30);
+      camera1Properties.setAvgLatencyMs(35);
+      camera1Properties.setLatencyStdDevMs(5);
+
+      camera2Properties.setCalibration(1280, 720, Rotation2d.fromDegrees(59));
+      camera2Properties.setFPS(30);
+      camera2Properties.setAvgLatencyMs(35);
+      camera2Properties.setLatencyStdDevMs(5);
+
+      camera1Sim = new PhotonCameraSim(camera1, camera1Properties);
+      camera2Sim = new PhotonCameraSim(camera2, camera2Properties);
+
+      camera1Sim.enableProcessedStream(true);
+      camera2Sim.enableProcessedStream(true);
+
+      visionSim = new VisionSystemSim("main");
+
+      try {
+        AprilTagFieldLayout tagLayout = AprilTagFieldLayout
+            .loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
+        visionSim.addAprilTags(tagLayout);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+      visionSim.addCamera(camera1Sim, PhotonConstants.kRobotToCam1);
+      visionSim.addCamera(camera2Sim, PhotonConstants.kRobotToCam2);
+
+      camera1 = camera1Sim.getCamera();
+      camera2 = camera2Sim.getCamera();
+    } else {
+      camera1Sim = null;
+      camera2Sim = null;
+      visionSim = null;
+    }
   }
 
   /**
