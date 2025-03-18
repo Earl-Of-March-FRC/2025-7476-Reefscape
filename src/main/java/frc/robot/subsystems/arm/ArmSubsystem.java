@@ -31,7 +31,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final DigitalInput lowerLimitSwitch;
   public boolean isManual = false;
   public double armOffset = 0;
-  public double CurrentSetpoint;
+  public double currentSetpoint;
+  public boolean pidRunning = false;
   // Starting angle of the arm, in radians
   // Ex: arm starting position is 1 radian, then m_armAngularOffset is 1
   private double m_armAngularOffset = 0;
@@ -65,10 +66,13 @@ public class ArmSubsystem extends SubsystemBase {
     Logger.recordOutput("Arm/Measured/LimitSwitch", getLimitSwitch());
     Logger.recordOutput("Arm/Applied/ArmOffset", armOffset);
 
-    if (!isManual) {
-      armClosedLoopController.setReference(CurrentSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0,
-          ArmConstants.kGainFF * Math.sin(getPosition()));
-    }
+    Logger.recordOutput("Arm/Measured/PIDRunning", pidRunning);
+
+    // if (!isManual) {
+    // armClosedLoopController.setReference(currentSetpoint, ControlType.kPosition,
+    // ClosedLoopSlot.kSlot0,
+    // ArmConstants.kGainFF * Math.sin(getPosition() - m_armAngularOffset));
+    // }
   }
 
   /**
@@ -108,25 +112,26 @@ public class ArmSubsystem extends SubsystemBase {
   public void setReferencePosition(double referenceAngle) {
     // Convert to radians, then subtract angular offset
     double refAngleWithOffset = referenceAngle * ArmConstants.kAngleConversionFactor - m_armAngularOffset;
-
+    currentSetpoint = refAngleWithOffset;
     // Determine whether arm needs to move up or down
-    ClosedLoopSlot closedLoopSlot;
+    // ClosedLoopSlot closedLoopSlot;
 
     // If arm needs to move up to reach reference position, use the upward
     // closed-loop controller
     // Note: arm moving upward is in the negative direction
-    if (getPosition() >= refAngleWithOffset) {
-      closedLoopSlot = ClosedLoopSlot.kSlot0;
-    }
+    // if (getPosition() >= refAngleWithOffset) {
+    // closedLoopSlot = ClosedLoopSlot.kSlot0;
+    // }
 
-    // Otherwise, use the downward closed-loop controller
-    else {
-      closedLoopSlot = ClosedLoopSlot.kSlot1;
-    }
+    // // Otherwise, use the downward closed-loop controller
+    // else {
+    // closedLoopSlot = ClosedLoopSlot.kSlot1;
+    // }
 
     Logger.recordOutput("Arm/Setpoint/Position",
         new Rotation2d(referenceAngle * ArmConstants.kAngleConversionFactor));
-    armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition, closedLoopSlot);
+    armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition,
+        ClosedLoopSlot.kSlot0, ArmConstants.kGainFF * Math.sin(getPosition() - m_armAngularOffset));
   }
 
   /**

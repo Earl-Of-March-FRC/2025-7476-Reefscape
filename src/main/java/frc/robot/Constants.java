@@ -162,17 +162,11 @@ public final class Constants {
     public static final MotorType kMotorType = MotorType.kBrushless;
 
     // public static final double kPUpPositionController = 1.5;
-    public static final double kPUpPositionController = 0;
-    public static final double kIUpPositionController = 0;
-    public static final double kDUpPositionController = 0;
-    public static final double kUpPositionFF = 0;
-    public static final double kGainFF = 0;
-
-    // public static final double kPDownPositionController = 1.5;
-    public static final double kPDownPositionController = 0;
-    public static final double kIDownPositionController = 0;
-    public static final double kDDownPositionController = 0;
-    public static final double kDownPositionFF = 0;
+    public static final double kPPositionController = 0.4;
+    public static final double kIPositionController = 0;
+    public static final double kDPositionController = 0;
+    public static final double kPositionFF = 0;
+    public static final double kGainFF = 0.7;
 
     public static final double kGearReduction = 1.0 / 50; // Gear ratio
 
@@ -184,7 +178,7 @@ public final class Constants {
     public static final double kMaxVelocity = 60;
 
     // Tolerance of arm position PID in degrees
-    public static final double kAngleTolerance = 15;
+    public static final double kAngleTolerance = 3;
 
     // Angles need to be set in degrees
     public static final double kAngleStowed = -6.5;
@@ -301,8 +295,10 @@ public final class Constants {
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
-    public static final double kVelocityFront = 2100; // 220 rad/s
-    public static final double kVelocityBack = 2626.056561; // 275 rad/s
+    // public static final double kVelocityFront = 2100; // 220 rad/s
+    // public static final double kVelocityBack = 2626.056561; // 275 rad/s
+    public static final double kVelocityFront = 1957.6058; // 205 rad/s
+    public static final double kVelocityBack = 2482.817112; // 260 rad/s
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
   }

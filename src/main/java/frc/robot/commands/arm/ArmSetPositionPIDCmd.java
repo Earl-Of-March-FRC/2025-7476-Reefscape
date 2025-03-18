@@ -37,13 +37,14 @@ public class ArmSetPositionPIDCmd extends Command {
   public void initialize() {
     armSub.armOffset = 0;
     armSub.isManual = false;
+    armSub.pidRunning = true;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     armSub.setReferencePosition(referenceAngle.getAsDouble());
-    armSub.CurrentSetpoint = referenceAngle.getAsDouble();
+    armSub.currentSetpoint = referenceAngle.getAsDouble();
   }
 
   // Called once the command ends or is interrupted.
@@ -62,6 +63,7 @@ public class ArmSetPositionPIDCmd extends Command {
     // armSub.setReferencePosition(armSub.getPosition() /
     // ArmConstants.kAngleConversionFactor);
     // }
+    armSub.pidRunning = false;
   }
 
   // Returns true when the command should end.
