@@ -46,8 +46,8 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 0.1;
-    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 20;
+    public static final double kBangBangTranslationalVelocityMetersPerSecond = 1;
+    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 10;
 
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
         kMaxAccelerationMetersPerSecondSquaredPathfinding, kMaxAngularSpeedRadiansPerSecond,

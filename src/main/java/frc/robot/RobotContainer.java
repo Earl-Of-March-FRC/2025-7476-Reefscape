@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -174,7 +175,7 @@ public class RobotContainer {
     // DRIVER CONTROLLER
 
     // Drive commands
-    driverController.b().onTrue(new CalibrateCmd(driveSub));
+    driverController.b().onTrue(new CalibrateGyroCmd(driveSub));
     driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneCmd(driveSub));
 
     // Toggle field or robot oriented drive
@@ -203,6 +204,11 @@ public class RobotContainer {
     driverController.rightTrigger().toggleOnTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
             () -> launcherSub.getPreferredBackVelocity()));
+
+    driverController.povUp()
+        .whileTrue(Commands.run(() -> driveSub.runVelocityFieldRelative(new ChassisSpeeds(0.1, 0, 0)), driveSub));
+    driverController.povDown()
+        .whileTrue(Commands.run(() -> driveSub.runVelocityFieldRelative(new ChassisSpeeds(-0.1, 0, 0)), driveSub));
 
     // OPERATOR CONTROLLER
 
