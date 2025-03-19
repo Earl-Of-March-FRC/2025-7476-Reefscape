@@ -264,12 +264,12 @@ public class RobotContainer {
     operatorController.leftBumper().whileTrue(
         Commands.runOnce(() -> {
           armSub.increaseAngularOffset(ArmConstants.kBumpOffsetDeg);
-        }));
+        }, armSub));
 
     operatorController.rightBumper().whileTrue(
         Commands.runOnce(() -> {
           armSub.increaseAngularOffset(-ArmConstants.kBumpOffsetDeg);
-        }));
+        }, armSub));
   }
 
   /**
