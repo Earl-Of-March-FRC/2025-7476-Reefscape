@@ -64,6 +64,7 @@ public class ArmSubsystem extends SubsystemBase {
     Logger.recordOutput("Arm/Applied/ArmOffset", armOffset);
 
     Logger.recordOutput("Arm/Measured/PIDRunning", pidRunning);
+    Logger.recordOutput("Arm/Measured/IsManual", isManual);
 
     // if (!isManual) {
     // armClosedLoopController.setReference(currentSetpoint, ControlType.kPosition,

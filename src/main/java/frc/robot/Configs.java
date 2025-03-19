@@ -83,7 +83,7 @@ public final class Configs {
           // ArmConstants.kIDownPositionController,
           // ArmConstants.kDDownPositionController, ArmConstants.kDownPositionFF,
           // ClosedLoopSlot.kSlot1)
-          .outputRange(-0.5, 0.5);
+          .outputRange(-0.8, 0.8);
     }
   }
 

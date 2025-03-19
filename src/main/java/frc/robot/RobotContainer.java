@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
@@ -205,39 +206,54 @@ public class RobotContainer {
         new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
             () -> launcherSub.getPreferredBackVelocity()));
 
-    driverController.povUp()
-        .whileTrue(Commands.run(() -> driveSub.runVelocityFieldRelative(new ChassisSpeeds(0.1, 0, 0)), driveSub));
-    driverController.povDown()
-        .whileTrue(Commands.run(() -> driveSub.runVelocityFieldRelative(new ChassisSpeeds(-0.1, 0, 0)), driveSub));
-
     // OPERATOR CONTROLLER
 
     // Arm setpoints
-    operatorController.leftTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
-        () -> ArmConstants.kAngleStowed - armSub.armOffset));
+    operatorController.leftTrigger().onTrue(
+        new SequentialCommandGroup(
+            new ArmSetVelocityManualCmd(armSub, () -> 0).withTimeout(0.02), // this makes it work. ✨ magic ✨
+            new ArmSetPositionPIDCmd(armSub,
+                () -> ArmConstants.kAngleStowed - armSub.armOffset)));
     operatorController.povDown().onTrue(
-        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake - armSub.armOffset));
-    operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
-        () -> ArmConstants.kAngleL2 - armSub.armOffset));
-    operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
-        () -> ArmConstants.kAngleL3 - armSub.armOffset));
-    operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
-        () -> ArmConstants.kAngleProcessor - armSub.armOffset));
-    operatorController.rightTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
-        () -> ArmConstants.kAngleCoral - armSub.armOffset));
+        new SequentialCommandGroup(
+            new ArmSetVelocityManualCmd(armSub, () -> 0).withTimeout(0.02), // this makes it work. ✨ magic ✨
+            new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake -
+                armSub.armOffset)));
+    operatorController.povRight().onTrue(
+        new SequentialCommandGroup(
+            new ArmSetVelocityManualCmd(armSub, () -> 0).withTimeout(0.02), // this makes it work. ✨ magic ✨
+            new ArmSetPositionPIDCmd(armSub,
+                () -> ArmConstants.kAngleL2 - armSub.armOffset)));
+    operatorController.povLeft().onTrue(
+        new SequentialCommandGroup(
+            new ArmSetVelocityManualCmd(armSub, () -> 0).withTimeout(0.02), // this makes it work. ✨ magic ✨
+            new ArmSetPositionPIDCmd(armSub,
+                () -> ArmConstants.kAngleL3 - armSub.armOffset)));
+    operatorController.povUp().onTrue(
+        new SequentialCommandGroup(
+            new ArmSetVelocityManualCmd(armSub, () -> 0).withTimeout(0.02), // this makes it work. ✨ magic ✨
+            new ArmSetPositionPIDCmd(armSub,
+                () -> ArmConstants.kAngleProcessor - armSub.armOffset)));
+    operatorController.rightTrigger().onTrue(
+        new SequentialCommandGroup(
+            new ArmSetVelocityManualCmd(armSub, () -> 0).withTimeout(0.02), // this makes it work. ✨ magic ✨
+            new ArmSetPositionPIDCmd(armSub,
+                () -> ArmConstants.kAngleCoral - armSub.armOffset)));
 
     // Indexer command
     operatorController.b().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
 
     // Toggle manual arm control
-    operatorController.axisGreaterThan(OIConstants.kOperatorArmManualAxis, OIConstants.kArmDeadband).onTrue(
-        Commands.runOnce(() -> {
-          armSub.isManual = true;
-        }));
-    operatorController.axisLessThan(OIConstants.kOperatorArmManualAxis, -OIConstants.kArmDeadband).onTrue(
-        Commands.runOnce(() -> {
-          armSub.isManual = true;
-        }));
+    operatorController.axisGreaterThan(OIConstants.kOperatorArmManualAxis,
+        OIConstants.kArmDeadband).onTrue(
+            Commands.runOnce(() -> {
+              armSub.isManual = true;
+            }));
+    operatorController.axisLessThan(OIConstants.kOperatorArmManualAxis,
+        -OIConstants.kArmDeadband).onTrue(
+            Commands.runOnce(() -> {
+              armSub.isManual = true;
+            }));
 
     // Bump arm by 2 degrees
     operatorController.leftBumper().whileTrue(

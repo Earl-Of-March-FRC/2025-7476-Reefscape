@@ -185,10 +185,10 @@ public final class Constants {
 
     // Angles need to be set in degrees
     public static final double kAngleStowed = -6.5;
-    public static final double kAngleGroundIntake = -60.5;
-    public static final double kAngleCoral = -98.5;
-    public static final double kAngleL2 = -108.5;
-    public static final double kAngleL3 = -150.5;
+    public static final double kAngleGroundIntake = -50.5;
+    public static final double kAngleCoral = -93.5;
+    public static final double kAngleL2 = -103.5;
+    public static final double kAngleL3 = -158.5;
     public static final double kAngleProcessor = -186.5;
 
     // Limit switch stuff
