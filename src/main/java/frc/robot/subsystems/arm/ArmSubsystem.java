@@ -63,9 +63,16 @@ public class ArmSubsystem extends SubsystemBase {
     if (usePid) {
       double setpoint = getReferencePosition();
 
+      Logger.recordOutput("Arm/Setpoint/Position",
+          new Rotation2d(setpoint));
+
       double gravityCompensationFFVoltage = ArmConstants.kGainFF * Math.sin(getPosition());
-      armClosedLoopController.setReference(setpoint, ControlType.kPosition,
-          ClosedLoopSlot.kSlot0, gravityCompensationFFVoltage);
+      REVLibError isOk = armClosedLoopController.setReference(
+          setpoint,
+          ControlType.kPosition,
+          ClosedLoopSlot.kSlot0,
+          gravityCompensationFFVoltage);
+      Logger.recordOutput("Arm/Setpoint/PositionOk", isOk);
     }
   }
 
@@ -142,18 +149,21 @@ public class ArmSubsystem extends SubsystemBase {
     usePid = true;
 
     pidReferencePositionDegWithoutOffset = referenceAngleDeg;
-    double offsettedReferenceAngleDeg = referenceAngleDeg + angularOffsetDeg;
+    // double offsettedReferenceAngleDeg = referenceAngleDeg + angularOffsetDeg;
 
-    // Convert deg -> rad
-    double refAngleRad = offsettedReferenceAngleDeg * ArmConstants.kAngleConversionFactor;
+    // // Convert deg -> rad
+    // double refAngleRad = offsettedReferenceAngleDeg *
+    // ArmConstants.kAngleConversionFactor;
 
-    double gravityCompensationFFVoltage = ArmConstants.kGainFF * Math.sin(getPosition());
+    // double gravityCompensationFFVoltage = ArmConstants.kGainFF *
+    // Math.sin(getPosition());
 
-    Logger.recordOutput("Arm/Setpoint/Position",
-        new Rotation2d(refAngleRad));
-    REVLibError isOk = armClosedLoopController.setReference(refAngleRad, ControlType.kPosition,
-        ClosedLoopSlot.kSlot0, gravityCompensationFFVoltage);
-    Logger.recordOutput("Arm/Setpoint/PositionOk", isOk);
+    // Logger.recordOutput("Arm/Setpoint/Position",
+    // new Rotation2d(refAngleRad));
+    // REVLibError isOk = armClosedLoopController.setReference(refAngleRad,
+    // ControlType.kPosition,
+    // ClosedLoopSlot.kSlot0, gravityCompensationFFVoltage);
+    // Logger.recordOutput("Arm/Setpoint/PositionOk", isOk);
   }
 
   /**
