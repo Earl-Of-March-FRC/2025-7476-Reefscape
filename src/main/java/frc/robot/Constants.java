@@ -194,6 +194,7 @@ public final class Constants {
 
     // Arm PID fine control bump offsets
     public static final double kBumpOffsetDeg = 2;
+    public static final double kMaxArmManualSpeedPercent = 0.5;
 
     // Limit switch stuff
     public static final int kLimitSwitchChannel = 9;
