@@ -162,7 +162,7 @@ public class RobotContainer {
     armSub.setDefaultCommand(
         new ArmSetVelocityManualCmd(armSub, () -> MathUtil.applyDeadband(
             operatorController.getRawAxis(OIConstants.kOperatorArmManualAxis) * 0.5,
-            armSub.getIsUsingPid() ? OIConstants.kArmDeadband : OIConstants.kArmManualDeadband)));
+            armSub.getIsUsingPid() ? OIConstants.kArmManualDeadband : OIConstants.kArmDeadband)));
 
     // Manual intake (arm roller) control with
     intakeSub.setDefaultCommand(
