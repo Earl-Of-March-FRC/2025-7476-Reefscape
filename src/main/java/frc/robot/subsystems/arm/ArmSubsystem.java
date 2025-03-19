@@ -6,6 +6,7 @@ package frc.robot.subsystems.arm;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -29,7 +30,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkClosedLoopController armClosedLoopController;
   private boolean usePid = true;
   private double angularOffsetDeg = 0;
-  private double pidReferencePositionRad;
+  private double pidReferencePositionDegWithoutOffset;
 
   /**
    * The constructor for the ArmSubsystem class configures the arm motor.
@@ -55,13 +56,15 @@ public class ArmSubsystem extends SubsystemBase {
     // Convert radians per second to RPM
     Logger.recordOutput("Arm/Measured/Velocity", getVelocity() / ArmConstants.kVelocityConversionFactor);
 
-    Logger.recordOutput("Arm/AngularOffset", Rotation2d.fromDegrees(angularOffsetDeg));
+    Logger.recordOutput("Arm/Setpoint/AngularOffset", Rotation2d.fromDegrees(angularOffsetDeg));
 
     Logger.recordOutput("Arm/UsePid", usePid);
 
     if (usePid) {
+      double setpoint = getReferencePosition();
+
       double gravityCompensationFFVoltage = ArmConstants.kGainFF * Math.sin(getPosition());
-      armClosedLoopController.setReference(pidReferencePositionRad, ControlType.kPosition,
+      armClosedLoopController.setReference(setpoint, ControlType.kPosition,
           ClosedLoopSlot.kSlot0, gravityCompensationFFVoltage);
     }
   }
@@ -138,27 +141,31 @@ public class ArmSubsystem extends SubsystemBase {
   public void setReferencePosition(double referenceAngleDeg) {
     usePid = true;
 
+    pidReferencePositionDegWithoutOffset = referenceAngleDeg;
     double offsettedReferenceAngleDeg = referenceAngleDeg + angularOffsetDeg;
 
     // Convert deg -> rad
     double refAngleRad = offsettedReferenceAngleDeg * ArmConstants.kAngleConversionFactor;
-    pidReferencePositionRad = refAngleRad;
 
     double gravityCompensationFFVoltage = ArmConstants.kGainFF * Math.sin(getPosition());
 
     Logger.recordOutput("Arm/Setpoint/Position",
         new Rotation2d(refAngleRad));
-    armClosedLoopController.setReference(refAngleRad, ControlType.kPosition,
+    REVLibError isOk = armClosedLoopController.setReference(refAngleRad, ControlType.kPosition,
         ClosedLoopSlot.kSlot0, gravityCompensationFFVoltage);
+    Logger.recordOutput("Arm/Setpoint/PositionOk", isOk);
   }
 
   /**
-   * Returns the reference position for the arm closed loop controller.
+   * Returns the setpoint, including offset for the arm closed loop controller.
    * 
    * @return double The reference angle, in radians.
    */
   public double getReferencePosition() {
-    return pidReferencePositionRad;
+    double offsettedReferenceAngleDeg = pidReferencePositionDegWithoutOffset + angularOffsetDeg;
+
+    // Convert deg -> rad
+    return offsettedReferenceAngleDeg * ArmConstants.kAngleConversionFactor;
   }
 
   /**
