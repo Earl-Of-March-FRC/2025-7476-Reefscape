@@ -62,7 +62,7 @@ public class RobotContainer {
   public final Drivetrain driveSub;
   public final Gyro gyro;
 
-  private final ArmSubsystem armSub;
+  public final ArmSubsystem armSub;
   private final IntakeSubsystem intakeSub;
   private final Indexer indexerSub;
   private final Launcher launcherSub;
@@ -210,47 +210,17 @@ public class RobotContainer {
 
     // Arm setpoints
     operatorController.leftTrigger().onTrue(
-        new SequentialCommandGroup(
-            new ArmSetVelocityManualCmd(armSub, () -> 0, true).withTimeout(0.1), // this makes it work. ✨ magic ✨
-            new ArmSetPositionPIDCmd(armSub,
-                () -> ArmConstants.kAngleStowed)));
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleStowed));
     operatorController.povDown().onTrue(
-        new SequentialCommandGroup(
-            new ArmSetVelocityManualCmd(armSub, () -> 0, true).withTimeout(0.1), // this makes it work. ✨ magic ✨
-            new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake)));
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake));
     operatorController.povRight().onTrue(
-        new SequentialCommandGroup(
-            new ArmSetVelocityManualCmd(armSub, () -> 0, true).withTimeout(0.1), // this makes it work. ✨ magic ✨
-            new ArmSetPositionPIDCmd(armSub,
-                () -> ArmConstants.kAngleL2)));
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL2));
     operatorController.povLeft().onTrue(
-        new SequentialCommandGroup(
-            new ArmSetVelocityManualCmd(armSub, () -> 0, true).withTimeout(0.1), // this makes it work. ✨ magic ✨
-            new ArmSetPositionPIDCmd(armSub,
-                () -> ArmConstants.kAngleL3)));
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL3));
     operatorController.povUp().onTrue(
-        new SequentialCommandGroup(
-            new ArmSetVelocityManualCmd(armSub, () -> 0, true).withTimeout(0.1), // this makes it work. ✨ magic ✨
-            new ArmSetPositionPIDCmd(armSub,
-                () -> ArmConstants.kAngleProcessor)));
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleProcessor));
     operatorController.rightTrigger().onTrue(
-        new SequentialCommandGroup(
-            new ArmSetVelocityManualCmd(armSub, () -> 0, true).withTimeout(0.1), // this makes it work. ✨ magic ✨
-            new ArmSetPositionPIDCmd(armSub,
-                () -> ArmConstants.kAngleCoral)));
-
-    // operatorController.leftTrigger().onTrue(
-    // new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleStowed));
-    // operatorController.povDown().onTrue(
-    // new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake));
-    // operatorController.povRight().onTrue(
-    // new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL2));
-    // operatorController.povLeft().onTrue(
-    // new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL3));
-    // operatorController.povUp().onTrue(
-    // new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleProcessor));
-    // operatorController.rightTrigger().onTrue(
-    // new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleCoral));
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleCoral));
 
     // Indexer command
     operatorController.b().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
@@ -258,12 +228,12 @@ public class RobotContainer {
     // Bump arm setpoints
     operatorController.leftBumper().whileTrue(
         Commands.runOnce(() -> {
-          armSub.increaseAngularOffset(ArmConstants.kBumpOffsetDeg);
+          armSub.increaseAngularOffset(-ArmConstants.kBumpOffsetDeg);
         }, armSub));
 
     operatorController.rightBumper().whileTrue(
         Commands.runOnce(() -> {
-          armSub.increaseAngularOffset(-ArmConstants.kBumpOffsetDeg);
+          armSub.increaseAngularOffset(ArmConstants.kBumpOffsetDeg);
         }, armSub));
   }
 
