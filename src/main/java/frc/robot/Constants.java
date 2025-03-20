@@ -84,7 +84,7 @@ public final class Constants {
     public static final boolean kGyroReversed = false;
 
     public static class LaunchingDistances {
-      public static final double kMetersFromBarge = 1.3;
+      public static final double kMetersFromBarge = 1.18; // 1.30 before March 20
       public static final double kToleranceMetersFromBarge = 0.1;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
     }
