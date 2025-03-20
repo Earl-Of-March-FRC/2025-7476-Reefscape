@@ -6,13 +6,13 @@ package frc.robot.commands.arm;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
 /**
  * This command uses closed-loop control to move the arm to the desired angle.
  */
-public class ArmSetPositionPIDCmd extends Command {
+public class ArmSetPositionPIDCmd extends InstantCommand {
 
   private ArmSubsystem armSub;
   private DoubleSupplier referenceAngle;
@@ -32,43 +32,9 @@ public class ArmSetPositionPIDCmd extends Command {
     addRequirements(armSub);
   }
 
-  // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSub.armOffset = 0;
-    armSub.isManual = false;
-    armSub.pidRunning = true;
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
+    armSub.clearOffset();
     armSub.setReferencePosition(referenceAngle.getAsDouble());
-    armSub.currentSetpoint = referenceAngle.getAsDouble();
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-
-    // If the command has been interrupted before the arm has reached its setpoint,
-    // then set the current arm angle as the new reference angle using position PID
-    // If it has already reached the setpoint, it should continue holding its
-    // current position
-    // if (Math.abs(
-    // referenceAngle - armSub.getPosition() / ArmConstants.kAngleConversionFactor)
-    // > ArmConstants.kAngleTolerance) {
-
-    // // Convert the current position to degrees
-    // armSub.setReferencePosition(armSub.getPosition() /
-    // ArmConstants.kAngleConversionFactor);
-    // }
-    armSub.pidRunning = false;
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return armSub.isManual;
   }
 }

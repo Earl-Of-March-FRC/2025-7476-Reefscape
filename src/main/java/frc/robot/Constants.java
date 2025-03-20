@@ -117,6 +117,7 @@ public final class Constants {
 
     public static final int kOperatorControllerPort = 1;
     public static final double kArmDeadband = 0.1;
+    public static final double kArmManualDeadband = 0.5;
     public static final int kOperatorArmManualAxis = 1;
     public static final double kIntakeDeadband = 0.5;
     public static final int kOperatorIntakeManualAxis = 5;
@@ -162,7 +163,7 @@ public final class Constants {
     public static final MotorType kMotorType = MotorType.kBrushless;
 
     // public static final double kPUpPositionController = 1.5;
-    public static final double kPPositionController = 0.4;
+    public static final double kPPositionController = 0.5;
     public static final double kIPositionController = 0;
     public static final double kDPositionController = 0;
     public static final double kPositionFF = 0;
@@ -190,6 +191,10 @@ public final class Constants {
     public static final double kAngleL2 = -103.5;
     public static final double kAngleL3 = -158.5;
     public static final double kAngleProcessor = -186.5;
+
+    // Arm PID fine control bump offsets
+    public static final double kBumpOffsetDeg = 2;
+    public static final double kMaxArmManualSpeedPercent = 0.5;
 
     // Limit switch stuff
     public static final int kLimitSwitchChannel = 9;

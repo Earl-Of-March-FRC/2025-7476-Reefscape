@@ -66,7 +66,7 @@ public final class Configs {
 
       armConfig
           .idleMode(IdleMode.kBrake) // Set to kBrake to hold position when not moving
-          .smartCurrentLimit(30); // Adjust current limit as needed
+          .smartCurrentLimit(40); // Adjust current limit as needed
 
       armConfig.encoder
           .positionConversionFactor(ArmConstants.kPositionConversionFactor) // Radians
@@ -83,7 +83,7 @@ public final class Configs {
           // ArmConstants.kIDownPositionController,
           // ArmConstants.kDDownPositionController, ArmConstants.kDownPositionFF,
           // ClosedLoopSlot.kSlot1)
-          .outputRange(-0.8, 0.8);
+          .outputRange(-1, 1);
     }
   }
 
