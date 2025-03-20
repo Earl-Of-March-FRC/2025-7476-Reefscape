@@ -186,11 +186,11 @@ public final class Constants {
 
     // Angles need to be set in degrees
     public static final double kAngleStowed = -6.5;
-    public static final double kAngleGroundIntake = -50.5;
+    public static final double kAngleGroundIntake = -54.5;
     public static final double kAngleCoral = -93.5;
-    public static final double kAngleL2 = -103.5;
+    public static final double kAngleL2 = -97.5;
     public static final double kAngleL3 = -158.5;
-    public static final double kAngleProcessor = -186.5;
+    public static final double kAngleProcessor = -176.5;
 
     // Arm PID fine control bump offsets
     public static final double kBumpOffsetDeg = 2;
