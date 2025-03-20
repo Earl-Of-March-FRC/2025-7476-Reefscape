@@ -119,6 +119,15 @@ public class MoveToNearestReefSpotCmd extends Command {
       // Bang bang controller returns 0 or 1
       // Multiply calculated output by 2 and subtract 1 to get -1 or 1
       directionY = (translationYController.calculate(currentPose.getY(), targetY) * 2) - 1;
+
+      // Reverse direction if on red alliance
+      if (DriverStation.getAlliance().isPresent()) {
+        Alliance alliance = DriverStation.getAlliance().get();
+        if (alliance == Alliance.Red) {
+          directionY *= -1;
+        }
+      }
+
       translationYFinish = translationYController.atSetpoint();
     }
 
