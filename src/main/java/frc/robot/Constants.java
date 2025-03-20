@@ -163,7 +163,7 @@ public final class Constants {
     public static final MotorType kMotorType = MotorType.kBrushless;
 
     // public static final double kPUpPositionController = 1.5;
-    public static final double kPPositionController = 0.4;
+    public static final double kPPositionController = 0.5;
     public static final double kIPositionController = 0;
     public static final double kDPositionController = 0;
     public static final double kPositionFF = 0;
