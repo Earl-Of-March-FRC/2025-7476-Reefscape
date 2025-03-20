@@ -12,12 +12,12 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -87,6 +87,16 @@ public final class Constants {
       public static final double kMetersFromBarge = 1.3;
       public static final double kToleranceMetersFromBarge = 0.1;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
+    }
+
+    public static class ReefConstants {
+      public static final double kMetresFromTag = 0.5; // Distance of center of robot from tag;
+      // Tag oriented offset. +x is in front of tag, +x is left of tag)
+      public static final Transform2d kOffsetFromTag = new Transform2d();
+      public static final double kToleranceMetersFromSpot = 0.1;
+      public static final double kToleranceRadiansFromSpot = 5 * Math.PI / 180;
+
+      public static final int[] kReefTagIds = { 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
     }
   }
 
