@@ -52,6 +52,7 @@ public class Launcher extends SubsystemBase {
     backLauncherSpark.configure(LauncherConfigs.backLauncherConfig.inverted(true), ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
+    // Log in rad/s
     SmartDashboard.putNumber("LauncherFrontVelocity",
         LauncherConstants.kVelocityFront * LauncherConstants.kVelocityConversionFactor);
     SmartDashboard.putNumber("LauncherBackVelocity",
@@ -64,11 +65,9 @@ public class Launcher extends SubsystemBase {
    */
   @Override
   public void periodic() {
-    // Converts radians per second to RPM
-    Logger.recordOutput("Launcher/Front/Measured/Velocity",
-        getFrontVelocity() / LauncherConstants.kVelocityConversionFactor);
-    Logger.recordOutput("Launcher/Back/Measured/Velocity",
-        getBackVelocity() / LauncherConstants.kVelocityConversionFactor);
+    // Log in rad/s
+    Logger.recordOutput("Launcher/Front/Measured/Velocity", getFrontVelocity());
+    Logger.recordOutput("Launcher/Back/Measured/Velocity", getBackVelocity());
     SmartDashboard.putNumber("FrontVel", getFrontVelocity());
     SmartDashboard.putNumber("BackVel", getBackVelocity());
   }
