@@ -90,9 +90,10 @@ public final class Constants {
     }
 
     public static class ReefConstants {
-      public static final double kMetresFromTag = 1; // Distance of center of robot from tag;
-      // Tag oriented offset. +x is in front of tag, +x is left of tag)
-      public static final Transform2d kOffsetFromTag = new Transform2d();
+      // Tag oriented offset from center of robot. +x is in front of tag, +y is left
+      // of tag)
+      public static final Transform2d kOffsetFromTag = new Transform2d(new Translation2d(0.5, 0),
+          new Rotation2d(Math.PI));
       public static final double kToleranceMetersFromSpot = 0.1;
       public static final double kToleranceRadiansFromSpot = 5 * Math.PI / 180;
 

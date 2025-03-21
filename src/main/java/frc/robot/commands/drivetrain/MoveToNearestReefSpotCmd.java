@@ -9,11 +9,10 @@ import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -70,9 +69,7 @@ public class MoveToNearestReefSpotCmd extends Command {
 
     ArrayList<Pose2d> reefSpots = new ArrayList<Pose2d>();
     for (Pose3d reefTagPose : reefTagPoses) {
-      reefSpots.add(PoseHelpers.toPose2d(reefTagPose)
-          .transformBy(new Transform2d(ReefConstants.kMetresFromTag, 0, new Rotation2d()))
-          .transformBy(ReefConstants.kOffsetFromTag));
+      reefSpots.add(PoseHelpers.toPose2d(reefTagPose).transformBy(ReefConstants.kOffsetFromTag));
     }
 
     Pose2d targetReefSpot = reefSpots.get(0);
@@ -136,8 +133,9 @@ public class MoveToNearestReefSpotCmd extends Command {
 
       // Bang bang controller returns 0 or 1
       // Multiply calculated output by 2 and subtract 1 to get -1 or 1
-      directionRot = (rotationController.calculate(currentRotation, targetRadians * Math.signum(currentRotation)) * 2)
-          - 1;
+      // Offset the rotation such that the setpoint is always "0". This rids of
+      // wrap-around issues.
+      directionRot = (rotationController.calculate(MathUtil.angleModulus(currentRotation - targetRadians), 0) * 2) - 1;
       rotationFinish = rotationController.atSetpoint();
     }
 
