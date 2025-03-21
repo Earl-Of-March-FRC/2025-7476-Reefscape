@@ -4,10 +4,14 @@
 
 package frc.robot.subsystems.arm;
 
+import java.util.ArrayList;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.sim.SparkRelativeEncoderSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -15,7 +19,15 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
@@ -32,6 +44,12 @@ public class ArmSubsystem extends SubsystemBase {
   private double angularOffsetDeg = 0;
   private double pidReferencePositionDegWithoutOffset;
 
+  private Mechanism2d armMech = new Mechanism2d(0.5, 0.5);
+  // arm length 0.473075 m
+  // arm width 0.0508 m
+  private MechanismRoot2d armMechRoot = armMech.getRoot("arm", 0, 0);
+  private MechanismLigament2d armMechLig;
+
   /**
    * The constructor for the ArmSubsystem class configures the arm motor.
    */
@@ -41,9 +59,8 @@ public class ArmSubsystem extends SubsystemBase {
     armEncoder = armSpark.getEncoder();
     armClosedLoopController = armSpark.getClosedLoopController();
 
-    // Configures arm motor
-    armSpark.configure(ArmConfigs.armConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+    armMechLig = armMechRoot.append(
+        new MechanismLigament2d("shoulder", 0.473075, 0));
 
     resetPosition();
     stopArm();
@@ -59,6 +76,9 @@ public class ArmSubsystem extends SubsystemBase {
     Logger.recordOutput("Arm/Setpoint/AngularOffset", Rotation2d.fromDegrees(angularOffsetDeg));
 
     Logger.recordOutput("Arm/UsePid", usePid);
+
+    Logger.recordOutput("Arm/Measured/ArmPose", new Pose3d(0.3175, 0, 0.717551,
+        new Rotation3d(0, RobotBase.isReal() ? getPosition() : getReferencePosition(), 0)));
 
     if (usePid) {
       double setpoint = getReferencePosition();
