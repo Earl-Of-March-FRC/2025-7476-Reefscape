@@ -90,7 +90,7 @@
         },
         {
           "axis": "z",
-          "degrees": 0
+          "degrees": 180
         }
       ],
       "zeroedPosition": [
