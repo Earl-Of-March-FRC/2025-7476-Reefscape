@@ -245,6 +245,7 @@ public class RobotContainer {
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
     autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
     autoChooser.addOption("EncoderAutoDrive", new EncoderAutoDrive(driveSub));
+    autoChooser.addOption("AlignWithBarge", new MoveToNearestBargeLaunchingZoneCmd(driveSub));
     SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
   }
 

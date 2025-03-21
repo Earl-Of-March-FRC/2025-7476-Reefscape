@@ -6,13 +6,14 @@ package frc.robot.commands.drivetrain;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
@@ -21,14 +22,13 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveToNearestBargeLaunchingZoneCmd extends Command {
   private final Drivetrain driveSub;
-  private final BangBangController translationController = new BangBangController(
+  private final PIDController translationController = new PIDController(AutoConstants.kPTranslationController,
+      AutoConstants.kITranslationController, AutoConstants.kDTranslationController,
       LaunchingDistances.kToleranceMetersFromBarge);
-  private final BangBangController rotationController = new BangBangController(
-      LaunchingDistances.kToleranceRadiansFromBarge);
+  private final PIDController rotationController = new PIDController(AutoConstants.kPThetaController,
+      AutoConstants.kIThetaController, AutoConstants.kDThetaController, LaunchingDistances.kToleranceRadiansFromBarge);
 
   private double targetX, targetRadians;
-
-  private boolean translationFinish = false, rotationFinish = false;
 
   /** Creates a new MoveToNearestBargeLaunchingZoneCmd. */
   public MoveToNearestBargeLaunchingZoneCmd(
@@ -41,8 +41,6 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    translationFinish = false;
-    rotationFinish = false;
   }
 
   @Override
@@ -69,34 +67,20 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
     double directionX = 0;
     double directionRot = 0;
 
-    // Calculate translation from bang bang controller
-    if (!translationFinish) {
-      // Bang bang controller returns 0 or 1
-      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
-      directionX = (translationController.calculate(currentPose.getX(), targetX) * 2) - 1;
+    directionX = translationController.calculate(currentPose.getX(), targetX);
 
-      // Reverse direction if on red alliance
-      if (DriverStation.getAlliance().isPresent()) {
-        Alliance alliance = DriverStation.getAlliance().get();
-        if (alliance == Alliance.Red) {
-          directionX *= -1;
-        }
+    // Reverse direction if on red alliance
+    if (DriverStation.getAlliance().isPresent()) {
+      Alliance alliance = DriverStation.getAlliance().get();
+      if (alliance == Alliance.Red) {
+        directionX *= -1;
       }
-
-      translationFinish = translationController.atSetpoint();
     }
+    double currentRotation = currentPose.getRotation().getRadians();
 
-    // Calculate rotation from bang bang controller
-    if (!rotationFinish) {
-      double currentRotation = currentPose.getRotation().getRadians();
-
-      // Bang bang controller returns 0 or 1
-      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
-      directionRot = (rotationController.calculate(currentRotation, targetRadians * Math.signum(currentRotation)) * 2)
-          - 1;
-
-      rotationFinish = rotationController.atSetpoint();
-    }
+    // Bang bang controller returns 0 or 1
+    // Multiply calculated output by 2 and subtract 1 to get -1 or 1
+    directionRot = (rotationController.calculate(currentRotation, targetRadians * Math.signum(currentRotation)));
 
     // Convert calculated value to velocity
     double xVel = DriveConstants.kBangBangTranslationalVelocityMetersPerSecond * directionX;
@@ -119,6 +103,6 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
 
   @Override
   public boolean isFinished() {
-    return translationFinish && rotationFinish;
+    return false;
   }
 }
