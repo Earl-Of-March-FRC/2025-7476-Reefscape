@@ -186,8 +186,8 @@ public final class Constants {
 
     // Angles need to be set in degrees
     public static final double kAngleStowed = -6.5;
-    public static final double kAngleGroundIntake = -54.5;
-    public static final double kAngleCoral = -93.5;
+    public static final double kAngleGroundIntake = -50.5; // 39 deg below horizontal
+    public static final double kAngleCoral = -93.5; // 8 deg above horizontal
     public static final double kAngleL2 = -97.5;
     public static final double kAngleL3 = -158.5;
     public static final double kAngleProcessor = -176.5;
