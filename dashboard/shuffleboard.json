@@ -24,7 +24,7 @@
               "_showGlyph": false
             }
           },
-          "1,3": {
+          "1,0": {
             "size": [
               1,
               1
@@ -145,7 +145,7 @@
               "Visuals/Show value": true
             }
           },
-          "1,0": {
+          "3,4": {
             "size": [
               1,
               1
@@ -177,7 +177,7 @@
               "Visuals/Orientation": "HORIZONTAL"
             }
           },
-          "0,3": {
+          "4,4": {
             "size": [
               1,
               1
@@ -219,6 +219,45 @@
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
+          },
+          "0,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/LauncherFrontVelocity",
+              "_title": "/SmartDashboard/LauncherFrontVelocity",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "1,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/LauncherBackVelocity",
+              "_title": "/SmartDashboard/LauncherBackVelocity",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "2,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Distance to Barge",
+              "_title": "/SmartDashboard/Distance to Barge",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -254,6 +293,6 @@
     "x": -7.199999809265137,
     "y": -7.199999809265137,
     "width": 1550.4000244140625,
-    "height": 830.4000244140625
+    "height": 926.4000244140625
   }
 }
