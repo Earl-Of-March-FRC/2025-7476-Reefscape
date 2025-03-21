@@ -84,7 +84,7 @@ public final class Constants {
     public static final boolean kGyroReversed = false;
 
     public static class LaunchingDistances {
-      public static final double kMetersFromBarge = 1.3;
+      public static final double kMetersFromBarge = 1.18; // 1.30 before March 20
       public static final double kToleranceMetersFromBarge = 0.1;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
     }
@@ -128,6 +128,7 @@ public final class Constants {
 
     public static final int kOperatorControllerPort = 1;
     public static final double kArmDeadband = 0.1;
+    public static final double kArmManualDeadband = 0.5;
     public static final int kOperatorArmManualAxis = 1;
     public static final double kIntakeDeadband = 0.5;
     public static final int kOperatorIntakeManualAxis = 5;
@@ -173,7 +174,7 @@ public final class Constants {
     public static final MotorType kMotorType = MotorType.kBrushless;
 
     // public static final double kPUpPositionController = 1.5;
-    public static final double kPPositionController = 0.4;
+    public static final double kPPositionController = 0.5;
     public static final double kIPositionController = 0;
     public static final double kDPositionController = 0;
     public static final double kPositionFF = 0;
@@ -196,11 +197,15 @@ public final class Constants {
 
     // Angles need to be set in degrees
     public static final double kAngleStowed = -6.5;
-    public static final double kAngleGroundIntake = -50.5;
+    public static final double kAngleGroundIntake = -54.5;
     public static final double kAngleCoral = -93.5;
-    public static final double kAngleL2 = -103.5;
+    public static final double kAngleL2 = -97.5;
     public static final double kAngleL3 = -158.5;
-    public static final double kAngleProcessor = -186.5;
+    public static final double kAngleProcessor = -176.5;
+
+    // Arm PID fine control bump offsets
+    public static final double kBumpOffsetDeg = 2;
+    public static final double kMaxArmManualSpeedPercent = 0.5;
 
     // Limit switch stuff
     public static final int kLimitSwitchChannel = 9;
