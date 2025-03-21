@@ -16,6 +16,7 @@ public class ArmSetVelocityManualCmd extends Command {
 
   private ArmSubsystem armSub;
   private DoubleSupplier percent;
+  private boolean forceManual;
 
   /**
    * Moves the arm manually.
@@ -24,8 +25,20 @@ public class ArmSetVelocityManualCmd extends Command {
    * @param percent Percent output, from -1 to 1.
    */
   public ArmSetVelocityManualCmd(ArmSubsystem armSub, DoubleSupplier percent) {
+    this(armSub, percent, false);
+  }
+
+  /**
+   * Moves the arm manually.
+   * 
+   * @param armSub      The instance of the ArmSubsystem class to be used.
+   * @param percent     Percent output, from -1 to 1.
+   * @param forceManual Force manual control mode.
+   */
+  public ArmSetVelocityManualCmd(ArmSubsystem armSub, DoubleSupplier percent, boolean forceManual) {
     this.armSub = armSub;
     this.percent = percent;
+    this.forceManual = forceManual;
 
     addRequirements(armSub);
   }
@@ -40,21 +53,18 @@ public class ArmSetVelocityManualCmd extends Command {
   public void execute() {
     double percentDouble = percent.getAsDouble();
 
-    // If joystick has not been moved, then don't do anything
-    // Prevents this from interrupting the arm from holding its position with PID
-    // If a button has not been pressed, allow for inputs of 0
-    if (percentDouble != 0) {
-      armSub.isManual = true;
-    }
-    if (armSub.isManual) {
-      armSub.setVelocity(percentDouble);
-    }
+    // This method will automatically enable manual mode when the input is non zero.
+    // See the method's JavaDoc for more information.
+    armSub.setVelocity(percentDouble, forceManual);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    armSub.stopArm();
+    // only stop the arm if it is not controlled by PID
+    if (!armSub.getIsUsingPid()) {
+      armSub.stopArm();
+    }
   }
 
   // Returns true when the command should end.

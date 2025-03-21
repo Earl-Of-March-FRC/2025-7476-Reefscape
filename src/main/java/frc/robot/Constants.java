@@ -46,8 +46,8 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 0.1;
-    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 20;
+    public static final double kBangBangTranslationalVelocityMetersPerSecond = 1;
+    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 10;
 
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
         kMaxAccelerationMetersPerSecondSquaredPathfinding, kMaxAngularSpeedRadiansPerSecond,
@@ -84,7 +84,7 @@ public final class Constants {
     public static final boolean kGyroReversed = false;
 
     public static class LaunchingDistances {
-      public static final double kMetersFromBarge = 1.3;
+      public static final double kMetersFromBarge = 1.18; // 1.30 before March 20
       public static final double kToleranceMetersFromBarge = 0.1;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
     }
@@ -130,6 +130,7 @@ public final class Constants {
 
     public static final int kOperatorControllerPort = 1;
     public static final double kArmDeadband = 0.1;
+    public static final double kArmManualDeadband = 0.5;
     public static final int kOperatorArmManualAxis = 1;
     public static final double kIntakeDeadband = 0.5;
     public static final int kOperatorIntakeManualAxis = 5;
@@ -175,17 +176,11 @@ public final class Constants {
     public static final MotorType kMotorType = MotorType.kBrushless;
 
     // public static final double kPUpPositionController = 1.5;
-    public static final double kPUpPositionController = 0;
-    public static final double kIUpPositionController = 0;
-    public static final double kDUpPositionController = 0;
-    public static final double kUpPositionFF = 0;
-    public static final double kGainFF = 0;
-
-    // public static final double kPDownPositionController = 1.5;
-    public static final double kPDownPositionController = 0;
-    public static final double kIDownPositionController = 0;
-    public static final double kDDownPositionController = 0;
-    public static final double kDownPositionFF = 0;
+    public static final double kPPositionController = 0.5;
+    public static final double kIPositionController = 0;
+    public static final double kDPositionController = 0;
+    public static final double kPositionFF = 0;
+    public static final double kGainFF = 0.7;
 
     public static final double kGearReduction = 1.0 / 50; // Gear ratio
 
@@ -197,15 +192,22 @@ public final class Constants {
     public static final double kMaxVelocity = 60;
 
     // Tolerance of arm position PID in degrees
-    public static final double kAngleTolerance = 15;
+    public static final double kAngleTolerance = 3;
+
+    // Arm starting position in radians
+    public static final double kAngleStart = -3.863;
 
     // Angles need to be set in degrees
     public static final double kAngleStowed = -6.5;
-    public static final double kAngleGroundIntake = -60.5;
-    public static final double kAngleCoral = -98.5;
-    public static final double kAngleL2 = -108.5;
-    public static final double kAngleL3 = -150.5;
-    public static final double kAngleProcessor = -186.5;
+    public static final double kAngleGroundIntake = -54.5;
+    public static final double kAngleCoral = -93.5;
+    public static final double kAngleL2 = -97.5;
+    public static final double kAngleL3 = -158.5;
+    public static final double kAngleProcessor = -176.5;
+
+    // Arm PID fine control bump offsets
+    public static final double kBumpOffsetDeg = 2;
+    public static final double kMaxArmManualSpeedPercent = 0.5;
 
     // Limit switch stuff
     public static final int kLimitSwitchChannel = 9;
@@ -314,8 +316,10 @@ public final class Constants {
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
-    public static final double kVelocityFront = 2100; // 220 rad/s
-    public static final double kVelocityBack = 2626.056561; // 275 rad/s
+    // public static final double kVelocityFront = 2100; // 220 rad/s
+    // public static final double kVelocityBack = 2626.056561; // 275 rad/s
+    public static final double kVelocityFront = 1957.6058; // 205 rad/s
+    public static final double kVelocityBack = 2482.817112; // 260 rad/s
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
   }

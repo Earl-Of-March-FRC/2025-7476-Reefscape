@@ -6,6 +6,7 @@ package frc.robot.subsystems.arm;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -15,7 +16,6 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
@@ -28,21 +28,15 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMax armSpark;
   private final RelativeEncoder armEncoder;
   private final SparkClosedLoopController armClosedLoopController;
-  private final DigitalInput lowerLimitSwitch;
-  public boolean isManual = false;
-  public double armOffset = 0;
-  public double CurrentSetpoint;
-  // Starting angle of the arm, in radians
-  // Ex: arm starting position is 1 radian, then m_armAngularOffset is 1
-  private double m_armAngularOffset = 0;
+  private boolean usePid = true;
+  private double angularOffsetDeg = 0;
+  private double pidReferencePositionDegWithoutOffset;
 
   /**
    * The constructor for the ArmSubsystem class configures the arm motor.
    */
   public ArmSubsystem(SparkMax armSpark, int limitSwitchChannel) {
     this.armSpark = armSpark;
-
-    lowerLimitSwitch = new DigitalInput(limitSwitchChannel);
 
     armEncoder = armSpark.getEncoder();
     armClosedLoopController = armSpark.getClosedLoopController();
@@ -52,6 +46,7 @@ public class ArmSubsystem extends SubsystemBase {
         PersistMode.kPersistParameters);
 
     resetPosition();
+    stopArm();
   }
 
   @Override
@@ -60,14 +55,24 @@ public class ArmSubsystem extends SubsystemBase {
 
     // Convert radians per second to RPM
     Logger.recordOutput("Arm/Measured/Velocity", getVelocity() / ArmConstants.kVelocityConversionFactor);
-    Logger.recordOutput("Arm/Measured/ArmOffset", this.armOffset);
 
-    Logger.recordOutput("Arm/Measured/LimitSwitch", getLimitSwitch());
-    Logger.recordOutput("Arm/Applied/ArmOffset", armOffset);
+    Logger.recordOutput("Arm/Setpoint/AngularOffset", Rotation2d.fromDegrees(angularOffsetDeg));
 
-    if (!isManual) {
-      armClosedLoopController.setReference(CurrentSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0,
-          ArmConstants.kGainFF * Math.sin(getPosition()));
+    Logger.recordOutput("Arm/UsePid", usePid);
+
+    if (usePid) {
+      double setpoint = getReferencePosition();
+
+      Logger.recordOutput("Arm/Setpoint/Position",
+          new Rotation2d(setpoint));
+
+      double gravityCompensationFFVoltage = ArmConstants.kGainFF * Math.sin(getPosition());
+      REVLibError isOk = armClosedLoopController.setReference(
+          setpoint,
+          ControlType.kPosition,
+          ClosedLoopSlot.kSlot0,
+          gravityCompensationFFVoltage);
+      Logger.recordOutput("Arm/Setpoint/PositionOk", isOk);
     }
   }
 
@@ -78,7 +83,7 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public double getPosition() {
     // Adds the angular offset
-    return armEncoder.getPosition() + m_armAngularOffset;
+    return armEncoder.getPosition();
   }
 
   /**
@@ -93,47 +98,91 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * Sets the velocity of the arm.
    * 
+   * <strong>This method will ONLY start working after given a non zero
+   * input, which then manual mode will be enabled.</strong> After enabling
+   * manual mode, an input of zero will command the arm to run at 0% velocity
+   * (stopping it).
+   * See {@link #setVelocity(double, boolean)} to force manual mode even if the
+   * input is zero.
+   * Use {@link #setReferencePosition(double)} to re-enable PID control.
+   * 
    * @param percent Percent output, from -1 to 1.
    */
   public void setVelocity(double percent) {
+    if (percent != 0) {
+      usePid = false;
+    }
+    if (usePid)
+      return;
+
     Logger.recordOutput("Arm/Setpoint/PercentVelocity", percent);
     armSpark.set(percent);
   }
 
   /**
-   * Sets the reference position for the arm closed loop controller.
+   * Sets the velocity of the arm.
    * 
-   * @param referenceAngle The reference angle, in degrees.
+   * This method allows the enforcement of manual mode, which will then command
+   * the arm to run at percent velocities.
+   * See {@link #setVelocity(double)} to enable manual mode automatically (when
+   * the input is non zero)
+   * Use {@link #setReferencePosition(double)} to re-enable PID control.
+   * 
+   * @param percent     Percent output, from -1 to 1.
+   * @param forceManual Whether to force manual control and stop Pid
    */
-  public void setReferencePosition(double referenceAngle) {
-    // Convert to radians, then subtract angular offset
-    double refAngleWithOffset = referenceAngle * ArmConstants.kAngleConversionFactor - m_armAngularOffset;
-
-    // Determine whether arm needs to move up or down
-    ClosedLoopSlot closedLoopSlot;
-
-    // If arm needs to move up to reach reference position, use the upward
-    // closed-loop controller
-    // Note: arm moving upward is in the negative direction
-    if (getPosition() >= refAngleWithOffset) {
-      closedLoopSlot = ClosedLoopSlot.kSlot0;
+  public void setVelocity(double percent, boolean forceManual) {
+    if (forceManual) {
+      usePid = false;
     }
-
-    // Otherwise, use the downward closed-loop controller
-    else {
-      closedLoopSlot = ClosedLoopSlot.kSlot1;
-    }
-
-    Logger.recordOutput("Arm/Setpoint/Position",
-        new Rotation2d(referenceAngle * ArmConstants.kAngleConversionFactor));
-    armClosedLoopController.setReference(refAngleWithOffset, ControlType.kPosition, closedLoopSlot);
+    setVelocity(percent);
   }
 
   /**
-   * Stops the arm motor.
+   * Sets the reference position for the arm closed loop controller.
+   * 
+   * <strong>This method will disable manual mode and enable PID control.</strong>
+   * 
+   * @param referenceAngle The reference angle, in degrees.
+   */
+  public void setReferencePosition(double referenceAngleDeg) {
+    usePid = true;
+
+    pidReferencePositionDegWithoutOffset = referenceAngleDeg;
+    // double offsettedReferenceAngleDeg = referenceAngleDeg + angularOffsetDeg;
+
+    // // Convert deg -> rad
+    // double refAngleRad = offsettedReferenceAngleDeg *
+    // ArmConstants.kAngleConversionFactor;
+
+    // double gravityCompensationFFVoltage = ArmConstants.kGainFF *
+    // Math.sin(getPosition());
+
+    // Logger.recordOutput("Arm/Setpoint/Position",
+    // new Rotation2d(refAngleRad));
+    // REVLibError isOk = armClosedLoopController.setReference(refAngleRad,
+    // ControlType.kPosition,
+    // ClosedLoopSlot.kSlot0, gravityCompensationFFVoltage);
+    // Logger.recordOutput("Arm/Setpoint/PositionOk", isOk);
+  }
+
+  /**
+   * Returns the setpoint, including offset for the arm closed loop controller.
+   * 
+   * @return double The reference angle, in radians.
+   */
+  public double getReferencePosition() {
+    double offsettedReferenceAngleDeg = pidReferencePositionDegWithoutOffset + angularOffsetDeg;
+
+    // Convert deg -> rad
+    return offsettedReferenceAngleDeg * ArmConstants.kAngleConversionFactor;
+  }
+
+  /**
+   * Stops the arm motor using percent output.
    */
   public void stopArm() {
-    setVelocity(0);
+    setVelocity(0, true);
   }
 
   /**
@@ -144,11 +193,53 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   /**
-   * Check if the calibration limit switches are triggered.
-   * 
-   * @return {@code true} if the limit switch is pressed, {@code false} if not.
+   * Calibrates the arm encoder to the starting angle.
    */
-  public boolean getLimitSwitch() {
-    return !lowerLimitSwitch.get();
+  public void calibrate() {
+    armEncoder.setPosition(ArmConstants.kAngleStart);
+  }
+
+  /**
+   * Returns whether the arm is using PID.
+   * 
+   * @return boolean Whether the arm is using PID.
+   */
+  public boolean getIsUsingPid() {
+    return usePid;
+  }
+
+  /**
+   * Returns the angular offset of the arm.
+   * 
+   * @return The angular offset of the arm, in degrees.
+   */
+  public double getAngularOffset() {
+    return angularOffsetDeg;
+  }
+
+  /**
+   * Resets the angular offset of the arm to 0 degrees.
+   */
+  public void clearOffset() {
+    setAngularOffset(0);
+  }
+
+  /**
+   * Sets the angular offset of the arm.
+   * 
+   * @param offsetDeg The angular offset of the arm, in degrees.
+   */
+  public void setAngularOffset(double offsetDeg) {
+    angularOffsetDeg = offsetDeg;
+  }
+
+  /**
+   * Increases the angular offset of the arm. Use a negative value to decrease the
+   * offset.
+   * 
+   * @param offsetDeg The angular offset of the arm, in degrees. Can be negative.
+   */
+  public void increaseAngularOffset(double offsetDeg) {
+    angularOffsetDeg += offsetDeg;
   }
 }

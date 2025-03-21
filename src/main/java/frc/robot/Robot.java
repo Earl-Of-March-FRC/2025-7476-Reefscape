@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.arm.ArmSetVelocityManualCmd;
 import frc.robot.utils.LocalADStarAK;
 
 /**
@@ -125,6 +126,8 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
+    new ArmSetVelocityManualCmd(robotContainer.armSub, () -> 0, true).schedule();
   }
 
   /** This function is called periodically during operator control. */
@@ -136,6 +139,8 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    new ArmSetVelocityManualCmd(robotContainer.armSub, () -> 0, true).schedule();
   }
 
   /** This function is called periodically during test mode. */
@@ -147,6 +152,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationInit() {
     SimulatedArena.getInstance().resetFieldForAuto();
+    new ArmSetVelocityManualCmd(robotContainer.armSub, () -> 0, true).schedule();
   }
 
   /** This function is called periodically whilst in simulation. */
