@@ -8,6 +8,8 @@ import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.sim.SparkRelativeEncoderSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -16,6 +18,8 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
@@ -40,10 +44,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     armEncoder = armSpark.getEncoder();
     armClosedLoopController = armSpark.getClosedLoopController();
-
-    // Configures arm motor
-    armSpark.configure(ArmConfigs.armConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
 
     resetPosition();
     stopArm();
