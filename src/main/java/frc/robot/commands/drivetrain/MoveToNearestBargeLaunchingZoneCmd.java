@@ -23,10 +23,9 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 public class MoveToNearestBargeLaunchingZoneCmd extends Command {
   private final Drivetrain driveSub;
   private final PIDController translationController = new PIDController(AutoConstants.kPTranslationController,
-      AutoConstants.kITranslationController, AutoConstants.kDTranslationController,
-      LaunchingDistances.kToleranceMetersFromBarge);
+      AutoConstants.kITranslationController, AutoConstants.kDTranslationController);
   private final PIDController rotationController = new PIDController(AutoConstants.kPThetaController,
-      AutoConstants.kIThetaController, AutoConstants.kDThetaController, LaunchingDistances.kToleranceRadiansFromBarge);
+      AutoConstants.kIThetaController, AutoConstants.kDThetaController);
 
   private double targetX, targetRadians;
 
@@ -41,6 +40,8 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    translationController.setTolerance(LaunchingDistances.kToleranceMetersFromBarge);
+    rotationController.setTolerance(LaunchingDistances.kToleranceRadiansFromBarge);
   }
 
   @Override
