@@ -297,8 +297,8 @@ public final class Constants {
     public static final double kPVelocityController = 0;
     public static final double kIVelocityController = 0;
     public static final double kDVelocityController = 0;
-    public static final double frontKVelocityFF = 0.0017;
-    public static final double backKVelocityFF = 0.00187;
+    public static final double frontKVelocityFF = 0.0021;
+    public static final double backKVelocityFF = 0.00215;
 
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
