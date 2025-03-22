@@ -46,9 +46,6 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 1;
-    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 10;
-
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
         kMaxAccelerationMetersPerSecondSquaredPathfinding, kMaxAngularSpeedRadiansPerSecond,
         kMaxAngularAccelerationRadiansPerSecondSquared);
@@ -85,8 +82,10 @@ public final class Constants {
 
     public static class LaunchingDistances {
       public static final double kMetersFromBarge = 1.18; // 1.30 before March 20
-      public static final double kToleranceMetersFromBarge = 0.1;
+      public static final double kToleranceMetersFromBarge = 0.05;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
+      public static final double kMaxTranslationalVelocityMetersPerSecond = 1;
+      public static final double kMaxRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 10;
     }
   }
 

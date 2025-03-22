@@ -84,6 +84,7 @@ public class RobotContainer {
     gyro = new GyroNavX();
     gyro.calibrate();
 
+<<<<<<< Updated upstream
     driveSub = new Drivetrain(
         new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
             DriveConstants.kFrontLeftTurningCanId,
@@ -98,6 +99,51 @@ public class RobotContainer {
             DriveConstants.kRearRightTurningCanId,
             DriveConstants.kBackRightChassisAngularOffset),
         gyro);
+=======
+      driveSub = new Drivetrain(
+          new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
+              DriveConstants.kFrontLeftTurningCanId,
+              DriveConstants.kFrontLeftChassisAngularOffset),
+          new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
+              DriveConstants.kFrontRightTurningCanId,
+              DriveConstants.kFrontRightChassisAngularOffset),
+          new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
+              DriveConstants.kRearLeftTurningCanId,
+              DriveConstants.kBackLeftChassisAngularOffset),
+          new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
+              DriveConstants.kRearRightTurningCanId,
+              DriveConstants.kBackRightChassisAngularOffset),
+          gyro);
+
+      swerveDriveSimulation = null;
+    } else {
+
+      DriveTrainSimulationConfig driveTrainSimulationConfig = DriveTrainSimulationConfig.Default()
+          .withGyro(COTS.ofGenericGyro())
+          .withSwerveModule(COTS.ofMAXSwerve(
+              DCMotor.getNEO(1),
+              DCMotor.getNeo550(1),
+              COTS.WHEELS.COLSONS.cof,
+              2))
+          .withTrackLengthTrackWidth(
+              Units.Meters.of(DriveConstants.kWheelBase),
+              Units.Meters.of(DriveConstants.kTrackWidth))
+          .withBumperSize(Units.Meters.of(0.75), Units.Meters.of(0.75));
+      swerveDriveSimulation = new SwerveDriveSimulation(
+          driveTrainSimulationConfig,
+          new Pose2d(7, 4, Rotation2d.fromDegrees(0)));
+      gyro = new GyroSim(swerveDriveSimulation.getGyroSimulation());
+
+      driveSub = new Drivetrain(
+          new SwerveModuleSim(swerveDriveSimulation.getModules()[0]),
+          new SwerveModuleSim(swerveDriveSimulation.getModules()[1]),
+          new SwerveModuleSim(swerveDriveSimulation.getModules()[2]),
+          new SwerveModuleSim(swerveDriveSimulation.getModules()[3]),
+          gyro, swerveDriveSimulation);
+
+      SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
+    }
+>>>>>>> Stashed changes
 
     armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType),
         ArmConstants.kLimitSwitchChannel);

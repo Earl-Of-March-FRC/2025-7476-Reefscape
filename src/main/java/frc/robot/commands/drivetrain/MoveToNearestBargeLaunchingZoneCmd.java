@@ -6,6 +6,7 @@ package frc.robot.commands.drivetrain;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -64,35 +65,20 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
         new Pose2d(targetX, currentPose.getY(),
             Rotation2d.fromRadians(targetRadians)));
 
-    // Make adjustments to the robot
-    double directionX = 0;
-    double directionRot = 0;
+    double xVel = MathUtil.clamp(translationController.calculate(currentPose.getX(), targetX),
+        -AutoConstants.kMaxSpeedMetersPerSecond,
+        AutoConstants.kMaxSpeedMetersPerSecond);
 
-    directionX = translationController.calculate(currentPose.getX(), targetX);
-
-    // Reverse direction if on red alliance
-    if (DriverStation.getAlliance().isPresent()) {
-      Alliance alliance = DriverStation.getAlliance().get();
-      if (alliance == Alliance.Red) {
-        directionX *= -1;
-      }
-    }
     double currentRotation = currentPose.getRotation().getRadians();
 
-    // Bang bang controller returns 0 or 1
-    // Multiply calculated output by 2 and subtract 1 to get -1 or 1
-    directionRot = (rotationController.calculate(currentRotation, targetRadians * Math.signum(currentRotation)));
-
-    // Convert calculated value to velocity
-    double xVel = DriveConstants.kBangBangTranslationalVelocityMetersPerSecond * directionX;
-    double rotVel = DriveConstants.kBangBangRotationalVelocityRadiansPerSecond * directionRot;
+    double rotVel = MathUtil.clamp(
+        rotationController.calculate(currentRotation, targetRadians * Math.signum(currentRotation)),
+        -AutoConstants.kMaxAngularSpeedRadiansPerSecond, AutoConstants.kMaxAngularSpeedRadiansPerSecond);
 
     // Set drivetrain to run at calculated velocity
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel, 0, rotVel);
     driveSub.runVelocityFieldRelative(chassisSpeeds);
 
-    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/OutputDirectionX", directionX);
-    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/OutputDirectionRotation", directionRot);
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/OutputVelocityX", xVel);
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/OutputVelocityRotation", rotVel);
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/OutputChassisSpeeds", chassisSpeeds);
