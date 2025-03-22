@@ -121,7 +121,8 @@ public final class Configs {
     static {
       frontLauncherConfig
           .idleMode(IdleMode.kCoast)
-          .smartCurrentLimit(50);
+          .smartCurrentLimit(50)
+          .voltageCompensation(10);
       frontLauncherConfig.encoder
           .positionConversionFactor(1)
           .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
@@ -137,7 +138,8 @@ public final class Configs {
     static {
       backLauncherConfig
           .idleMode(IdleMode.kCoast)
-          .smartCurrentLimit(50);
+          .smartCurrentLimit(50)
+          .voltageCompensation(10);
       backLauncherConfig.encoder
           .positionConversionFactor(1)
           .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
