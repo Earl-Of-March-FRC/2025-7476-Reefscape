@@ -19,7 +19,7 @@ import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class MoveToNearestBargeLaunchingZoneCmd extends Command {
+public class MoveToNearestBargeLaunchingZoneBangBangCmd extends Command {
   private final Drivetrain driveSub;
   private final BangBangController translationController = new BangBangController(
       LaunchingDistances.kToleranceMetersFromBarge);
@@ -31,7 +31,7 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
   private boolean translationFinish = false, rotationFinish = false;
 
   /** Creates a new MoveToNearestBargeLaunchingZoneCmd. */
-  public MoveToNearestBargeLaunchingZoneCmd(
+  public MoveToNearestBargeLaunchingZoneBangBangCmd(
       Drivetrain driveSub) {
     this.driveSub = driveSub;
     addRequirements(driveSub);
@@ -106,11 +106,11 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel, 0, rotVel);
     driveSub.runVelocityFieldRelative(chassisSpeeds);
 
-    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/OutputDirectionX", directionX);
-    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/OutputDirectionRotation", directionRot);
-    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/OutputVelocityX", xVel);
-    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/OutputVelocityRotation", rotVel);
-    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/OutputChassisSpeeds", chassisSpeeds);
+    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/BangBang/OutputDirectionX", directionX);
+    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/BangBang/OutputDirectionRotation", directionRot);
+    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/BangBang/OutputVelocityX", xVel);
+    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/BangBang/OutputVelocityRotation", rotVel);
+    Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/BangBang/OutputChassisSpeeds", chassisSpeeds);
   }
 
   @Override

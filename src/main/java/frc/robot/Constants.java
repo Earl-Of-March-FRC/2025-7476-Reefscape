@@ -46,7 +46,7 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 1;
+    public static final double kBangBangTranslationalVelocityMetersPerSecond = 2.5;
     public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 10;
 
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
@@ -84,7 +84,7 @@ public final class Constants {
     public static final boolean kGyroReversed = false;
 
     public static class LaunchingDistances {
-      public static final double kMetersFromBarge = 1.18; // 1.30 before March 20
+      public static final double kMetersFromBarge = 1.30; // 1.30 before March 20
       public static final double kToleranceMetersFromBarge = 0.1;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
     }
@@ -199,10 +199,10 @@ public final class Constants {
 
     // Angles need to be set in degrees
     public static final double kAngleStowed = -6.5;
-    public static final double kAngleGroundIntake = -54.5;
-    public static final double kAngleCoral = -93.5;
+    public static final double kAngleGroundIntake = -44.5; // 39 deg below horizontal
+    public static final double kAngleCoral = -83.5; // 8 deg above horizontal
     public static final double kAngleL2 = -97.5;
-    public static final double kAngleL3 = -158.5;
+    public static final double kAngleL3 = -142.5;
     public static final double kAngleProcessor = -176.5;
 
     // Arm PID fine control bump offsets
@@ -310,8 +310,8 @@ public final class Constants {
     public static final double kPVelocityController = 0;
     public static final double kIVelocityController = 0;
     public static final double kDVelocityController = 0;
-    public static final double frontKVelocityFF = 0.0017;
-    public static final double backKVelocityFF = 0.00187;
+    public static final double frontKVelocityFF = 0.0021;
+    public static final double backKVelocityFF = 0.00215;
 
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 

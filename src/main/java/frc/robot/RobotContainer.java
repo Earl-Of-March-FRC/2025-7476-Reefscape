@@ -219,7 +219,8 @@ public class RobotContainer {
 
     // Drive commands
     driverController.b().onTrue(new CalibrateGyroCmd(driveSub));
-    driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneCmd(driveSub));
+    driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneBangBangCmd(driveSub));
+    driverController.x().whileTrue(new MoveToNearestBargeLaunchingZonePIDCmd(driveSub));
 
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
@@ -232,7 +233,6 @@ public class RobotContainer {
         }));
 
     // Indexer commands
-    driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
     driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
 
     driverController.leftBumper().whileTrue(

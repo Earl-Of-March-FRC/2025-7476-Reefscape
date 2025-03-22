@@ -67,7 +67,7 @@ public class EncoderAutoDrive extends Command {
 
   @Override
   public void execute() {
-    driveSub.runVelocity(new ChassisSpeeds(xVel, yVel, 0));
+    driveSub.runVelocityRobotRelative(new ChassisSpeeds(xVel, yVel, 0));
   }
 
   @Override
