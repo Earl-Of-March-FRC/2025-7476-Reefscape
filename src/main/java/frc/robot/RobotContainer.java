@@ -95,7 +95,6 @@ public class RobotContainer {
   public RobotContainer() {
     if (RobotBase.isReal()) {
       gyro = new GyroNavX();
-      gyro.calibrate();
 
       driveSub = new Drivetrain(
           new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
