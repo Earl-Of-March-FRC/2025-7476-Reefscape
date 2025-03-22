@@ -91,7 +91,7 @@ public class Drivetrain extends SubsystemBase {
       },
       new Pose2d(0, 0, new Rotation2d()),
       VecBuilder.fill(0.1, 0.1, 0.1),
-      VecBuilder.fill(0.7, 0.7, 0.7));
+      VecBuilder.fill(0.5, 0.5, 0.5));
 
   SwerveDrivePoseEstimator visionlessOdometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
