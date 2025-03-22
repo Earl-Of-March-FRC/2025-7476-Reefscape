@@ -66,7 +66,7 @@ public final class Configs {
 
       armConfig
           .idleMode(IdleMode.kBrake) // Set to kBrake to hold position when not moving
-          .smartCurrentLimit(30); // Adjust current limit as needed
+          .smartCurrentLimit(40); // Adjust current limit as needed
 
       armConfig.encoder
           .positionConversionFactor(ArmConstants.kPositionConversionFactor) // Radians
@@ -75,11 +75,14 @@ public final class Configs {
       armConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Upward position PID controller is slot 0
-          .pidf(ArmConstants.kPUpPositionController, ArmConstants.kIUpPositionController,
-              ArmConstants.kDUpPositionController, ArmConstants.kUpPositionFF, ClosedLoopSlot.kSlot0)
+          .pidf(ArmConstants.kPPositionController, ArmConstants.kIPositionController,
+              ArmConstants.kDPositionController, ArmConstants.kPositionFF, ClosedLoopSlot.kSlot0)
+
           // Downward position PID controller is slot 1
-          .pidf(ArmConstants.kPDownPositionController, ArmConstants.kIDownPositionController,
-              ArmConstants.kDDownPositionController, ArmConstants.kDownPositionFF, ClosedLoopSlot.kSlot1)
+          // .pidf(ArmConstants.kPDownPositionController,
+          // ArmConstants.kIDownPositionController,
+          // ArmConstants.kDDownPositionController, ArmConstants.kDownPositionFF,
+          // ClosedLoopSlot.kSlot1)
           .outputRange(-1, 1);
     }
   }
@@ -89,7 +92,7 @@ public final class Configs {
 
     static {
       intakeConfig
-          .idleMode(IdleMode.kBrake) // Set to kBrake to hold position when not moving
+          .idleMode(IdleMode.kCoast) // Set to kBrake to hold position when not moving
           .smartCurrentLimit(30); // Adjust current limit as needed
 
       intakeConfig.encoder
@@ -118,7 +121,8 @@ public final class Configs {
     static {
       frontLauncherConfig
           .idleMode(IdleMode.kCoast)
-          .smartCurrentLimit(50);
+          .smartCurrentLimit(50)
+          .voltageCompensation(10);
       frontLauncherConfig.encoder
           .positionConversionFactor(1)
           .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
@@ -134,7 +138,8 @@ public final class Configs {
     static {
       backLauncherConfig
           .idleMode(IdleMode.kCoast)
-          .smartCurrentLimit(50);
+          .smartCurrentLimit(50)
+          .voltageCompensation(10);
       backLauncherConfig.encoder
           .positionConversionFactor(1)
           .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);

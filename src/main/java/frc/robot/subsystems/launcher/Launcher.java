@@ -32,7 +32,7 @@ public class Launcher extends SubsystemBase {
   private final SparkClosedLoopController backLauncherClosedLoopController;
 
   private double frontReferenceVelocity = 0.0;
-  private double backReferenveVelocity = 0.0;
+  private double backReferenceVelocity = 0.0;
 
   /**
    * Constructs a new LauncherSubsystem and configures the launcher motors.
@@ -52,6 +52,7 @@ public class Launcher extends SubsystemBase {
     backLauncherSpark.configure(LauncherConfigs.backLauncherConfig.inverted(true), ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
+    // Log in rad/s
     SmartDashboard.putNumber("LauncherFrontVelocity",
         LauncherConstants.kVelocityFront * LauncherConstants.kVelocityConversionFactor);
     SmartDashboard.putNumber("LauncherBackVelocity",
@@ -64,11 +65,9 @@ public class Launcher extends SubsystemBase {
    */
   @Override
   public void periodic() {
-    // Converts radians per second to RPM
-    Logger.recordOutput("Launcher/Front/Measured/Velocity",
-        getFrontVelocity() / LauncherConstants.kVelocityConversionFactor);
-    Logger.recordOutput("Launcher/Back/Measured/Velocity",
-        getBackVelocity() / LauncherConstants.kVelocityConversionFactor);
+    // Log in rad/s
+    Logger.recordOutput("Launcher/Front/Measured/Velocity", getFrontVelocity());
+    Logger.recordOutput("Launcher/Back/Measured/Velocity", getBackVelocity());
     SmartDashboard.putNumber("FrontVel", getFrontVelocity());
     SmartDashboard.putNumber("BackVel", getBackVelocity());
   }
@@ -137,7 +136,7 @@ public class Launcher extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setBackReferenceVelocity(double referenceVelocity) {
-    backReferenveVelocity = referenceVelocity;
+    backReferenceVelocity = referenceVelocity;
     Logger.recordOutput("Launcher/Back/Setpoint/Velocity", referenceVelocity);
 
     // Converts RPM to radians per second
@@ -180,7 +179,7 @@ public class Launcher extends SubsystemBase {
   }
 
   public boolean backRollerAtSetpoint() {
-    return MathUtil.isNear(backReferenveVelocity, getBackVelocity() / LauncherConstants.kVelocityConversionFactor,
+    return MathUtil.isNear(backReferenceVelocity, getBackVelocity() / LauncherConstants.kVelocityConversionFactor,
         LauncherConstants.kVelocityBackTolerance);
   }
 }

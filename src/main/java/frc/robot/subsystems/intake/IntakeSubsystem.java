@@ -29,7 +29,6 @@ public class IntakeSubsystem extends SubsystemBase {
    */
   public IntakeSubsystem(SparkMax intakeSpark) {
     this.intakeSpark = intakeSpark;
-
     intakeEncoder = intakeSpark.getEncoder();
 
     intakeSpark.configure(IntakeConfigs.intakeConfig, ResetMode.kResetSafeParameters,

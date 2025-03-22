@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
@@ -60,7 +62,7 @@ public class RobotContainer {
   public final Drivetrain driveSub;
   public final Gyro gyro;
 
-  private final ArmSubsystem armSub;
+  public final ArmSubsystem armSub;
   private final IntakeSubsystem intakeSub;
   private final Indexer indexerSub;
   private final Launcher launcherSub;
@@ -99,6 +101,7 @@ public class RobotContainer {
 
     armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType),
         ArmConstants.kLimitSwitchChannel);
+    armSub.calibrate();
 
     intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
 
@@ -111,29 +114,10 @@ public class RobotContainer {
         new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 
-    // Register named Commands
-    NamedCommands.registerCommand("Calibrate", new CalibrateCmd(driveSub));
-
-    driveSub.setDefaultCommand(
-        new DriveSqrtCmd(
-            driveSub,
-            () -> MathUtil.applyDeadband(
-                -driverController.getRawAxis(
-                    OIConstants.kDriverControllerYAxis),
-                OIConstants.kDriveDeadband),
-            () -> MathUtil.applyDeadband(
-                -driverController.getRawAxis(
-                    OIConstants.kDriverControllerXAxis),
-                OIConstants.kDriveDeadband),
-            () -> MathUtil.applyDeadband(
-                -driverController.getRawAxis(
-                    OIConstants.kDriverControllerRotAxis),
-                OIConstants.kDriveDeadband)));
-
     algaeSubsystem = new AlgaeSubsystem(() -> driveSub.getPose());
 
-    // indexerSub.setDefaultCommand(
-    // new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
+    // Register named Commands
+    NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
 
     configureAutos();
     configureBindings();
@@ -154,12 +138,32 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+
+    // SET DEFAULT COMMANDS
+
+    // Drive with
+    driveSub.setDefaultCommand(
+        new DriveSqrtCmd(
+            driveSub,
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerYAxis),
+                OIConstants.kDriveDeadband),
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerXAxis),
+                OIConstants.kDriveDeadband),
+            () -> MathUtil.applyDeadband(
+                -driverController.getRawAxis(
+                    OIConstants.kDriverControllerRotAxis),
+                OIConstants.kDriveDeadband)));
+
     // Manual arm control with
     armSub.setDefaultCommand(
         new ArmSetVelocityManualCmd(armSub, () -> MathUtil.applyDeadband(
-            operatorController.getRawAxis(
-                OIConstants.kOperatorArmManualAxis) * 0.5,
-            OIConstants.kArmDeadband)));
+            operatorController.getRawAxis(OIConstants.kOperatorArmManualAxis),
+            armSub.getIsUsingPid() ? OIConstants.kArmManualDeadband : OIConstants.kArmDeadband)
+            * ArmConstants.kMaxArmManualSpeedPercent));
 
     // Manual intake (arm roller) control with
     intakeSub.setDefaultCommand(
@@ -169,39 +173,13 @@ public class RobotContainer {
                     OIConstants.kOperatorIntakeManualAxis),
                 OIConstants.kIntakeDeadband)));
 
-    driverController.b().onTrue(new CalibrateCmd(driveSub));
+    // DRIVER CONTROLLER
 
-    // UNCOMMENT AFTER THE ARM IS TESTED
-    operatorController.leftTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
-        () -> ArmConstants.kAngleStowed - armSub.armOffset));
-    operatorController.povDown().onTrue(
-        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake - armSub.armOffset));
-    operatorController.povRight().onTrue(new ArmSetPositionPIDCmd(armSub,
-        () -> ArmConstants.kAngleL2 - armSub.armOffset));
-    operatorController.povLeft().onTrue(new ArmSetPositionPIDCmd(armSub,
-        () -> ArmConstants.kAngleL3 - armSub.armOffset));
-    operatorController.povUp().onTrue(new ArmSetPositionPIDCmd(armSub,
-        () -> ArmConstants.kAngleProcessor - armSub.armOffset));
-    operatorController.rightTrigger().onTrue(new ArmSetPositionPIDCmd(armSub,
-        () -> ArmConstants.kAngleCoral - armSub.armOffset));
-    // operatorController.a()
-    // .whileTrue(new IntakeSetVelocityManualCmd(intakeSub, () ->
-    // IntakeConstants.kDefaultPercent));
-    operatorController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
-    // operatorController.b().onTrue(new IntakeStopCmd(intakeSub));
-    // operatorController.y().onTrue(new ArmResetEncoderCmd(armSub));
-    driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
-    driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
-    driverController.rightTrigger().toggleOnTrue(
-        new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
-            () -> launcherSub.getPreferredBackVelocity()));
-    driverController.leftTrigger().whileTrue(
-        new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
-            () -> -launcherSub.getPreferredBackVelocity()));
-    driverController.rightBumper().whileTrue(
-        new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
-    driverController.leftBumper().whileTrue(
-        new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
+    // Drive commands
+    driverController.b().onTrue(new CalibrateGyroCmd(driveSub));
+    driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneCmd(driveSub));
+
+    // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
         Commands.runOnce(() -> {
           driveSub.isFieldRelative = true;
@@ -210,40 +188,53 @@ public class RobotContainer {
         Commands.runOnce(() -> {
           driveSub.isFieldRelative = false;
         }));
-    operatorController.axisGreaterThan(OIConstants.kOperatorArmManualAxis, OIConstants.kArmDeadband).onTrue(
-        Commands.runOnce(() -> {
-          armSub.isManual = true;
-        }));
-    operatorController.axisLessThan(OIConstants.kOperatorArmManualAxis, -OIConstants.kArmDeadband).onTrue(
-        Commands.runOnce(() -> {
-          armSub.isManual = true;
-        }));
+
+    // Indexer commands
+    driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
+    driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
+
+    driverController.leftBumper().whileTrue(
+        new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
+    driverController.rightBumper().whileTrue(
+        new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
+
+    // Launcher commands
+    driverController.leftTrigger().whileTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
+            () -> -launcherSub.getPreferredBackVelocity()));
+    driverController.rightTrigger().toggleOnTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
+            () -> launcherSub.getPreferredBackVelocity()));
+
+    // OPERATOR CONTROLLER
+
+    // Arm setpoints
+    operatorController.leftTrigger().onTrue(
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleStowed));
+    operatorController.povDown().onTrue(
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleGroundIntake));
+    operatorController.povRight().onTrue(
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL2));
+    operatorController.povLeft().onTrue(
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL3));
+    operatorController.povUp().onTrue(
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleProcessor));
+    operatorController.rightTrigger().onTrue(
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleCoral));
+
+    // Indexer command
+    operatorController.b().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
+
+    // Bump arm setpoints
     operatorController.leftBumper().whileTrue(
         Commands.runOnce(() -> {
-          armSub.armOffset += 2;
-        }));
+          armSub.increaseAngularOffset(-ArmConstants.kBumpOffsetDeg);
+        }, armSub));
 
     operatorController.rightBumper().whileTrue(
         Commands.runOnce(() -> {
-          armSub.armOffset -= 2;
-        }));
-
-    // driverController.rightStick().whileTrue(new GoToAlgaeCmd(algaeSubsystem,
-    // intakeSub));
-
-    // driverController.a().whileTrue(new
-    // MoveToNearestBargeLaunchingZoneCmd(driveSub));
-    driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneCmd(driveSub));
-
-    // driverController.a().whileTrue(new ConditionalCommand(
-    // new PathfindToLaunchSpotCmd(AutoConstants.kLaunchPoseBlue),
-    // new PathfindToLaunchSpotCmd(AutoConstants.kLaunchPoseRed),
-    // () -> DriverStation.getAlliance().isPresent() &&
-    // DriverStation.getAlliance().get() == Alliance.Blue));
-
-    // Arm calibration
-    // new Trigger(() -> armSub.getLimitSwitch()).onTrue(Commands.runOnce(() ->
-    // armSub.resetPosition()));
+          armSub.increaseAngularOffset(ArmConstants.kBumpOffsetDeg);
+        }, armSub));
   }
 
   /**

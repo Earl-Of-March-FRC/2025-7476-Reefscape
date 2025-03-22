@@ -12,7 +12,6 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.pathplanner.lib.path.EventMarker;
-import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
@@ -25,14 +24,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.Constants.Vision.PhotonConstants;
 
 public class AlgaeSubsystem extends SubsystemBase {
-  private Drivetrain drivetrain;
+  // private Drivetrain drivetrain;
   private final Supplier<Pose2d> drivetrainPoseSupplier;
-  private Pose2d relativeToRobot = new Pose2d(), relativeToField = new Pose2d(); // In m
+  private Pose2d relativeToRobot, relativeToField; // In m
+
   private PhotonCamera camera1;
-  private Pose2d robotPose2d;
 
   /**
    * Creates a new AlgaeSubsystem in which creates a new relative to robot object
@@ -41,9 +40,8 @@ public class AlgaeSubsystem extends SubsystemBase {
    *                               position
    */
   public AlgaeSubsystem(Supplier<Pose2d> drivetrainPoseSupplier) {
-    camera1 = new PhotonCamera(Constants.Vision.PhotonConstants.kCamera1);
     this.drivetrainPoseSupplier = drivetrainPoseSupplier;
-    relativeToRobot = new Pose2d();
+    camera1 = new PhotonCamera(Constants.Vision.PhotonConstants.kCamera1);
   }
 
   @Override
@@ -53,33 +51,30 @@ public class AlgaeSubsystem extends SubsystemBase {
     Logger.recordOutput("Vision/Algae/RelativeField", relativeToField);
   }
 
-  public void updateTargetPose() {
+  private boolean updateTargetPose() {
     var result = camera1.getLatestResult();
-    boolean hasTarget = result.hasTargets();
 
-    if (hasTarget) {
-      PhotonTrackedTarget target = result.getBestTarget();
-
-      double targetYaw = target.getYaw(); // in degrees (x angle)
-      Transform3d cameraToTarget = target.bestCameraToTarget;
-
-      Transform3d robotToAlgae = cameraToTarget.plus(Constants.Vision.PhotonConstants.robotToCamera);
-
-      SmartDashboard.putBoolean("Algae Detected",
-          targetYaw < Constants.Vision.AlgaeConstants.kUpperBound
-              && targetYaw > Constants.Vision.AlgaeConstants.kLowerBound);
-
-      relativeToRobot = new Pose2d(
-          robotToAlgae.getTranslation().getX(),
-          robotToAlgae.getTranslation().getY(),
-          Rotation2d.kZero);
-
-      // Assuming we already have the robot's position on the field
-      relativeToField = drivetrainPoseSupplier.get()
-          .plus(new Transform2d(relativeToRobot.getTranslation(), relativeToRobot.getRotation()));
-    } else {
+    // If no targets, return false
+    if (!result.hasTargets()) {
       SmartDashboard.putBoolean("Algae Detected", false);
+      return false;
     }
+
+    PhotonTrackedTarget target = result.getBestTarget();
+    double targetYaw = target.getYaw();
+    Transform3d robotToAlgae = target.bestCameraToTarget.plus(PhotonConstants.kRobotToCam1);
+
+    SmartDashboard.putBoolean("Algae Detected",
+        targetYaw < Constants.Vision.AlgaeConstants.kUpperBound
+            && targetYaw > Constants.Vision.AlgaeConstants.kLowerBound);
+
+    relativeToRobot = new Pose2d(robotToAlgae.getTranslation().getX(), robotToAlgae.getTranslation().getY(),
+        Rotation2d.kZero);
+
+    relativeToField = drivetrainPoseSupplier.get()
+        .plus(new Transform2d(relativeToRobot.getTranslation(), relativeToRobot.getRotation()));
+
+    return true;
   }
 
   /**
@@ -114,9 +109,10 @@ public class AlgaeSubsystem extends SubsystemBase {
    * @experimental
    */
   public PathPlannerPath getPath() {
-    updateTargetPose();
+    if (!updateTargetPose())
+      return null; // Skip path generation if no algae detected
 
-    Translation2d currentTranslation2d = drivetrain.getPose().getTranslation();
+    Translation2d currentTranslation2d = drivetrainPoseSupplier.get().getTranslation();
 
     double overshootDistance = 1.0; // Distance to overshoot the algae (adjust when testing) -- 1.0 units of
                                     // overshot distance
@@ -169,7 +165,9 @@ public class AlgaeSubsystem extends SubsystemBase {
     // new GoalEndState(0.0, Rotation2d.fromDegrees(-90))
 
     // waypoints.get(1) as a backup
-    path.getEventMarkers().add(new EventMarker("Intake", 1.0, 2.0, null));
+    // NOTE: Do not need the event marker as the cmd auto starts up the intake
+
+    // path.getEventMarkers().add(new EventMarker("Intake", 1.0, 2.0, null));
 
     // Prevent the path from being flipped if the coordinates are already correct
     // (this was copy pasted from

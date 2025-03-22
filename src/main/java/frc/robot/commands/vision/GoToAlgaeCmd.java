@@ -23,8 +23,7 @@ public class GoToAlgaeCmd extends Command {
 
   @Override
   public void initialize() {
-    timer.reset(); // Reset timer when the command starts
-    timer.start(); // Start the timer
+    timer.restart(); // Stop, reset, and start timer
 
     // Switch to Algae pipeline
     algaeSubsystem.setPipeline(Constants.Vision.PhotonConstants.kAlgaePipeline);
@@ -32,11 +31,6 @@ public class GoToAlgaeCmd extends Command {
 
   @Override
   public void execute() {
-    // The button state is automatically handled by whileHeld, no need for manual
-    // checking
-
-    // If the button was pressed, start tracking and moving
-    algaeSubsystem.updateTargetPose();
 
     // // If the path has changed, cancel the old path command and start a new one
     // if (pathCommand != null) {
@@ -74,7 +68,7 @@ public class GoToAlgaeCmd extends Command {
     }
     intakeSubsystem.stopIntake();
 
-    // Switch back to the AprilTag pipeline =
+    // Switch back to the AprilTag pipeline
     algaeSubsystem.setPipeline(Constants.Vision.PhotonConstants.kAprilTagPipeline);
   }
 
