@@ -81,8 +81,13 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+<<<<<<< Updated upstream
     gyro = new GyroNavX();
     gyro.calibrate();
+=======
+    if (RobotBase.isReal()) {
+      gyro = new GyroNavX();
+>>>>>>> Stashed changes
 
     driveSub = new Drivetrain(
         new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
