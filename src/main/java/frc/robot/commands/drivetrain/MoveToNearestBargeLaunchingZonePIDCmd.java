@@ -31,7 +31,7 @@ public class MoveToNearestBargeLaunchingZonePIDCmd extends Command {
   private double targetX, targetRadians;
 
   /** Creates a new MoveToNearestBargeLaunchingZoneCmd. */
-  public MoveToNearestBargeLaunchingZoneCmd(
+  public MoveToNearestBargeLaunchingZonePIDCmd(
       Drivetrain driveSub) {
     this.driveSub = driveSub;
     addRequirements(driveSub);
