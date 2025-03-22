@@ -69,6 +69,14 @@ public class MoveToNearestBargeLaunchingZoneCmd extends Command {
         -AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxSpeedMetersPerSecond);
 
+    // Invert the direction if robot is on red alliance
+    if (DriverStation.getAlliance().isPresent()) {
+      Alliance alliance = DriverStation.getAlliance().get();
+      if (alliance == Alliance.Red) {
+        xVel *= -1;
+      }
+    }
+
     double currentRotation = currentPose.getRotation().getRadians();
 
     double rotVel = MathUtil.clamp(
