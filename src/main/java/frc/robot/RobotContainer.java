@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
@@ -117,6 +118,15 @@ public class RobotContainer {
 
     // Register named Commands
     NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
+    NamedCommands.registerCommand("IndexerToLauncherBeamBreak", new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
+    NamedCommands.registerCommand("IndexerToIntake",
+        new IndexerSetVelocityManualCmd(indexerSub, () -> -1).withTimeout(10));
+    NamedCommands.registerCommand("IntakeIn",
+        new IntakeSetVelocityManualCmd(intakeSub, () -> 1).until(() -> indexerSub.getLauncherSensor()));
+    NamedCommands.registerCommand("IntakeOut", new IntakeSetVelocityManualCmd(intakeSub, () -> -1).withTimeout(10));
+    NamedCommands.registerCommand("ArmBalleypop",
+        new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleCoral).until(() -> indexerSub.getLauncherSensor()));
+    NamedCommands.registerCommand("ArmProcessor", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleProcessor));
 
     configureAutos();
     configureBindings();
