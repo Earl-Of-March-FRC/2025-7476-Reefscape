@@ -69,7 +69,8 @@ public class Drivetrain extends SubsystemBase {
   Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   // Current pose of the robot
-  Pose2d pose, visionlessPose;
+  Pose2d pose = new Pose2d();
+  Pose2d visionlessPose = new Pose2d();
 
   // Cameras & Photonvision variables
   private final PhotonCamera camera1;
