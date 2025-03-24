@@ -178,25 +178,22 @@ public final class Constants {
     public static final Angle kPositionConversionFactor = kGearReduction;
     public static final AngularVelocity kVelocityConversionFactor = kGearReduction.div(Seconds.of(60));
 
-    // Max velocity of arm in RPM for manual joystick control
-    public static final double kMaxVelocity = 60;
-
     // Tolerance of arm position PID in degrees
-    public static final double kAngleTolerance = 3;
+    public static final Angle kAngleTolerance = Degrees.of(3);
 
     // Arm starting position in radians
-    public static final double kAngleStart = -3.863;
+    public static final Angle kAngleStart = Radians.of(-3.863);
 
     // Angles need to be set in degrees
-    public static final double kAngleStowed = -6.5;
-    public static final double kAngleGroundIntake = -44.5; // 39 deg below horizontal
-    public static final double kAngleCoral = -83.5; // 8 deg above horizontal
-    public static final double kAngleL2 = -97.5;
-    public static final double kAngleL3 = -142.5;
-    public static final double kAngleProcessor = -176.5;
+    public static final Angle kAngleStowed = Degrees.of(-6.5);
+    public static final Angle kAngleGroundIntake = Degrees.of(-44.5); // 39 deg below horizontal
+    public static final Angle kAngleCoral = Degrees.of(-83.5); // 8 deg above horizontal
+    public static final Angle kAngleL2 = Degrees.of(-97.5);
+    public static final Angle kAngleL3 = Degrees.of(-142.5);
+    public static final Angle kAngleProcessor = Degrees.of(-176.5);
 
     // Arm PID fine control bump offsets
-    public static final double kBumpOffsetDeg = 2;
+    public static final Angle kBumpOffset = Degrees.of(2);
     public static final double kMaxArmManualSpeedPercent = 0.5;
 
     // Limit switch stuff

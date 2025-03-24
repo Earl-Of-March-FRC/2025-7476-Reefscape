@@ -227,12 +227,12 @@ public class RobotContainer {
     // Bump arm setpoints
     operatorController.leftBumper().whileTrue(
         Commands.runOnce(() -> {
-          armSub.increaseAngularOffset(-ArmConstants.kBumpOffsetDeg);
+          armSub.increaseAngularOffset(ArmConstants.kBumpOffset.times(-1));
         }, armSub));
 
     operatorController.rightBumper().whileTrue(
         Commands.runOnce(() -> {
-          armSub.increaseAngularOffset(ArmConstants.kBumpOffsetDeg);
+          armSub.increaseAngularOffset(ArmConstants.kBumpOffset);
         }, armSub));
   }
 
