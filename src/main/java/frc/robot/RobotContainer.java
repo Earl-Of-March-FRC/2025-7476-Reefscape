@@ -199,8 +199,8 @@ public class RobotContainer {
 
     // Launcher commands
     driverController.leftTrigger().whileTrue(
-        new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
-            () -> -launcherSub.getPreferredBackVelocity()));
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity().times(-1),
+            () -> launcherSub.getPreferredBackVelocity().times(-1)));
     driverController.rightTrigger().toggleOnTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
             () -> launcherSub.getPreferredBackVelocity()));
