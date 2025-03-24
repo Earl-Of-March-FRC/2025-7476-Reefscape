@@ -7,6 +7,8 @@ package frc.robot;
 import com.pathplanner.lib.path.PathConstraints;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,7 +20,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.*;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -205,11 +207,6 @@ public final class Constants {
     public static final MotorType kMotorType = MotorType.kBrushless;
 
     public static final double kMotorReduction = 1 / 10.0;
-
-    public static final double kPositionConversionFactor = (2 * Math.PI); // Rotations to radians
-    public static final double kVelocityConversionFactor = (2 * Math.PI / 60); // RPM to radians/sec
-
-    public static final double kMaxVelocity = 60; // Max velocity of intake in RPM, used as a reference velocity
 
     // Percent output for intake rollers
     public static final double kDefaultPercent = 0.5;
