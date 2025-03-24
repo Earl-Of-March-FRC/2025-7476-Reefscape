@@ -206,7 +206,10 @@ public final class Constants {
     public static final int kMotorCanId = 9;
     public static final MotorType kMotorType = MotorType.kBrushless;
 
-    public static final double kMotorReduction = 1 / 10.0;
+    public static final Angle kMotorReduction = Rotations.of(1 / 10.0);
+
+    public static final Angle kPositionConversionFactor = kMotorReduction;
+    public static final AngularVelocity kVelocityConversionFactor = kMotorReduction.div(Seconds.of(60));
 
     // Percent output for intake rollers
     public static final double kDefaultPercent = 0.5;

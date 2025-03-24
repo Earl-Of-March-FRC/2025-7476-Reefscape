@@ -5,6 +5,8 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import static edu.wpi.first.units.Units.*;
+
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
@@ -96,8 +98,8 @@ public final class Configs {
           .smartCurrentLimit(30); // Adjust current limit as needed
 
       intakeConfig.encoder
-          .positionConversionFactor(IntakeConstants.kPositionConversionFactor * IntakeConstants.kMotorReduction)
-          .velocityConversionFactor(IntakeConstants.kVelocityConversionFactor * IntakeConstants.kMotorReduction);
+          .positionConversionFactor(IntakeConstants.kPositionConversionFactor.in(Radians))
+          .velocityConversionFactor(IntakeConstants.kVelocityConversionFactor.in(RadiansPerSecond));
     }
   }
 
