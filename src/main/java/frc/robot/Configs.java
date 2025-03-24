@@ -127,7 +127,7 @@ public final class Configs {
           .voltageCompensation(10);
       frontLauncherConfig.encoder
           .positionConversionFactor(1)
-          .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
+          .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor.in(RadiansPerSecond));
       frontLauncherConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           .pidf(LauncherConstants.kPVelocityController,
@@ -144,7 +144,7 @@ public final class Configs {
           .voltageCompensation(10);
       backLauncherConfig.encoder
           .positionConversionFactor(1)
-          .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
+          .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor.in(RadiansPerSecond));
       backLauncherConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           .pidf(LauncherConstants.kPVelocityController,

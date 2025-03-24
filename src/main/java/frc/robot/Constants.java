@@ -300,15 +300,17 @@ public final class Constants {
     public static final double frontKVelocityFF = 0.0021;
     public static final double backKVelocityFF = 0.00215;
 
-    public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
+    public static final Angle kMotorReduction = Rotations.of(1);
+    public static final AngularVelocity kVelocityConversionFactor = kMotorReduction.div(Seconds.of(60));
 
-    // Velocities in RPM
-    // public static final double kVelocityFront = 2100; // 220 rad/s
-    // public static final double kVelocityBack = 2626.056561; // 275 rad/s
-    public static final double kVelocityFront = 1957.6058; // 205 rad/s
-    public static final double kVelocityBack = 2482.817112; // 260 rad/s
-    public static final double kVelocityFrontTolerance = 247.8;
-    public static final double kVelocityBackTolerance = 247.8;
+    // Velocity setpoints
+    // public static final AngularVelocity kVelocityFront =
+    // RadiansPerSecond.of(220);
+    // public static final AngularVelocity kVelocityBack = RadiansPerSecond.of(275);
+    public static final AngularVelocity kVelocityFront = RadiansPerSecond.of(205);
+    public static final AngularVelocity kVelocityBack = RadiansPerSecond.of(260);
+    public static final AngularVelocity kVelocityFrontTolerance = RPM.of(247.8);
+    public static final AngularVelocity kVelocityBackTolerance = RPM.of(247.8);
   }
 
   public static class FieldConstants {
