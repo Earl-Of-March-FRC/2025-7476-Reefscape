@@ -133,6 +133,8 @@ public class RobotContainer {
         () -> -1));
     NamedCommands.registerCommand("StopIntake", new IntakeSetVelocityManualCmd(intakeSub,
         () -> 0));
+    NamedCommands.registerCommand("IndexerBack",
+        new IndexerSetVelocityManualCmd(indexerSub, () -> -1).until(() -> !indexerSub.getIntakeSensor()));
     configureAutos();
     configureBindings();
   }
