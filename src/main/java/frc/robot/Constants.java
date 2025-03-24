@@ -230,19 +230,19 @@ public final class Constants {
     }
 
     public static final class PhotonConstants {
-      public static final double camera1Roll = 0;
-      public static final double camera1Pitch = 10 * Math.PI / 180; // in rad
-      public static final double camera1Yaw = 0;
-      public static final double camera1X = 0.2921; // forward (pos)
-      public static final double camera1Y = 0.127; // left (pos)
-      public static final double camera1Z = 0.4699; // up (pos)
+      public static final Angle camera1Roll = Degrees.of(0);
+      public static final Angle camera1Pitch = Degrees.of(10);
+      public static final Angle camera1Yaw = Degrees.of(0);
+      public static final Distance camera1X = Meters.of(0.2921); // forward (pos)
+      public static final Distance camera1Y = Meters.of(0.127); // left (pos)
+      public static final Distance camera1Z = Meters.of(0.4699); // up (pos)
 
-      public static final double camera2Roll = 0;
-      public static final double camera2Pitch = 0; // 10 * Math.PI / 180; // in rad
-      public static final double camera2Yaw = Math.PI;
-      public static final double camera2X = -0.2921;
-      public static final double camera2Y = 0;
-      public static final double camera2Z = 0.3175;
+      public static final Angle camera2Roll = Degrees.of(0);
+      public static final Angle camera2Pitch = Degrees.of(0);
+      public static final Angle camera2Yaw = Degrees.of(180);
+      public static final Distance camera2X = Meters.of(-0.2921);
+      public static final Distance camera2Y = Meters.of(0);
+      public static final Distance camera2Z = Meters.of(0.3175);
 
       public static final int kAlgaePipeline = 1;
       public static final int kAprilTagPipeline = 0;
@@ -257,7 +257,7 @@ public final class Constants {
           new Translation3d(PhotonConstants.camera2X, PhotonConstants.camera2Y, PhotonConstants.camera2Z),
           new Rotation3d(PhotonConstants.camera2Roll, PhotonConstants.camera2Pitch, PhotonConstants.camera2Yaw));
 
-      public static final double kHeightTolerance = 0.5; // meters above and below ground
+      public static final Distance kHeightTolerance = Meters.of(0.5); // meters above and below ground
       public static final double kAmbiguityDiscardThreshold = 0.7; // ignore targets above this value
       public static final double kAmbiguityThreshold = 0.3; // targets above this need to be checked
       public static final double kMinSingleTagArea = 0.3;
