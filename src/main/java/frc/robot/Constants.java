@@ -307,6 +307,8 @@ public final class Constants {
     // public static final double kVelocityBack = 2626.056561; // 275 rad/s
     public static final double kVelocityFront = 1957.6058; // 205 rad/s
     public static final double kVelocityBack = 2482.817112; // 260 rad/s
+    public static final double kVelocityYeetBack = 4964;
+    public static final double kVelocityYeetForward = 4964;
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
   }
