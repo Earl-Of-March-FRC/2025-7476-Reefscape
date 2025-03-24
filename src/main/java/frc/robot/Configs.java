@@ -71,8 +71,8 @@ public final class Configs {
           .smartCurrentLimit(40); // Adjust current limit as needed
 
       armConfig.encoder
-          .positionConversionFactor(ArmConstants.kPositionConversionFactor) // Radians
-          .velocityConversionFactor(ArmConstants.kVelocityConversionFactor); // Radians per second
+          .positionConversionFactor(ArmConstants.kPositionConversionFactor.in(Radians)) // Radians
+          .velocityConversionFactor(ArmConstants.kVelocityConversionFactor.in(RadiansPerSecond)); // Radians per second
 
       armConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)

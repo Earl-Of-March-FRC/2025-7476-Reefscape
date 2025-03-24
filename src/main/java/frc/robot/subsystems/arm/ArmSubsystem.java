@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.arm;
 
+import static edu.wpi.first.units.Units.*;
+
 import java.util.ArrayList;
 
 import org.littletonrobotics.junction.Logger;
@@ -23,6 +25,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -41,8 +44,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final RelativeEncoder armEncoder;
   private final SparkClosedLoopController armClosedLoopController;
   private boolean usePid = true;
-  private double angularOffsetDeg = 0;
-  private double pidReferencePositionDegWithoutOffset;
+  private Angle angularOffset = Degrees.of(0);
+  private Angle pidReferencePositionWithoutOffset;
 
   private Mechanism2d armMech = new Mechanism2d(0.5, 0.5);
   // arm length 0.473075 m
@@ -68,25 +71,19 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Arm/Measured/Position", new Rotation2d(getPosition()));
-
-    // Convert radians per second to RPM
-    Logger.recordOutput("Arm/Measured/Velocity", getVelocity() / ArmConstants.kVelocityConversionFactor);
-
-    Logger.recordOutput("Arm/Setpoint/AngularOffset", Rotation2d.fromDegrees(angularOffsetDeg));
-
+    Logger.recordOutput("Arm/Measured/Position", getPosition());
+    Logger.recordOutput("Arm/Measured/Velocity", getVelocity());
+    Logger.recordOutput("Arm/Setpoint/AngularOffset", angularOffset);
     Logger.recordOutput("Arm/UsePid", usePid);
-
     Logger.recordOutput("Arm/Measured/ArmPose", new Pose3d(0.3175, 0, 0.717551,
-        new Rotation3d(0, RobotBase.isReal() ? getPosition() : getReferencePosition(), 0)));
+        new Rotation3d(0, RobotBase.isReal() ? getPosition().in(Radians) : getReferencePosition().in(Radians), 0)));
 
     if (usePid) {
-      double setpoint = getReferencePosition();
+      double setpoint = getReferencePosition().in(Radians);
 
-      Logger.recordOutput("Arm/Setpoint/Position",
-          new Rotation2d(setpoint));
+      Logger.recordOutput("Arm/Setpoint/Position", getReferencePosition());
 
-      double gravityCompensationFFVoltage = ArmConstants.kGainFF * Math.sin(getPosition());
+      double gravityCompensationFFVoltage = ArmConstants.kGainFF * Math.sin(getPosition().in(Radians));
       REVLibError isOk = armClosedLoopController.setReference(
           setpoint,
           ControlType.kPosition,
@@ -99,20 +96,19 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * Returns the current arm position.
    * 
-   * @return double The current angle of the arm, in radians.
+   * @return Angle The current angle of the arm, in radians.
    */
-  public double getPosition() {
-    // Adds the angular offset
-    return armEncoder.getPosition();
+  public Angle getPosition() {
+    return Radians.of(armEncoder.getPosition());
   }
 
   /**
    * Returns the current arm velocity.
    * 
-   * @return double The current velocity of the arm, in radians per second.
+   * @return AngularVelocity The current velocity of the arm.
    */
-  public double getVelocity() {
-    return armEncoder.getVelocity();
+  public AngularVelocity getVelocity() {
+    return RadiansPerSecond.of(armEncoder.getVelocity());
   }
 
   /**
@@ -163,12 +159,12 @@ public class ArmSubsystem extends SubsystemBase {
    * 
    * <strong>This method will disable manual mode and enable PID control.</strong>
    * 
-   * @param referenceAngle The reference angle, in degrees.
+   * @param referenceAngle The reference angle.
    */
-  public void setReferencePosition(double referenceAngleDeg) {
+  public void setReferencePosition(Angle referenceAngle) {
     usePid = true;
 
-    pidReferencePositionDegWithoutOffset = referenceAngleDeg;
+    pidReferencePositionWithoutOffset = referenceAngle;
     // double offsettedReferenceAngleDeg = referenceAngleDeg + angularOffsetDeg;
 
     // // Convert deg -> rad
@@ -189,13 +185,10 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * Returns the setpoint, including offset for the arm closed loop controller.
    * 
-   * @return double The reference angle, in radians.
+   * @return Angle The reference angle.
    */
-  public double getReferencePosition() {
-    double offsettedReferenceAngleDeg = pidReferencePositionDegWithoutOffset + angularOffsetDeg;
-
-    // Convert deg -> rad
-    return offsettedReferenceAngleDeg * ArmConstants.kAngleConversionFactor;
+  public Angle getReferencePosition() {
+    return pidReferencePositionWithoutOffset.plus(angularOffset);
   }
 
   /**
@@ -231,35 +224,35 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * Returns the angular offset of the arm.
    * 
-   * @return The angular offset of the arm, in degrees.
+   * @return The angular offset of the arm.
    */
-  public double getAngularOffset() {
-    return angularOffsetDeg;
+  public Angle getAngularOffset() {
+    return angularOffset;
   }
 
   /**
    * Resets the angular offset of the arm to 0 degrees.
    */
   public void clearOffset() {
-    setAngularOffset(0);
+    setAngularOffset(Degrees.of(0));
   }
 
   /**
    * Sets the angular offset of the arm.
    * 
-   * @param offsetDeg The angular offset of the arm, in degrees.
+   * @param offsetDeg The angular offset of the arm.
    */
-  public void setAngularOffset(double offsetDeg) {
-    angularOffsetDeg = offsetDeg;
+  public void setAngularOffset(Angle offset) {
+    angularOffset = offset;
   }
 
   /**
    * Increases the angular offset of the arm. Use a negative value to decrease the
    * offset.
    * 
-   * @param offsetDeg The angular offset of the arm, in degrees. Can be negative.
+   * @param offsetDeg The angular offset of the arm. Can be negative.
    */
-  public void increaseAngularOffset(double offsetDeg) {
-    angularOffsetDeg += offsetDeg;
+  public void increaseAngularOffset(Angle offset) {
+    angularOffset = angularOffset.plus(offset);
   }
 }

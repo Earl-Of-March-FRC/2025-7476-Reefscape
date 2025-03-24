@@ -171,11 +171,12 @@ public final class Constants {
     public static final double kPositionFF = 0;
     public static final double kGainFF = 0.7;
 
-    public static final double kGearReduction = 1.0 / 50; // Gear ratio
+    public static final Angle kGearReduction = Rotations.of(1.0 / 50); // Gear ratio
 
-    public static final double kAngleConversionFactor = 2 * Math.PI / 360; // Degrees to radians
-    public static final double kPositionConversionFactor = 2 * Math.PI * kGearReduction; // Rotations to radians
-    public static final double kVelocityConversionFactor = 2 * Math.PI / 60 * kGearReduction; // RPM to radians/sec
+    // public static final double kAngleConversionFactor = 2 * Math.PI / 360; //
+    // Degrees to radians
+    public static final Angle kPositionConversionFactor = kGearReduction;
+    public static final AngularVelocity kVelocityConversionFactor = kGearReduction.div(Seconds.of(60));
 
     // Max velocity of arm in RPM for manual joystick control
     public static final double kMaxVelocity = 60;
