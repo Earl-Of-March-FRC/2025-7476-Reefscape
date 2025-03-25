@@ -7,6 +7,8 @@ package frc.robot;
 import com.pathplanner.lib.path.PathConstraints;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,8 +19,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
+import edu.wpi.first.units.measure.*;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -36,39 +39,43 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 4.8; // Default 4.8 - Max net robot translational speed
-    public static final double kMaxWheelSpeedMetersPerSecond = 4.8; // Max possible speed for wheel
-    public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
-    public static final double kBalleyPopMetersPerSecond = 0.8; // Max net robot translational speed when intaking algae
-                                                                // stacked on coral
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquaredPathfinding = 1;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
+    public static final LinearVelocity kMaxSpeed = MetersPerSecond.of(4.8); // Default 4.8 - Max net robot translational
+                                                                            // speed
+    public static final LinearVelocity kMaxWheelSpeed = MetersPerSecond.of(4.8); // Max possible speed for wheel
+    public static final AngularVelocity kMaxAngularSpeed = RadiansPerSecond.of(2 * Math.PI); // radians per second
+    public static final LinearVelocity kBalleyPopSpeed = MetersPerSecond.of(0.8); // Max net robot
+                                                                                  // translational speed when
+                                                                                  // intaking algae
+    // stacked on coral
+    public static final LinearAcceleration kMaxAcceleration = MetersPerSecondPerSecond.of(3);
+    public static final LinearAcceleration kMaxAccelerationPathfinding = MetersPerSecondPerSecond.of(1);
+    public static final AngularVelocity kMaxAngularSpeedPathfinding = RadiansPerSecond.of(Math.PI);
+    public static final AngularVelocity kMaxAngularAccelerationPathfinding = RadiansPerSecond.of(Math.PI);
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 2.5;
-    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 10;
+    public static final LinearVelocity kBangBangTranslationalVelocity = MetersPerSecond.of(2.5);
+    public static final AngularVelocity kBangBangRotationalVelocity = RadiansPerSecond
+        .of((2 * Math.PI) / 10);
 
-    public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
-        kMaxAccelerationMetersPerSecondSquaredPathfinding, kMaxAngularSpeedRadiansPerSecond,
-        kMaxAngularAccelerationRadiansPerSecondSquared);
+    public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeed.in(MetersPerSecond),
+        kMaxAccelerationPathfinding.in(MetersPerSecondPerSecond), kMaxAngularSpeedPathfinding.in(RadiansPerSecond),
+        kMaxAngularAccelerationPathfinding.in(RadiansPerSecond));
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(26.5);
+    public static final Distance kTrackWidth = Inches.of(26.5);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(26.5);
+    public static final Distance kWheelBase = Inches.of(26.5);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-        new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-        new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-        new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-        new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+        new Translation2d(kWheelBase.div(2).in(Meter), kTrackWidth.div(2).in(Meter)),
+        new Translation2d(kWheelBase.div(2).in(Meter), -kTrackWidth.div(2).in(Meter)),
+        new Translation2d(-kWheelBase.div(2).in(Meter), kTrackWidth.div(2).in(Meter)),
+        new Translation2d(-kWheelBase.div(2).in(Meter), -kTrackWidth.div(2).in(Meter)));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
-    public static final double kFrontRightChassisAngularOffset = 0;
-    public static final double kBackLeftChassisAngularOffset = Math.PI;
-    public static final double kBackRightChassisAngularOffset = Math.PI / 2;
+    public static final Angle kFrontLeftChassisAngularOffset = Radians.of(-Math.PI / 2);
+    public static final Angle kFrontRightChassisAngularOffset = Radians.of(0);
+    public static final Angle kBackLeftChassisAngularOffset = Radians.of(Math.PI);
+    public static final Angle kBackRightChassisAngularOffset = Radians.of(Math.PI / 2);
 
     // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 1;
@@ -84,9 +91,9 @@ public final class Constants {
     public static final boolean kGyroReversed = false;
 
     public static class LaunchingDistances {
-      public static final double kMetersFromBarge = 1.30; // 1.30 before March 20
-      public static final double kToleranceMetersFromBarge = 0.1;
-      public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
+      public static final Distance kDistanceFromBarge = Meters.of(1.30); // 1.30 before March 20
+      public static final Distance kToleranceDistanceFromBarge = Meters.of(0.1);
+      public static final Angle kToleranceAngleFromBarge = Radians.of(5 * Math.PI / 180);
     }
   }
 
@@ -182,31 +189,29 @@ public final class Constants {
     public static final double kPositionFF = 0;
     public static final double kGainFF = 0.7;
 
-    public static final double kGearReduction = 1.0 / 50; // Gear ratio
+    public static final Angle kGearReduction = Rotations.of(1.0 / 50); // Gear ratio
 
-    public static final double kAngleConversionFactor = 2 * Math.PI / 360; // Degrees to radians
-    public static final double kPositionConversionFactor = 2 * Math.PI * kGearReduction; // Rotations to radians
-    public static final double kVelocityConversionFactor = 2 * Math.PI / 60 * kGearReduction; // RPM to radians/sec
-
-    // Max velocity of arm in RPM for manual joystick control
-    public static final double kMaxVelocity = 60;
+    // public static final double kAngleConversionFactor = 2 * Math.PI / 360; //
+    // Degrees to radians
+    public static final Angle kPositionConversionFactor = kGearReduction;
+    public static final AngularVelocity kVelocityConversionFactor = kGearReduction.div(Seconds.of(60));
 
     // Tolerance of arm position PID in degrees
-    public static final double kAngleTolerance = 3;
+    public static final Angle kAngleTolerance = Degrees.of(3);
 
     // Arm starting position in radians
-    public static final double kAngleStart = -3.863;
+    public static final Angle kAngleStart = Radians.of(-3.863);
 
     // Angles need to be set in degrees
-    public static final double kAngleStowed = -6.5;
-    public static final double kAngleGroundIntake = -44.5; // 39 deg below horizontal
-    public static final double kAngleCoral = -83.5; // 8 deg above horizontal
-    public static final double kAngleL2 = -97.5;
-    public static final double kAngleL3 = -142.5;
-    public static final double kAngleProcessor = -176.5;
+    public static final Angle kAngleStowed = Degrees.of(-6.5);
+    public static final Angle kAngleGroundIntake = Degrees.of(-44.5); // 39 deg below horizontal
+    public static final Angle kAngleCoral = Degrees.of(-83.5); // 8 deg above horizontal
+    public static final Angle kAngleL2 = Degrees.of(-97.5);
+    public static final Angle kAngleL3 = Degrees.of(-142.5);
+    public static final Angle kAngleProcessor = Degrees.of(-176.5);
 
     // Arm PID fine control bump offsets
-    public static final double kBumpOffsetDeg = 2;
+    public static final Angle kBumpOffset = Degrees.of(2);
     public static final double kMaxArmManualSpeedPercent = 0.5;
 
     // Limit switch stuff
@@ -217,12 +222,10 @@ public final class Constants {
     public static final int kMotorCanId = 9;
     public static final MotorType kMotorType = MotorType.kBrushless;
 
-    public static final double kMotorReduction = 1 / 10.0;
+    public static final Angle kMotorReduction = Rotations.of(1 / 10.0);
 
-    public static final double kPositionConversionFactor = (2 * Math.PI); // Rotations to radians
-    public static final double kVelocityConversionFactor = (2 * Math.PI / 60); // RPM to radians/sec
-
-    public static final double kMaxVelocity = 60; // Max velocity of intake in RPM, used as a reference velocity
+    public static final Angle kPositionConversionFactor = kMotorReduction;
+    public static final AngularVelocity kVelocityConversionFactor = kMotorReduction.div(Seconds.of(60));
 
     // Percent output for intake rollers
     public static final double kDefaultPercent = 0.5;
@@ -246,19 +249,19 @@ public final class Constants {
     }
 
     public static final class PhotonConstants {
-      public static final double camera1Roll = 0;
-      public static final double camera1Pitch = 10 * Math.PI / 180; // in rad
-      public static final double camera1Yaw = 0;
-      public static final double camera1X = 0.2921; // forward (pos)
-      public static final double camera1Y = 0.127; // left (pos)
-      public static final double camera1Z = 0.4699; // up (pos)
+      public static final Angle camera1Roll = Degrees.of(0);
+      public static final Angle camera1Pitch = Degrees.of(10);
+      public static final Angle camera1Yaw = Degrees.of(0);
+      public static final Distance camera1X = Meters.of(0.2921); // forward (pos)
+      public static final Distance camera1Y = Meters.of(0.127); // left (pos)
+      public static final Distance camera1Z = Meters.of(0.4699); // up (pos)
 
-      public static final double camera2Roll = 0;
-      public static final double camera2Pitch = 0; // 10 * Math.PI / 180; // in rad
-      public static final double camera2Yaw = Math.PI;
-      public static final double camera2X = -0.2921;
-      public static final double camera2Y = 0;
-      public static final double camera2Z = 0.3175;
+      public static final Angle camera2Roll = Degrees.of(0);
+      public static final Angle camera2Pitch = Degrees.of(0);
+      public static final Angle camera2Yaw = Degrees.of(180);
+      public static final Distance camera2X = Meters.of(-0.2921);
+      public static final Distance camera2Y = Meters.of(0);
+      public static final Distance camera2Z = Meters.of(0.3175);
 
       public static final int kAlgaePipeline = 1;
       public static final int kAprilTagPipeline = 0;
@@ -273,7 +276,7 @@ public final class Constants {
           new Translation3d(PhotonConstants.camera2X, PhotonConstants.camera2Y, PhotonConstants.camera2Z),
           new Rotation3d(PhotonConstants.camera2Roll, PhotonConstants.camera2Pitch, PhotonConstants.camera2Yaw));
 
-      public static final double kHeightTolerance = 0.5; // meters above and below ground
+      public static final Distance kHeightTolerance = Meters.of(0.5); // meters above and below ground
       public static final double kAmbiguityDiscardThreshold = 0.7; // ignore targets above this value
       public static final double kAmbiguityThreshold = 0.3; // targets above this need to be checked
       public static final double kMinSingleTagArea = 0.3;
@@ -313,15 +316,17 @@ public final class Constants {
     public static final double frontKVelocityFF = 0.0021;
     public static final double backKVelocityFF = 0.00215;
 
-    public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
+    public static final Angle kMotorReduction = Rotations.of(1);
+    public static final AngularVelocity kVelocityConversionFactor = kMotorReduction.div(Seconds.of(60));
 
-    // Velocities in RPM
-    // public static final double kVelocityFront = 2100; // 220 rad/s
-    // public static final double kVelocityBack = 2626.056561; // 275 rad/s
-    public static final double kVelocityFront = 1957.6058; // 205 rad/s
-    public static final double kVelocityBack = 2482.817112; // 260 rad/s
-    public static final double kVelocityFrontTolerance = 247.8;
-    public static final double kVelocityBackTolerance = 247.8;
+    // Velocity setpoints
+    // public static final AngularVelocity kVelocityFront =
+    // RadiansPerSecond.of(220);
+    // public static final AngularVelocity kVelocityBack = RadiansPerSecond.of(275);
+    public static final AngularVelocity kVelocityFront = RadiansPerSecond.of(205);
+    public static final AngularVelocity kVelocityBack = RadiansPerSecond.of(260);
+    public static final AngularVelocity kVelocityFrontTolerance = RPM.of(247.8);
+    public static final AngularVelocity kVelocityBackTolerance = RPM.of(247.8);
   }
 
   public static class FieldConstants {

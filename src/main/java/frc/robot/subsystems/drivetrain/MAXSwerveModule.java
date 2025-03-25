@@ -7,6 +7,7 @@ package frc.robot.subsystems.drivetrain;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
 
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -14,6 +15,9 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import static edu.wpi.first.units.Units.Radians;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 
@@ -29,7 +33,7 @@ public class MAXSwerveModule implements SwerveModule {
   private final SparkClosedLoopController driveClosedLoopController;
   private final SparkClosedLoopController turnClosedLoopController;
 
-  private double m_chassisAngularOffset = 0;
+  private Angle m_chassisAngularOffset = Radians.of(0);
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
   /**
@@ -38,7 +42,7 @@ public class MAXSwerveModule implements SwerveModule {
    * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
    * Encoder.
    */
-  public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
+  public MAXSwerveModule(int drivingCANId, int turningCANId, Angle chassisAngularOffset) {
     driveSpark = new SparkMax(drivingCANId, MotorType.kBrushless);
     turnSpark = new SparkMax(turningCANId, MotorType.kBrushless);
 
@@ -70,7 +74,7 @@ public class MAXSwerveModule implements SwerveModule {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModuleState(driveEncoder.getVelocity(),
-        new Rotation2d(turnEncoder.getPosition() - m_chassisAngularOffset));
+        new Rotation2d(turnEncoder.getPosition() - m_chassisAngularOffset.in(Radians)));
   }
 
   /**
@@ -83,7 +87,7 @@ public class MAXSwerveModule implements SwerveModule {
     // relative to the chassis.
     return new SwerveModulePosition(
         driveEncoder.getPosition(),
-        new Rotation2d(turnEncoder.getPosition() - m_chassisAngularOffset));
+        new Rotation2d(turnEncoder.getPosition() - m_chassisAngularOffset.in(Radians)));
   }
 
   /**
@@ -95,7 +99,7 @@ public class MAXSwerveModule implements SwerveModule {
     // Apply chassis angular offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
+    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset.in(Radians)));
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
     correctedDesiredState.optimize(new Rotation2d(turnEncoder.getPosition()));

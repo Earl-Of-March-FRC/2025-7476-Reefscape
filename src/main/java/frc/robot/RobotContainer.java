@@ -8,6 +8,7 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -122,8 +123,8 @@ public class RobotContainer {
               COTS.WHEELS.COLSONS.cof,
               2))
           .withTrackLengthTrackWidth(
-              Units.Meters.of(DriveConstants.kWheelBase),
-              Units.Meters.of(DriveConstants.kTrackWidth))
+              DriveConstants.kWheelBase,
+              DriveConstants.kTrackWidth)
           .withBumperSize(Units.Meters.of(0.75), Units.Meters.of(0.75));
       swerveDriveSimulation = new SwerveDriveSimulation(
           driveTrainSimulationConfig,
@@ -241,8 +242,8 @@ public class RobotContainer {
 
     // Launcher commands
     driverController.leftTrigger().whileTrue(
-        new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
-            () -> -launcherSub.getPreferredBackVelocity()));
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity().times(-1),
+            () -> launcherSub.getPreferredBackVelocity().times(-1)));
     driverController.rightTrigger().toggleOnTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
             () -> launcherSub.getPreferredBackVelocity()));
@@ -269,12 +270,12 @@ public class RobotContainer {
     // Bump arm setpoints
     operatorController.leftBumper().whileTrue(
         Commands.runOnce(() -> {
-          armSub.increaseAngularOffset(-ArmConstants.kBumpOffsetDeg);
+          armSub.increaseAngularOffset(ArmConstants.kBumpOffset.times(-1));
         }, armSub));
 
     operatorController.rightBumper().whileTrue(
         Commands.runOnce(() -> {
-          armSub.increaseAngularOffset(ArmConstants.kBumpOffsetDeg);
+          armSub.increaseAngularOffset(ArmConstants.kBumpOffset);
         }, armSub));
   }
 

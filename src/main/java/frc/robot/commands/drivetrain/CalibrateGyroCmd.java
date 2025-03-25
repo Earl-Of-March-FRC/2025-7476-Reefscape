@@ -36,7 +36,7 @@ public class CalibrateGyroCmd extends Command {
    */
   @Override
   public void initialize() {
-    driveSub.gyro.setAngle(new Rotation2d(180 * Math.PI / 180));
+    driveSub.gyro.setAngle(Rotation2d.fromRadians(180 * Math.PI / 180));
   }
 
   // Called every time the scheduler runs while the command is scheduled.

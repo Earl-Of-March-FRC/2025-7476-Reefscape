@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.launcher;
 
+import static edu.wpi.first.units.Units.*;
+
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -13,6 +15,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.LauncherConfigs;
@@ -31,8 +34,8 @@ public class Launcher extends SubsystemBase {
   private final RelativeEncoder backLauncherEncoder;
   private final SparkClosedLoopController backLauncherClosedLoopController;
 
-  private double frontReferenceVelocity = 0.0;
-  private double backReferenceVelocity = 0.0;
+  private AngularVelocity frontReferenceVelocity = RadiansPerSecond.of(0);
+  private AngularVelocity backReferenceVelocity = RadiansPerSecond.of(0);
 
   /**
    * Constructs a new LauncherSubsystem and configures the launcher motors.
@@ -52,11 +55,10 @@ public class Launcher extends SubsystemBase {
     backLauncherSpark.configure(LauncherConfigs.backLauncherConfig.inverted(true), ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    // Log in rad/s
     SmartDashboard.putNumber("LauncherFrontVelocity",
-        LauncherConstants.kVelocityFront * LauncherConstants.kVelocityConversionFactor);
+        LauncherConstants.kVelocityFront.in(RadiansPerSecond));
     SmartDashboard.putNumber("LauncherBackVelocity",
-        LauncherConstants.kVelocityBack * LauncherConstants.kVelocityConversionFactor);
+        LauncherConstants.kVelocityBack.in(RadiansPerSecond));
   }
 
   /**
@@ -68,8 +70,8 @@ public class Launcher extends SubsystemBase {
     // Log in rad/s
     Logger.recordOutput("Launcher/Front/Measured/Velocity", getFrontVelocity());
     Logger.recordOutput("Launcher/Back/Measured/Velocity", getBackVelocity());
-    SmartDashboard.putNumber("FrontVel", getFrontVelocity());
-    SmartDashboard.putNumber("BackVel", getBackVelocity());
+    SmartDashboard.putNumber("FrontVel", getFrontVelocity().in(RadiansPerSecond));
+    SmartDashboard.putNumber("BackVel", getBackVelocity().in(RadiansPerSecond));
   }
 
   /**
@@ -77,8 +79,8 @@ public class Launcher extends SubsystemBase {
    *
    * @return The velocity of the front launcher motor, in radians per second.
    */
-  public double getFrontVelocity() {
-    return frontLauncherEncoder.getVelocity();
+  public AngularVelocity getFrontVelocity() {
+    return RadiansPerSecond.of(frontLauncherEncoder.getVelocity());
   }
 
   /**
@@ -86,8 +88,8 @@ public class Launcher extends SubsystemBase {
    *
    * @return The velocity of the back launcher motor, in radians per second.
    */
-  public double getBackVelocity() {
-    return backLauncherEncoder.getVelocity();
+  public AngularVelocity getBackVelocity() {
+    return RadiansPerSecond.of(backLauncherEncoder.getVelocity());
   }
 
   /**
@@ -111,7 +113,7 @@ public class Launcher extends SubsystemBase {
    * 
    * @param referenceVelocity The reference velocity, in RPM.
    */
-  public void setReferenceVelocity(double referenceVelocity) {
+  public void setReferenceVelocity(AngularVelocity referenceVelocity) {
     setFrontReferenceVelocity(referenceVelocity);
     setBackReferenceVelocity(referenceVelocity);
   }
@@ -121,12 +123,11 @@ public class Launcher extends SubsystemBase {
    *
    * @param referenceVelocity The reference velocity, in RPM.
    */
-  public void setFrontReferenceVelocity(double referenceVelocity) {
+  public void setFrontReferenceVelocity(AngularVelocity referenceVelocity) {
     frontReferenceVelocity = referenceVelocity;
     Logger.recordOutput("Launcher/Front/Setpoint/Velocity", referenceVelocity);
 
-    // Converts RPM to radians per second
-    frontLauncherClosedLoopController.setReference(referenceVelocity * LauncherConstants.kVelocityConversionFactor,
+    frontLauncherClosedLoopController.setReference(referenceVelocity.in(RadiansPerSecond),
         ControlType.kVelocity);
   }
 
@@ -135,12 +136,11 @@ public class Launcher extends SubsystemBase {
    *
    * @param referenceVelocity The reference velocity, in RPM.
    */
-  public void setBackReferenceVelocity(double referenceVelocity) {
+  public void setBackReferenceVelocity(AngularVelocity referenceVelocity) {
     backReferenceVelocity = referenceVelocity;
     Logger.recordOutput("Launcher/Back/Setpoint/Velocity", referenceVelocity);
 
-    // Converts RPM to radians per second
-    backLauncherClosedLoopController.setReference(referenceVelocity * LauncherConstants.kVelocityConversionFactor,
+    backLauncherClosedLoopController.setReference(referenceVelocity.in(RadiansPerSecond),
         ControlType.kVelocity);
   }
 
@@ -148,7 +148,7 @@ public class Launcher extends SubsystemBase {
    * Stops the launcher motors.
    */
   public void stopLauncher() {
-    setReferenceVelocity(0);
+    setReferenceVelocity(RadiansPerSecond.of(0));
   }
 
   /**
@@ -156,10 +156,9 @@ public class Launcher extends SubsystemBase {
    * 
    * @return Preferred velocity
    */
-  public double getPreferredFrontVelocity() {
-    return SmartDashboard.getNumber("LauncherFrontVelocity",
-        LauncherConstants.kVelocityFront * LauncherConstants.kVelocityConversionFactor)
-        / LauncherConstants.kVelocityConversionFactor;
+  public AngularVelocity getPreferredFrontVelocity() {
+    return RadiansPerSecond.of(SmartDashboard.getNumber("LauncherFrontVelocity",
+        LauncherConstants.kVelocityFront.in(RadiansPerSecond)));
   }
 
   /**
@@ -167,19 +166,18 @@ public class Launcher extends SubsystemBase {
    * 
    * @return Preferred velocity
    */
-  public double getPreferredBackVelocity() {
-    return SmartDashboard.getNumber("LauncherBackVelocity",
-        LauncherConstants.kVelocityBack * LauncherConstants.kVelocityConversionFactor)
-        / LauncherConstants.kVelocityConversionFactor;
+  public AngularVelocity getPreferredBackVelocity() {
+    return RadiansPerSecond.of(SmartDashboard.getNumber("LauncherBackVelocity",
+        LauncherConstants.kVelocityBack.in(RadiansPerSecond)));
   }
 
   public boolean frontRollerAtSetpoint() {
-    return MathUtil.isNear(frontReferenceVelocity, getFrontVelocity() / LauncherConstants.kVelocityConversionFactor,
-        LauncherConstants.kVelocityFrontTolerance);
+    return MathUtil.isNear(frontReferenceVelocity.in(RadiansPerSecond), getFrontVelocity().in(RadiansPerSecond),
+        LauncherConstants.kVelocityFrontTolerance.in(RadiansPerSecond));
   }
 
   public boolean backRollerAtSetpoint() {
-    return MathUtil.isNear(backReferenceVelocity, getBackVelocity() / LauncherConstants.kVelocityConversionFactor,
-        LauncherConstants.kVelocityBackTolerance);
+    return MathUtil.isNear(backReferenceVelocity.in(RadiansPerSecond), getBackVelocity().in(RadiansPerSecond),
+        LauncherConstants.kVelocityBackTolerance.in(RadiansPerSecond));
   }
 }
