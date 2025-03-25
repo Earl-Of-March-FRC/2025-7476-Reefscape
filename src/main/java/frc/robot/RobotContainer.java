@@ -36,6 +36,7 @@ import frc.robot.commands.indexer.IndexToBeamBreakCmd;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
+import frc.robot.commands.launcher.LauncherStopCmd;
 import frc.robot.commands.vision.GoToAlgaeCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -82,7 +83,6 @@ public class RobotContainer {
    */
   public RobotContainer() {
     gyro = new GyroNavX();
-    gyro.calibrate();
 
     driveSub = new Drivetrain(
         new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
@@ -118,7 +118,23 @@ public class RobotContainer {
 
     // Register named Commands
     NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
-
+    NamedCommands.registerCommand("ArmL2", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL2));
+    NamedCommands.registerCommand("ArmStow", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleStowed));
+    NamedCommands.registerCommand("LauncherIntake",
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
+            () -> -launcherSub.getPreferredBackVelocity()));
+    NamedCommands.registerCommand("RevLauncher",
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
+            () -> launcherSub.getPreferredBackVelocity()));
+    NamedCommands.registerCommand("StopLauncher", new LauncherStopCmd(launcherSub));
+    NamedCommands.registerCommand("Launch", new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
+    NamedCommands.registerCommand("StopIndexer", new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
+    NamedCommands.registerCommand("RunIntake", new IntakeSetVelocityManualCmd(intakeSub,
+        () -> -1));
+    NamedCommands.registerCommand("StopIntake", new IntakeSetVelocityManualCmd(intakeSub,
+        () -> 0));
+    NamedCommands.registerCommand("IndexerBack",
+        new IndexerSetVelocityManualCmd(indexerSub, () -> -1).until(() -> !indexerSub.getIntakeSensor()));
     configureAutos();
     configureBindings();
   }
@@ -177,7 +193,8 @@ public class RobotContainer {
 
     // Drive commands
     driverController.b().onTrue(new CalibrateGyroCmd(driveSub));
-    driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneCmd(driveSub));
+    driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneBangBangCmd(driveSub));
+    driverController.x().whileTrue(new MoveToNearestBargeLaunchingZonePIDCmd(driveSub));
 
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
@@ -190,7 +207,6 @@ public class RobotContainer {
         }));
 
     // Indexer commands
-    driverController.x().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> -1));
     driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
 
     driverController.leftBumper().whileTrue(
@@ -205,6 +221,9 @@ public class RobotContainer {
     driverController.rightTrigger().toggleOnTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
             () -> launcherSub.getPreferredBackVelocity()));
+    driverController.povDown().toggleOnTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> LauncherConstants.kVelocityYeetForward,
+            () -> LauncherConstants.kVelocityYeetBack));
 
     // OPERATOR CONTROLLER
 
