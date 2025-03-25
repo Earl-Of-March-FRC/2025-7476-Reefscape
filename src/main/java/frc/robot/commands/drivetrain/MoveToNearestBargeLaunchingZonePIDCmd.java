@@ -4,6 +4,9 @@
 
 package frc.robot.commands.drivetrain;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -41,8 +44,8 @@ public class MoveToNearestBargeLaunchingZonePIDCmd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    translationController.setTolerance(LaunchingDistances.kToleranceMetersFromBarge);
-    rotationController.setTolerance(LaunchingDistances.kToleranceRadiansFromBarge);
+    translationController.setTolerance(LaunchingDistances.kToleranceDistanceFromBarge.in(Meters));
+    rotationController.setTolerance(LaunchingDistances.kToleranceAngleFromBarge.in(Radians));
   }
 
   @Override
@@ -54,7 +57,7 @@ public class MoveToNearestBargeLaunchingZonePIDCmd extends Command {
 
     // Calculate target translation
     // (0,0) is ALWAYS on the blue alliance side
-    targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
+    targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kDistanceFromBarge.in(Meters));
 
     // Calculate target rotation based on side of field that robot is currently on
     targetRadians = onBlueSide ? Math.PI : 0;

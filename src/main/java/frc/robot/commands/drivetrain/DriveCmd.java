@@ -8,6 +8,8 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -62,9 +64,9 @@ public class DriveCmd extends Command {
    */
   @Override
   public void execute() {
-    double xVel = xSupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
-    double yVel = ySupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
-    double omega = omegaSupplier.get() * DriveConstants.kMaxAngularSpeed;
+    LinearVelocity xVel = DriveConstants.kMaxSpeed.times(xSupplier.get());
+    LinearVelocity yVel = DriveConstants.kMaxSpeed.times(ySupplier.get());
+    AngularVelocity omega = DriveConstants.kMaxAngularSpeed.times(omegaSupplier.get());
     driveSub.runVelocity(new ChassisSpeeds(xVel, yVel, omega));
   }
 

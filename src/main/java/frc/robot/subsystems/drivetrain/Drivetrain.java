@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems.drivetrain;
 
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -275,9 +278,10 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Distance to Barge", distanceToBarge);
     SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBarge);
 
-    SmartDashboard.putBoolean("FarFromBargeLaunchingRange", xDistanceToBarge > LaunchingDistances.kMetersFromBarge);
+    SmartDashboard.putBoolean("FarFromBargeLaunchingRange",
+        xDistanceToBarge > LaunchingDistances.kDistanceFromBarge.in(Meters));
     SmartDashboard.putBoolean("WithinBargeLaunchingRange", MathUtil.isNear(xDistanceToBarge,
-        LaunchingDistances.kMetersFromBarge, LaunchingDistances.kToleranceMetersFromBarge));
+        LaunchingDistances.kDistanceFromBarge.in(Meters), LaunchingDistances.kToleranceDistanceFromBarge.in(Meters)));
 
     Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBarge);
     Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBarge);
@@ -330,7 +334,7 @@ public class Drivetrain extends SubsystemBase {
     SwerveModuleState[] states = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
 
     // Desaturate the wheel speeds to ensure they are within the maximum speed
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.kMaxWheelSpeedMetersPerSecond);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.kMaxWheelSpeed);
 
     // Set the desired state for each swerve module
     for (int i = 0; i < 4; i++) {
@@ -580,7 +584,8 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public boolean isOnGround(Pose3d pose) {
-    return pose.getZ() <= PhotonConstants.kHeightTolerance && pose.getZ() >= -PhotonConstants.kHeightTolerance;
+    return pose.getZ() <= PhotonConstants.kHeightTolerance.in(Meters)
+        && pose.getZ() >= -PhotonConstants.kHeightTolerance.in(Meters);
   }
 
   public double distanceBetween(Pose3d pose1, Pose3d pose2) {
@@ -616,7 +621,8 @@ public class Drivetrain extends SubsystemBase {
       targetRadians = startingPose.getRotation().getRadians();
     }
     Pose2d targetPose = new Pose2d(
-        FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge), startingPose.getY(),
+        FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kDistanceFromBarge.in(Meters)),
+        startingPose.getY(),
         new Rotation2d(targetRadians));
 
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startingPose, targetPose);

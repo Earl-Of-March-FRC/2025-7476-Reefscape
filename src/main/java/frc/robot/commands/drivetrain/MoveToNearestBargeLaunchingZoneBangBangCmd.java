@@ -4,12 +4,18 @@
 
 package frc.robot.commands.drivetrain;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,9 +28,9 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 public class MoveToNearestBargeLaunchingZoneBangBangCmd extends Command {
   private final Drivetrain driveSub;
   private final BangBangController translationController = new BangBangController(
-      LaunchingDistances.kToleranceMetersFromBarge);
+      LaunchingDistances.kToleranceDistanceFromBarge.in(Meters));
   private final BangBangController rotationController = new BangBangController(
-      LaunchingDistances.kToleranceRadiansFromBarge);
+      LaunchingDistances.kToleranceAngleFromBarge.in(Radians));
 
   private double targetX, targetRadians;
 
@@ -54,7 +60,7 @@ public class MoveToNearestBargeLaunchingZoneBangBangCmd extends Command {
 
     // Calculate target translation
     // (0,0) is ALWAYS on the blue alliance side
-    targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
+    targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kDistanceFromBarge.in(Meters));
 
     // Calculate target rotation based on side of field that robot is currently on
     targetRadians = onBlueSide ? Math.PI : 0;
@@ -99,8 +105,8 @@ public class MoveToNearestBargeLaunchingZoneBangBangCmd extends Command {
     }
 
     // Convert calculated value to velocity
-    double xVel = DriveConstants.kBangBangTranslationalVelocityMetersPerSecond * directionX;
-    double rotVel = DriveConstants.kBangBangRotationalVelocityRadiansPerSecond * directionRot;
+    double xVel = DriveConstants.kBangBangTranslationalVelocity.in(MetersPerSecond) * directionX;
+    double rotVel = DriveConstants.kBangBangRotationalVelocity.in(RadiansPerSecond) * directionRot;
 
     // Set drivetrain to run at calculated velocity
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel, 0, rotVel);

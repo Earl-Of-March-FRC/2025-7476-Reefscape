@@ -25,6 +25,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -209,7 +210,7 @@ public class ArmSubsystem extends SubsystemBase {
    * Calibrates the arm encoder to the starting angle.
    */
   public void calibrate() {
-    armEncoder.setPosition(ArmConstants.kAngleStart);
+    armEncoder.setPosition(ArmConstants.kAngleStart.in(Radians));
   }
 
   /**
