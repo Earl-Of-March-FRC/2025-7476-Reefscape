@@ -46,7 +46,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkClosedLoopController armClosedLoopController;
   private boolean usePid = true;
   private Angle angularOffset = Degrees.of(0);
-  private Angle pidReferencePositionWithoutOffset;
+  private Angle pidReferencePositionWithoutOffset = Radians.zero();
 
   private Mechanism2d armMech = new Mechanism2d(0.5, 0.5);
   // arm length 0.473075 m
