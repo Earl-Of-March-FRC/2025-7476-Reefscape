@@ -45,6 +45,12 @@
           "data": {
             "pathName": "Launch Center To Reef"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Calibrate"
+          }
         }
       ]
     }
