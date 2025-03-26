@@ -30,6 +30,7 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.drivetrain.*;
+import frc.robot.commands.StripAlgaeCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
 import frc.robot.commands.indexer.IndexToBeamBreakCmd;
@@ -119,7 +120,9 @@ public class RobotContainer {
     // Register named Commands
     NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
     NamedCommands.registerCommand("ArmL2", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL2));
+    NamedCommands.registerCommand("ArmL3", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL3));
     NamedCommands.registerCommand("ArmStow", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleStowed));
+    NamedCommands.registerCommand("StripAlgae", new StripAlgaeCmd(intakeSub, armSub));
     NamedCommands.registerCommand("LauncherIntake",
         new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
             () -> -launcherSub.getPreferredBackVelocity()));

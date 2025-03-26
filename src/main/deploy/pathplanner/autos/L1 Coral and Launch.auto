@@ -17,33 +17,27 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "ArmL2"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Centered To Reef"
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "StripAlgae"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Reef To Launch Right"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Launch Right To Reef"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Reef To Launch Center"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Launch Center To Reef"
           }
         },
         {
