@@ -19,6 +19,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -198,6 +200,12 @@ public final class Constants {
 
     // Limit switch stuff
     public static final int kLimitSwitchChannel = 9;
+
+    // Color sensor
+    public static final I2C.Port kColorSensorI2CPort = I2C.Port.kOnboard;
+    public static final Color kAlgaeColor = Color.kTurquoise;
+    public static final double kColorMatchThreshold = 0;
+    public static final int kColorSensorProximityThreshold = 2000;
   }
 
   public static final class IntakeConstants {
