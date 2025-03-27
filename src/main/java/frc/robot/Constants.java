@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
+import edu.wpi.first.units.MultUnit;
 import edu.wpi.first.units.measure.*;
 
 /**
@@ -104,14 +105,18 @@ public final class Constants {
     public static final int kDrivingMotorPinionTeeth = 13;
 
     // Calculations required for driving motor conversion factors and feed forward
-    public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = Units.inchesToMeters(3);
-    public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
+    public static final AngularVelocity kDrivingMotorFreeSpeed = NeoMotorConstants.kFreeSpeed;
+    public static final Distance kWheelDiameter = Inches.of(3);
+    public static final Distance kWheelCircumference = kWheelDiameter.times(Math.PI);
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
     // teeth on the bevel pinion
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
-    public static final double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
-        / kDrivingMotorReduction;
+    public static final AngularVelocity kDriveWheelFreeSpeed = RotationsPerSecond
+        .of(
+            kDrivingMotorFreeSpeed
+                .times(kWheelCircumference)
+                .div(kDrivingMotorReduction)
+                .in(MultUnit.combine(RotationsPerSecond, Meters)));
   }
 
   public static final class OIConstants {
@@ -162,7 +167,7 @@ public final class Constants {
   }
 
   public static final class NeoMotorConstants {
-    public static final double kFreeSpeedRpm = 5676;
+    public static final AngularVelocity kFreeSpeed = RotationsPerSecond.of(5676 / 60);
   }
 
   public static final class ArmConstants {
