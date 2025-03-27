@@ -89,6 +89,11 @@ public final class Constants {
       public static final double kMetersFromBarge = 1.30; // 1.30 before March 20
       public static final double kToleranceMetersFromBarge = 0.1;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
+
+      public static final double kTargetBargeAngle = 45 * Math.PI / 180;
+      public static final double kTargetBargeAngleLeft = kTargetBargeAngle;
+      public static final double kTargetBargeAngleStraight = 0;
+      public static final double kTargetBargeAngleRight = -kTargetBargeAngle;
     }
 
     public static class ReefConstants {

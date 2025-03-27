@@ -29,6 +29,7 @@ import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.commands.drivetrain.*;
 import frc.robot.commands.StripAlgaeCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
@@ -199,6 +200,14 @@ public class RobotContainer {
     driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneBangBangCmd(driveSub));
     driverController.x().whileTrue(new MoveToNearestBargeLaunchingZonePIDCmd(driveSub));
 
+    // Move to barge launching zone, facing in the specified direction
+    driverController.povLeft().whileTrue(
+        new MoveToTargetPoseCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft)));
+    driverController.povUp().whileTrue(
+        new MoveToTargetPoseCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight)));
+    driverController.povRight().whileTrue(
+        new MoveToTargetPoseCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight)));
+
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
         Commands.runOnce(() -> {
@@ -211,7 +220,6 @@ public class RobotContainer {
 
     // Indexer commands
     driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
-
     driverController.leftBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> -0.75));
     driverController.rightBumper().whileTrue(

@@ -7,6 +7,7 @@ package frc.robot.subsystems.drivetrain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
@@ -610,5 +611,30 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput("PathPlanner/GoToBarge/TargetPose", targetPose);
 
     return AutoBuilder.followPath(path);
+  }
+
+  /**
+   * Calculates the target pose for the robot at the nearest barge launching zone.
+   * 
+   * @param targetAngle Angle that robot should face in its target pose, in
+   *                    radians. CCW is positive.
+   * @return The calculated target pose for the robot at the barge.
+   */
+  public Pose2d getBargeTargetPose(double targetAngle) {
+    Pose2d currentPose = getPose();
+
+    // Y coordinate stays the same as current pose
+    double targetY = currentPose.getY();
+
+    boolean onBlueSide = PoseHelpers.isOnBlueSide(currentPose);
+
+    // Calculate target translation
+    // (0,0) is ALWAYS on the blue alliance side
+    double targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
+
+    // Calculate target rotation based on side of field that robot is currently on
+    double targetRadians = (onBlueSide ? Math.PI : 0) + targetAngle;
+
+    return new Pose2d(targetX, targetY, new Rotation2d(targetRadians));
   }
 }
