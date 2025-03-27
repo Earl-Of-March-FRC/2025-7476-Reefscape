@@ -33,48 +33,55 @@ public class MoveToTargetPoseCmd extends Command {
       ReefConstants.kToleranceMetersFromSpot);
   private final BangBangController rotationController = new BangBangController(ReefConstants.kToleranceRadiansFromSpot);
 
-  private Pose2d targetPose;
+  private Supplier<Pose2d> targetPose;
+  private Pose2d initialTargetPose;
   private double targetX, targetY, targetRadians;
-
-  private boolean translationXFinish = false, translationYFinish = false, rotationFinish = false;
+  private boolean dynamicPose;
 
   /** Creates a new MoveToTargetPoseCmd. */
-  public MoveToTargetPoseCmd(Drivetrain driveSub, Pose2d targetPose) {
+  public MoveToTargetPoseCmd(Drivetrain driveSub, Supplier<Pose2d> targetPose, boolean dynamicPose) {
     this.driveSub = driveSub;
     addRequirements(driveSub);
 
     this.targetPose = targetPose;
+    this.dynamicPose = dynamicPose;
+
+    initialTargetPose = targetPose.get();
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    translationXFinish = false;
-    translationYFinish = false;
-    rotationFinish = false;
-  }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
+    // Run calculations once to ensure that the three bang bang controllers have
+    // setpoints
     Pose2d currentPose = driveSub.getPose();
-
-    // Get the current target pose
-    targetX = targetPose.getX();
-    targetY = targetPose.getY();
-    targetRadians = targetPose.getRotation().getRadians();
-
     Logger.recordOutput("Odometry/MoveToTargetPose/CurrentPose",
         currentPose);
-    Logger.recordOutput("Odometry/MoveToTargetPose/TargetPose",
-        targetPose);
+
+    // Set target based on whether the target pose is dynamic
+    if (dynamicPose) {
+      targetX = targetPose.get().getX();
+      targetY = targetPose.get().getY();
+      targetRadians = targetPose.get().getRotation().getRadians();
+      Logger.recordOutput("Odometry/MoveToTargetPose/TargetPose",
+          targetPose.get());
+
+      // If target pose is not dynamic, always use initial target pose
+    } else {
+      targetX = initialTargetPose.getX();
+      targetY = initialTargetPose.getY();
+      targetRadians = initialTargetPose.getRotation().getRadians();
+      Logger.recordOutput("Odometry/MoveToTargetPose/TargetPose",
+          initialTargetPose);
+    }
 
     // Make adjustments to the robot
     double directionX = 0;
     double directionY = 0;
     double directionRot = 0;
 
-    if (!translationXFinish) {
+    if (!translationXController.atSetpoint()) {
       // Bang bang controller returns 0 or 1
       // Multiply calculated output by 2 and subtract 1 to get -1 or 1
       directionX = (translationXController.calculate(currentPose.getX(), targetX) * 2) - 1;
@@ -86,11 +93,9 @@ public class MoveToTargetPoseCmd extends Command {
           directionX *= -1;
         }
       }
-
-      translationXFinish = translationXController.atSetpoint();
     }
 
-    if (!translationYFinish) {
+    if (!translationYController.atSetpoint()) {
       // Bang bang controller returns 0 or 1
       // Multiply calculated output by 2 and subtract 1 to get -1 or 1
       directionY = (translationYController.calculate(currentPose.getY(), targetY) * 2) - 1;
@@ -102,11 +107,9 @@ public class MoveToTargetPoseCmd extends Command {
           directionY *= -1;
         }
       }
-
-      translationYFinish = translationYController.atSetpoint();
     }
 
-    if (!rotationFinish) {
+    if (!rotationController.atSetpoint()) {
       double currentRotation = currentPose.getRotation().getRadians();
 
       // Bang bang controller returns 0 or 1
@@ -114,7 +117,75 @@ public class MoveToTargetPoseCmd extends Command {
       // Offset the rotation such that the setpoint is always "0". This rids of
       // wrap-around issues.
       directionRot = (rotationController.calculate(MathUtil.angleModulus(currentRotation - targetRadians), 0) * 2) - 1;
-      rotationFinish = rotationController.atSetpoint();
+    }
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+
+    Pose2d currentPose = driveSub.getPose();
+    Logger.recordOutput("Odometry/MoveToTargetPose/CurrentPose",
+        currentPose);
+
+    // Set target based on whether the target pose is dynamic
+    if (dynamicPose) {
+      targetX = targetPose.get().getX();
+      targetY = targetPose.get().getY();
+      targetRadians = targetPose.get().getRotation().getRadians();
+      Logger.recordOutput("Odometry/MoveToTargetPose/TargetPose",
+          targetPose.get());
+
+      // If target pose is not dynamic, always use initial target pose
+    } else {
+      targetX = initialTargetPose.getX();
+      targetY = initialTargetPose.getY();
+      targetRadians = initialTargetPose.getRotation().getRadians();
+      Logger.recordOutput("Odometry/MoveToTargetPose/TargetPose",
+          initialTargetPose);
+    }
+
+    // Make adjustments to the robot
+    double directionX = 0;
+    double directionY = 0;
+    double directionRot = 0;
+
+    if (!translationXController.atSetpoint()) {
+      // Bang bang controller returns 0 or 1
+      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
+      directionX = (translationXController.calculate(currentPose.getX(), targetX) * 2) - 1;
+
+      // Reverse direction if on red alliance
+      if (DriverStation.getAlliance().isPresent()) {
+        Alliance alliance = DriverStation.getAlliance().get();
+        if (alliance == Alliance.Red) {
+          directionX *= -1;
+        }
+      }
+    }
+
+    if (!translationYController.atSetpoint()) {
+      // Bang bang controller returns 0 or 1
+      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
+      directionY = (translationYController.calculate(currentPose.getY(), targetY) * 2) - 1;
+
+      // Reverse direction if on red alliance
+      if (DriverStation.getAlliance().isPresent()) {
+        Alliance alliance = DriverStation.getAlliance().get();
+        if (alliance == Alliance.Red) {
+          directionY *= -1;
+        }
+      }
+    }
+
+    if (!rotationController.atSetpoint()) {
+      double currentRotation = currentPose.getRotation().getRadians();
+
+      // Bang bang controller returns 0 or 1
+      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
+      // Offset the rotation such that the setpoint is always "0". This rids of
+      // wrap-around issues.
+      directionRot = (rotationController.calculate(MathUtil.angleModulus(currentRotation - targetRadians), 0) * 2) - 1;
     }
 
     // Convert calculated value to velocity
@@ -142,6 +213,7 @@ public class MoveToTargetPoseCmd extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return translationXFinish && translationYFinish && rotationFinish;
+    return translationXController.atSetpoint() && translationYController.atSetpoint()
+        && rotationController.atSetpoint();
   }
 }
