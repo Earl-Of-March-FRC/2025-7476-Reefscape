@@ -19,6 +19,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -46,7 +48,7 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 1;
+    public static final double kBangBangTranslationalVelocityMetersPerSecond = 2.5;
     public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 10;
 
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
@@ -84,7 +86,7 @@ public final class Constants {
     public static final boolean kGyroReversed = false;
 
     public static class LaunchingDistances {
-      public static final double kMetersFromBarge = 1.18; // 1.30 before March 20
+      public static final double kMetersFromBarge = 1.30; // 1.30 before March 20
       public static final double kToleranceMetersFromBarge = 0.1;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
     }
@@ -197,10 +199,10 @@ public final class Constants {
 
     // Angles need to be set in degrees
     public static final double kAngleStowed = -6.5;
-    public static final double kAngleGroundIntake = -54.5;
-    public static final double kAngleCoral = -93.5;
+    public static final double kAngleGroundIntake = -44.5; // 39 deg below horizontal
+    public static final double kAngleCoral = -83.5; // 8 deg above horizontal
     public static final double kAngleL2 = -97.5;
-    public static final double kAngleL3 = -158.5;
+    public static final double kAngleL3 = -142.5;
     public static final double kAngleProcessor = -176.5;
 
     // Arm PID fine control bump offsets
@@ -209,6 +211,12 @@ public final class Constants {
 
     // Limit switch stuff
     public static final int kLimitSwitchChannel = 9;
+
+    // Color sensor
+    public static final I2C.Port kColorSensorI2CPort = I2C.Port.kOnboard;
+    public static final Color kAlgaeColor = Color.kTurquoise;
+    public static final double kColorMatchThreshold = 0;
+    public static final int kColorSensorProximityThreshold = 2000;
   }
 
   public static final class IntakeConstants {
@@ -308,8 +316,8 @@ public final class Constants {
     public static final double kPVelocityController = 0;
     public static final double kIVelocityController = 0;
     public static final double kDVelocityController = 0;
-    public static final double frontKVelocityFF = 0.0017;
-    public static final double backKVelocityFF = 0.00187;
+    public static final double frontKVelocityFF = 0.0021;
+    public static final double backKVelocityFF = 0.00215;
 
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
@@ -318,6 +326,8 @@ public final class Constants {
     // public static final double kVelocityBack = 2626.056561; // 275 rad/s
     public static final double kVelocityFront = 1957.6058; // 205 rad/s
     public static final double kVelocityBack = 2482.817112; // 260 rad/s
+    public static final double kVelocityYeetBack = 4964;
+    public static final double kVelocityYeetForward = 4964;
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
   }

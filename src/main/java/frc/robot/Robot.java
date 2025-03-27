@@ -13,12 +13,14 @@ import org.littletonrobotics.urcl.URCL;
 import com.pathplanner.lib.pathfinding.Pathfinder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
-import frc.robot.utils.LocalADStarAK;
+import frc.robot.commands.drivetrain.CalibrateGyroCmd;
+import frc.utils.LocalADStarAK;
 
 /**
  * The methods in this class are called automatically corresponding to each
@@ -101,6 +103,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void autonomousInit() {
+    new CalibrateGyroCmd(robotContainer.driveSub).schedule();
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)

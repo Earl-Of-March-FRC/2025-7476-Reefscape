@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.829965753424658,
+        "y": 4.002461472602739
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.5688643962513105,
+        "y": 4.8387420807277515
+      },
+      "isLocked": false,
+      "linkedName": "Algae"
+    },
+    {
+      "anchor": {
+        "x": 7.39641393442623,
+        "y": 5.6013831967213115
+      },
+      "prevControl": {
+        "x": 6.730906469936015,
+        "y": 5.096633322304935
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Launch Center"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -146.63363399894033
+  },
+  "reversed": false,
+  "folder": "Reef Stripping",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}
