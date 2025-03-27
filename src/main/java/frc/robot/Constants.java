@@ -19,8 +19,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
 import edu.wpi.first.units.MultUnit;
 import edu.wpi.first.units.measure.*;
 
@@ -290,7 +288,7 @@ public final class Constants {
     public static final double kDirectionConstant = -1.0;
 
     public static final double kMotorReduction = 1.0;
-    public static final double kWheelDiameterMeters = 0.17;
+    public static final Distance kWheelDiameter = Meters.of(0.17);
 
     // Ports for sensors. TBD
     public static final int kIntakeSensorChannel = 0;
@@ -323,11 +321,13 @@ public final class Constants {
 
   public static class FieldConstants {
     public static final AprilTagFieldLayout kfieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-    public static final double kFieldLengthX = kfieldLayout.getFieldLength(); // meters from drivestation wall to
-                                                                              // drivestation wall
-    public static final double kFieldWidthY = kfieldLayout.getFieldWidth(); // meters of parallel distance from
-                                                                            // processor to processor
-    public static final double kBargeX = kFieldLengthX / 2; // meters from drivestation wall to middle of barge
+    public static final Distance kFieldLengthX = Meters.of(kfieldLayout.getFieldLength()); // meters from drivestation
+                                                                                           // wall to
+    // drivestation wall
+    public static final Distance kFieldWidthY = Meters.of(kfieldLayout.getFieldWidth()); // meters of parallel distance
+                                                                                         // from
+    // processor to processor
+    public static final Distance kBargeX = kFieldLengthX.div(2); // meters from drivestation wall to middle of barge
   }
 
   // PDP CAN IDs

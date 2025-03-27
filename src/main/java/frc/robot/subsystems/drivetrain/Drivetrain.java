@@ -579,8 +579,8 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public boolean isInField(Pose3d pose) {
-    return pose.getX() >= 0 && pose.getX() <= FieldConstants.kFieldLengthX && pose.getY() >= 0
-        && pose.getY() <= FieldConstants.kFieldWidthY;
+    return pose.getX() >= 0 && pose.getX() <= FieldConstants.kFieldLengthX.in(Meters) && pose.getY() >= 0
+        && pose.getY() <= FieldConstants.kFieldWidthY.in(Meters);
   }
 
   public boolean isOnGround(Pose3d pose) {
@@ -594,12 +594,12 @@ public class Drivetrain extends SubsystemBase {
 
   public boolean isOnBlueSide() {
     double robotX = getPose().getTranslation().getX();
-    return robotX - FieldConstants.kBargeX < 0;
+    return robotX - FieldConstants.kBargeX.in(Meters) < 0;
   }
 
   public double getXDistanceToBarge() {
     double robotX = getPose().getTranslation().getX();
-    return Math.abs(robotX - FieldConstants.kBargeX);
+    return Math.abs(robotX - FieldConstants.kBargeX.in(Meters));
   }
 
   public double distanceToBardge() {
@@ -621,7 +621,7 @@ public class Drivetrain extends SubsystemBase {
       targetRadians = startingPose.getRotation().getRadians();
     }
     Pose2d targetPose = new Pose2d(
-        FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kDistanceFromBarge.in(Meters)),
+        FieldConstants.kBargeX.plus(LaunchingDistances.kDistanceFromBarge.times(onBlueSide ? -1 : 1)).in(Meters),
         startingPose.getY(),
         new Rotation2d(targetRadians));
 
