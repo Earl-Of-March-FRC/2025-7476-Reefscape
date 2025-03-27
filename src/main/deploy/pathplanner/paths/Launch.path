@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.586270491803279,
-        "y": 4.222797131147541
+        "x": 6.896789383561644,
+        "y": 4.002461472602739
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.71311475409836,
-        "y": 4.126895491803278
+        "x": 7.302482876712329,
+        "y": 5.279644691780822
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Launch Start"
     },
     {
       "anchor": {
-        "x": 6.605225409836065,
-        "y": 5.2897028688524586
+        "x": 7.587970890410959,
+        "y": 6.076005993150685
       },
       "prevControl": {
-        "x": 7.106818541590025,
-        "y": 5.005712639844702
-      },
-      "nextControl": {
-        "x": 4.974897540983607,
-        "y": 6.212756147540984
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 1.6183401639344261,
-        "y": 5.853125
-      },
-      "prevControl": {
-        "x": 3.776127049180327,
-        "y": 5.829149590163934
+        "x": 7.257405821917809,
+        "y": 5.234567636986301
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Algae"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -64,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 179.93335434916654
   },
   "useDefaultConstraints": true
 }
