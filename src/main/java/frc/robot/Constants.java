@@ -138,11 +138,10 @@ public final class Constants {
   public static final class AutoConstants {
     // Auto Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 2; // Default 4.8
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
-    public static final double kMaxAngularSpeed = 2 * Math.PI;
+    public static final LinearVelocity kMaxSpeed = MetersPerSecond.of(2); // Default 4.8
+    public static final LinearAcceleration kMaxAcceleration = MetersPerSecondPerSecond.of(3);
+    public static final AngularVelocity kMaxAngularSpeed = RadiansPerSecond.of(Math.PI);
+    public static final AngularAcceleration kMaxAngularAcceleration = RadiansPerSecondPerSecond.of(Math.PI);
 
     public static final double kPTranslationController = 1.5;
     public static final double kPThetaController = 1;
@@ -152,13 +151,14 @@ public final class Constants {
     public static final double kDThetaController = 0;
 
     public static final class EncoderAutoDriveConstants {
-      public static final double kLeaveZoneMeters = 0.5; // Distance to travel
-      public static final double kLeaveZoneVelocity = 0.5; // Velocity (Meters/S) to leave zone at
+      public static final Distance kLeaveZoneDistance = Meters.of(0.5); // Distance to travel
+      public static final LinearVelocity kLeaveZoneVelocity = MetersPerSecond.of(0.5); // Velocity (Meters/S) to leave
+                                                                                       // zone at
     }
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-        kMaxAngularSpeedRadiansPerSecond, kMaxAngularAccelerationRadiansPerSecondSquared);
+        kMaxAngularSpeed.in(RadiansPerSecond), kMaxAngularAcceleration.in(RadiansPerSecondPerSecond));
 
     public static final Pose2d kLaunchPoseBlue = new Pose2d(new Translation2d(7.475, 5.37),
         Rotation2d.fromDegrees(180));

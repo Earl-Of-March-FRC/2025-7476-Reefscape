@@ -4,8 +4,15 @@
 
 package frc.robot.commands.drivetrain;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants.EncoderAutoDriveConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -15,7 +22,8 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class EncoderAutoDrive extends Command {
   private final Drivetrain driveSub;
-  private final double netdistance, xVel, yVel;
+  private final Distance netdistance;
+  private final LinearVelocity xVel, yVel;
 
   private SwerveModulePosition[] initialModulePositions;
 
@@ -29,19 +37,24 @@ public class EncoderAutoDrive extends Command {
    */
   public EncoderAutoDrive(
       Drivetrain driveSub,
-      double netVelocity,
-      double xDis, double yDis) {
+      LinearVelocity netVelocity,
+      Distance xDis, Distance yDis) {
 
     this.driveSub = driveSub;
 
     addRequirements(driveSub);
 
     // Get the total net distance
-    netdistance = Math.sqrt(Math.pow(xDis, 2) + Math.pow(yDis, 2));
+    netdistance = Meters.of(Math.sqrt(Math.pow(xDis.in(Meters), 2) + Math.pow(yDis.in(Meters), 2)));
 
-    double heading = (xDis == 0 ? 0 : Math.atan(xDis / yDis)); // Angle (degrees): {Moving left < 0 < Moving right}
-    xVel = Math.sin(heading) * netVelocity; // Calculate required x-velocity to meet net velocity
-    yVel = Math.cos(heading) * netVelocity; // Calculate required y-velocity to meet net velocity
+    // Angle (degrees): {Moving left < 0 < Moving right}
+    Angle heading = Degrees.of(xDis.in(Meters) == 0 ? 0 : Math.atan(xDis.in(Meters) / yDis.in(Meters)));
+
+    // Calculate required x-velocity to meet net velocity
+    xVel = MetersPerSecond.of(Math.sin(heading.in(Degrees)) * netVelocity.in(MetersPerSecond));
+
+    // Calculate required y-velocity to meet net velocity
+    yVel = MetersPerSecond.of(Math.cos(heading.in(Degrees)) * netVelocity.in(MetersPerSecond));
 
   }
 
@@ -52,11 +65,9 @@ public class EncoderAutoDrive extends Command {
    * @param driveSub Drivetrain subsystem
    */
   public EncoderAutoDrive(Drivetrain driveSub) {
-    this(driveSub, EncoderAutoDriveConstants.kLeaveZoneVelocity, EncoderAutoDriveConstants.kLeaveZoneMeters, 0); // Move
-                                                                                                                 // out
-                                                                                                                 // of
-                                                                                                                 // zone
-                                                                                                                 // auto
+    // Move out of zone auto
+    this(driveSub, EncoderAutoDriveConstants.kLeaveZoneVelocity, EncoderAutoDriveConstants.kLeaveZoneDistance,
+        Meters.zero());
   }
 
   @Override
@@ -67,7 +78,7 @@ public class EncoderAutoDrive extends Command {
 
   @Override
   public void execute() {
-    driveSub.runVelocityRobotRelative(new ChassisSpeeds(xVel, yVel, 0));
+    driveSub.runVelocityRobotRelative(new ChassisSpeeds(xVel.in(MetersPerSecond), yVel.in(MetersPerSecond), 0));
   }
 
   @Override
@@ -84,6 +95,6 @@ public class EncoderAutoDrive extends Command {
       currentAverageDistance += Math.abs(currentPosition - initialPosition) /
           initialModulePositions.length;
     }
-    return currentAverageDistance >= netdistance;
+    return currentAverageDistance >= netdistance.in(Meters);
   }
 }
