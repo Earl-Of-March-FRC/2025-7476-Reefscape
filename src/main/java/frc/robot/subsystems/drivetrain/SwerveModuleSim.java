@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drivetrain;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
@@ -41,14 +43,14 @@ public class SwerveModuleSim implements SwerveModule {
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         moduleSimulation.getDriveWheelFinalSpeed().in(Units.RadiansPerSecond)
-            * ModuleConstants.kWheelDiameterMeters / 2,
+            * ModuleConstants.kWheelDiameter.in(Meters) / 2,
         moduleSimulation.getSteerAbsoluteFacing());
   }
 
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
         moduleSimulation.getDriveWheelFinalPosition().in(Units.Radians)
-            * ModuleConstants.kWheelDiameterMeters / 2,
+            * ModuleConstants.kWheelDiameter.in(Meters) / 2,
         moduleSimulation.getSteerAbsoluteFacing());
   }
 
@@ -64,10 +66,10 @@ public class SwerveModuleSim implements SwerveModule {
 
     driveMotor.requestVoltage(
         Units.Volts.of(driveFeedforward.calculate(
-            correctedDesiredState.speedMetersPerSecond / (ModuleConstants.kWheelDiameterMeters / 2)))
+            correctedDesiredState.speedMetersPerSecond / (ModuleConstants.kWheelDiameter.in(Meters) / 2)))
             .plus(
                 Units.Volts.of(drivePID.calculate(moduleSimulation.getDriveWheelFinalSpeed().in(Units.RadiansPerSecond),
-                    correctedDesiredState.speedMetersPerSecond / (ModuleConstants.kWheelDiameterMeters / 2)))));
+                    correctedDesiredState.speedMetersPerSecond / (ModuleConstants.kWheelDiameter.in(Meters) / 2)))));
     turnMotor.requestVoltage(Units.Volts.of(
         turnController.calculate(moduleSimulation.getSteerAbsoluteFacing().getRadians(),
             correctedDesiredState.angle.getRadians())));
