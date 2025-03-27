@@ -213,7 +213,7 @@ public class RobotContainer {
     driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
 
     driverController.leftBumper().whileTrue(
-        new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
+        new IndexerSetVelocityManualCmd(indexerSub, () -> -0.75));
     driverController.rightBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
 
