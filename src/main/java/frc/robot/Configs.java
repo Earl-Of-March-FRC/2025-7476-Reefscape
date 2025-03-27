@@ -114,7 +114,7 @@ public final class Configs {
       indexerConfig.idleMode(IdleMode.kBrake);
       indexerConfig.smartCurrentLimit(40);
       indexerConfig.encoder
-          .velocityConversionFactor(IndexerConstants.kWheelDiameterMeters * Math.PI
+          .velocityConversionFactor(IndexerConstants.kWheelDiameter.times(Math.PI).in(Meters)
               / IndexerConstants.kMotorReduction / 60);
     }
   }

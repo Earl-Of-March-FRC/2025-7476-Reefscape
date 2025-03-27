@@ -6,7 +6,11 @@
 
 package frc.robot.commands.drivetrain;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
@@ -21,9 +25,9 @@ public class TimedAutoDrive extends Command {
   private Drivetrain driveSub;
 
   // Desired velocities and duration for the autonomous drive
-  double xVel;
-  double yVel;
-  double omega;
+  LinearVelocity xVel;
+  LinearVelocity yVel;
+  AngularVelocity omega;
   double seconds;
 
   /**
@@ -41,9 +45,9 @@ public class TimedAutoDrive extends Command {
     addRequirements(driveSub);
 
     // Set the desired velocities and duration
-    xVel = x * AutoConstants.kMaxSpeedMetersPerSecond;
-    yVel = y * AutoConstants.kMaxSpeedMetersPerSecond;
-    omega = ohm * AutoConstants.kMaxAngularSpeed;
+    xVel = AutoConstants.kMaxSpeed.times(x);
+    yVel = AutoConstants.kMaxSpeed.times(y);
+    omega = AutoConstants.kMaxAngularSpeed.times(ohm);
     seconds = secs;
   }
 

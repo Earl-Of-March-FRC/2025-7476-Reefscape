@@ -5,7 +5,9 @@
 package frc.robot.commands.drivetrain;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -14,11 +16,14 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -30,8 +35,6 @@ public class MoveToNearestBargeLaunchingZonePIDCmd extends Command {
       AutoConstants.kITranslationController, AutoConstants.kDTranslationController);
   private final PIDController rotationController = new PIDController(AutoConstants.kPThetaController,
       AutoConstants.kIThetaController, AutoConstants.kDThetaController);
-
-  private double targetX, targetRadians;
 
   /** Creates a new MoveToNearestBargeLaunchingZoneCmd. */
   public MoveToNearestBargeLaunchingZonePIDCmd(
@@ -57,37 +60,45 @@ public class MoveToNearestBargeLaunchingZonePIDCmd extends Command {
 
     // Calculate target translation
     // (0,0) is ALWAYS on the blue alliance side
-    targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kDistanceFromBarge.in(Meters));
+    Distance targetX = FieldConstants.kBargeX.plus(LaunchingDistances.kDistanceFromBarge.times((onBlueSide ? -1 : 1)));
 
     // Calculate target rotation based on side of field that robot is currently on
-    targetRadians = onBlueSide ? Math.PI : 0;
+    Angle targetAngle = Radians.of(onBlueSide ? Math.PI : 0);
 
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/CurrentPose",
         currentPose);
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/TargetPose",
-        new Pose2d(targetX, currentPose.getY(),
-            Rotation2d.fromRadians(targetRadians)));
+        new Pose2d(targetX.in(Meters), currentPose.getY(),
+            Rotation2d.fromRadians(targetAngle.in(Radians))));
 
-    double xVel = MathUtil.clamp(translationController.calculate(currentPose.getX(), targetX),
-        -AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxSpeedMetersPerSecond);
+    LinearVelocity xVel = MetersPerSecond.of(
+        MathUtil.clamp(translationController.calculate(currentPose.getX(), targetX.in(Meters)),
+            -AutoConstants.kMaxSpeed.in(MetersPerSecond),
+            AutoConstants.kMaxSpeed.in(MetersPerSecond)));
 
     // Invert the direction if robot is on red alliance
     if (DriverStation.getAlliance().isPresent()) {
       Alliance alliance = DriverStation.getAlliance().get();
       if (alliance == Alliance.Red) {
-        xVel *= -1;
+        xVel = xVel.times(-1);
       }
     }
 
-    double currentRotation = currentPose.getRotation().getRadians();
+    Angle currentRotation = Radians.of(currentPose.getRotation().getRadians());
 
-    double rotVel = MathUtil.clamp(
-        rotationController.calculate(currentRotation, targetRadians * Math.signum(currentRotation)),
-        -AutoConstants.kMaxAngularSpeedRadiansPerSecond, AutoConstants.kMaxAngularSpeedRadiansPerSecond);
+    AngularVelocity rotVel = RadiansPerSecond.of(MathUtil.clamp(
+        rotationController.calculate(
+            currentRotation.in(Radians),
+            targetAngle.times(Math.signum(currentRotation.in(Radians))).in(Radians)
+
+        ),
+        -AutoConstants.kMaxAngularSpeed.in(RadiansPerSecond),
+        AutoConstants.kMaxAngularSpeed.in(RadiansPerSecond)
+
+    ));
 
     // Set drivetrain to run at calculated velocity
-    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel, 0, rotVel);
+    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel.in(MetersPerSecond), 0, rotVel.in(RadiansPerSecond));
     driveSub.runVelocityFieldRelative(chassisSpeeds);
 
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/PID/OutputVelocityX", xVel);

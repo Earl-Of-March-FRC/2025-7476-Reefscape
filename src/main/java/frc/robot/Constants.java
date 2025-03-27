@@ -19,8 +19,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
 import edu.wpi.first.units.MultUnit;
 import edu.wpi.first.units.measure.*;
 
@@ -152,11 +150,10 @@ public final class Constants {
   public static final class AutoConstants {
     // Auto Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 2; // Default 4.8
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
-    public static final double kMaxAngularSpeed = 2 * Math.PI;
+    public static final LinearVelocity kMaxSpeed = MetersPerSecond.of(2); // Default 4.8
+    public static final LinearAcceleration kMaxAcceleration = MetersPerSecondPerSecond.of(3);
+    public static final AngularVelocity kMaxAngularSpeed = RadiansPerSecond.of(Math.PI);
+    public static final AngularAcceleration kMaxAngularAcceleration = RadiansPerSecondPerSecond.of(Math.PI);
 
     public static final double kPTranslationController = 1.5;
     public static final double kPThetaController = 1;
@@ -166,13 +163,14 @@ public final class Constants {
     public static final double kDThetaController = 0;
 
     public static final class EncoderAutoDriveConstants {
-      public static final double kLeaveZoneMeters = 0.5; // Distance to travel
-      public static final double kLeaveZoneVelocity = 0.5; // Velocity (Meters/S) to leave zone at
+      public static final Distance kLeaveZoneDistance = Meters.of(0.5); // Distance to travel
+      public static final LinearVelocity kLeaveZoneVelocity = MetersPerSecond.of(0.5); // Velocity (Meters/S) to leave
+                                                                                       // zone at
     }
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-        kMaxAngularSpeedRadiansPerSecond, kMaxAngularAccelerationRadiansPerSecondSquared);
+        kMaxAngularSpeed.in(RadiansPerSecond), kMaxAngularAcceleration.in(RadiansPerSecondPerSecond));
 
     public static final Pose2d kLaunchPoseBlue = new Pose2d(new Translation2d(7.475, 5.37),
         Rotation2d.fromDegrees(180));
@@ -304,7 +302,7 @@ public final class Constants {
     public static final double kDirectionConstant = -1.0;
 
     public static final double kMotorReduction = 1.0;
-    public static final double kWheelDiameterMeters = 0.17;
+    public static final Distance kWheelDiameter = Meters.of(0.17);
 
     // Ports for sensors. TBD
     public static final int kIntakeSensorChannel = 0;
@@ -337,11 +335,13 @@ public final class Constants {
 
   public static class FieldConstants {
     public static final AprilTagFieldLayout kfieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-    public static final double kFieldLengthX = kfieldLayout.getFieldLength(); // meters from drivestation wall to
-                                                                              // drivestation wall
-    public static final double kFieldWidthY = kfieldLayout.getFieldWidth(); // meters of parallel distance from
-                                                                            // processor to processor
-    public static final double kBargeX = kFieldLengthX / 2; // meters from drivestation wall to middle of barge
+    public static final Distance kFieldLengthX = Meters.of(kfieldLayout.getFieldLength()); // meters from drivestation
+                                                                                           // wall to
+    // drivestation wall
+    public static final Distance kFieldWidthY = Meters.of(kfieldLayout.getFieldWidth()); // meters of parallel distance
+                                                                                         // from
+    // processor to processor
+    public static final Distance kBargeX = kFieldLengthX.div(2); // meters from drivestation wall to middle of barge
   }
 
   // PDP CAN IDs
