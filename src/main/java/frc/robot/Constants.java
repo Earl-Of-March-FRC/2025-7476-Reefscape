@@ -318,19 +318,19 @@ public final class Constants {
     public static final int kBackCanId = 13;
     public static MotorType kMotorType = MotorType.kBrushless;
 
-    public static final double kPVelocityController = 0;
+    public static final double kPVelocityController = 0.003;
     public static final double kIVelocityController = 0;
     public static final double kDVelocityController = 0;
     public static final double frontKVelocityFF = 0.0021;
-    public static final double backKVelocityFF = 0.00215;
+    public static final double backKVelocityFF = 0.0021;
 
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
     // public static final double kVelocityFront = 2100; // 220 rad/s
     // public static final double kVelocityBack = 2626.056561; // 275 rad/s
-    public static final double kVelocityFront = 1957.6058; // 205 rad/s
-    public static final double kVelocityBack = 2482.817112; // 260 rad/s
+    public static final double kVelocityFront = 202 / kVelocityConversionFactor; // 205 rad/s
+    public static final double kVelocityBack = 257 / kVelocityConversionFactor; // 260 rad/s
     public static final double kVelocityYeetBack = 4964;
     public static final double kVelocityYeetForward = 4964;
     public static final double kVelocityFrontTolerance = 247.8;
