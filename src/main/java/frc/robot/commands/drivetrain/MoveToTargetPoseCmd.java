@@ -4,6 +4,10 @@
 
 package frc.robot.commands.drivetrain;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.*;
+
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -189,9 +193,9 @@ public class MoveToTargetPoseCmd extends Command {
     }
 
     // Convert calculated value to velocity
-    double xVel = DriveConstants.kBangBangTranslationalVelocityMetersPerSecond * directionX;
-    double yVel = DriveConstants.kBangBangTranslationalVelocityMetersPerSecond * directionY;
-    double rotVel = DriveConstants.kBangBangRotationalVelocityRadiansPerSecond * directionRot;
+    double xVel = DriveConstants.kBangBangTranslationalVelocity.times(directionX).in(MetersPerSecond);
+    double yVel = DriveConstants.kBangBangTranslationalVelocity.times(directionY).in(MetersPerSecond);
+    double rotVel = DriveConstants.kBangBangRotationalVelocity.times(directionRot).in(RadiansPerSecond);
 
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel, yVel, rotVel);
     driveSub.runVelocityFieldRelative(chassisSpeeds);
