@@ -197,7 +197,16 @@ public class RobotContainer {
 
     // Drive commands
     driverController.b().onTrue(new CalibrateGyroCmd(driveSub));
-    driverController.x().whileTrue(new MoveToNearestBargeLaunchingZonePIDCmd(driveSub));
+    driverController.x().whileTrue(new RotateTowardsReefWithDriveCmd(
+        driveSub,
+        () -> MathUtil.applyDeadband(
+            -driverController.getRawAxis(
+                OIConstants.kDriverControllerYAxis),
+            OIConstants.kDriveDeadband),
+        () -> MathUtil.applyDeadband(
+            -driverController.getRawAxis(
+                OIConstants.kDriverControllerXAxis),
+            OIConstants.kDriveDeadband)));
 
     // Move to barge launching zone, facing in the specified direction
     driverController.povLeft().whileTrue(
