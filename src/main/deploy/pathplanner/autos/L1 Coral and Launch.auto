@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto Coral L1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Leave Reef Centered"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmL2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Centered To Reef"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StripAlgae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Reef To Launch Right"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Calibrate"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Launch Autos",
+  "choreoAuto": false
+}

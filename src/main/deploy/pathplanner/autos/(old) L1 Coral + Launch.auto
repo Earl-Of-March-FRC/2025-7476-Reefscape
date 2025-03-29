@@ -61,7 +61,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Intake L2 Algae"
+            "pathName": "Centered To Reef"
           }
         },
         {
@@ -73,7 +73,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Algae Leave Reef"
+            "pathName": "Reef To Launch Right"
           }
         },
         {
@@ -103,7 +103,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Launch"
+            "pathName": null
           }
         },
         {

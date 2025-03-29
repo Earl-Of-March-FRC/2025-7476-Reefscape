@@ -7,6 +7,7 @@ package frc.robot.subsystems.drivetrain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
@@ -23,6 +24,10 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -50,6 +55,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Vision.PhotonConstants;
+import frc.robot.utils.PoseHelpers;
 
 /**
  * The Drivetrain class represents the robot's drivetrain subsystem.
@@ -275,9 +281,10 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Distance to Barge", distanceToBarge);
     SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBarge);
 
-    SmartDashboard.putBoolean("FarFromBargeLaunchingRange", xDistanceToBarge > LaunchingDistances.kMetersFromBarge);
+    SmartDashboard.putBoolean("FarFromBargeLaunchingRange",
+        xDistanceToBarge > LaunchingDistances.kDistanceFromBarge.in(Meters));
     SmartDashboard.putBoolean("WithinBargeLaunchingRange", MathUtil.isNear(xDistanceToBarge,
-        LaunchingDistances.kMetersFromBarge, LaunchingDistances.kToleranceMetersFromBarge));
+        LaunchingDistances.kDistanceFromBarge.in(Meters), LaunchingDistances.kToleranceDistanceFromBarge.in(Meters)));
 
     Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBarge);
     Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBarge);
@@ -288,9 +295,7 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putBoolean("GyroDisconnected", gyroDisconnected);
 
     // Log which side the robot is on
-    Logger.recordOutput("Odometry/IsOnBlueSide",
-
-        isOnBlueSide());
+    Logger.recordOutput("Odometry/IsOnBlueSide", PoseHelpers.isOnBlueSide(getPose()));
   }
 
   /**
@@ -330,7 +335,7 @@ public class Drivetrain extends SubsystemBase {
     SwerveModuleState[] states = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
 
     // Desaturate the wheel speeds to ensure they are within the maximum speed
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.kMaxWheelSpeedMetersPerSecond);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.kMaxWheelSpeed);
 
     // Set the desired state for each swerve module
     for (int i = 0; i < 4; i++) {
@@ -443,8 +448,8 @@ public class Drivetrain extends SubsystemBase {
 
         Logger.recordOutput("Vision/" + camera.getName() + "/RawEstimatedPose", estimation.estimatedPose);
 
-        if (isInField(estimation.estimatedPose) &&
-            isOnGround(estimation.estimatedPose)) {
+        if (PoseHelpers.isInField(estimation.estimatedPose) &&
+            PoseHelpers.isOnGround(estimation.estimatedPose, PhotonConstants.kHeightTolerance.in(Meters))) {
 
           // ignore the result if it only has one tag and the tag is too small
           if (camResult.getTargets().size() == 1
@@ -493,14 +498,15 @@ public class Drivetrain extends SubsystemBase {
             Logger.recordOutput("Vision/" + camera.getName() + "/FallbackAltPose", altRobotPose);
 
             // check if they are reasonable
-            boolean isBestPoseValid = isInField(bestRobotPose) &&
-                isOnGround(bestRobotPose);
-            boolean isAltPoseValid = isInField(altRobotPose) && isOnGround(altRobotPose);
+            boolean isBestPoseValid = PoseHelpers.isInField(bestRobotPose) &&
+                PoseHelpers.isOnGround(bestRobotPose, PhotonConstants.kHeightTolerance.in(Meters));
+            boolean isAltPoseValid = PoseHelpers.isInField(altRobotPose)
+                && PoseHelpers.isOnGround(altRobotPose, PhotonConstants.kHeightTolerance.in(Meters));
             if (isBestPoseValid && isAltPoseValid) {
               targetsUsed.add(target);
               // if both are valid, use the one that is closer to the previous estimation
-              double bestDistance = distanceBetween(bestRobotPose, new Pose3d(prevEstimatedRobotPose));
-              double altDistance = distanceBetween(altRobotPose, new Pose3d(prevEstimatedRobotPose));
+              double bestDistance = PoseHelpers.distanceBetween(bestRobotPose, new Pose3d(prevEstimatedRobotPose));
+              double altDistance = PoseHelpers.distanceBetween(altRobotPose, new Pose3d(prevEstimatedRobotPose));
               if (bestDistance < altDistance) {
                 validPoses.add(bestRobotPose);
               } else {
@@ -521,7 +527,8 @@ public class Drivetrain extends SubsystemBase {
           // robotTransform = tagTransform - camToTarget - robotToCam
           Pose3d robotPose = tagPose.transformBy(camToTarget.inverse()).transformBy(robotToCam.inverse());
           // check if the pose is reasonable
-          if (isInField(robotPose) && isOnGround(robotPose)) {
+          if (PoseHelpers.isInField(robotPose)
+              && PoseHelpers.isOnGround(robotPose, PhotonConstants.kHeightTolerance.in(Meters))) {
             validPoses.add(robotPose);
             targetsUsed.add(target);
           }
@@ -574,27 +581,9 @@ public class Drivetrain extends SubsystemBase {
     return getEstimatedGlobalPose(photonPoseEstimator2, camera2, PhotonConstants.kRobotToCam2, prevEstimatedRobotPose);
   }
 
-  public boolean isInField(Pose3d pose) {
-    return pose.getX() >= 0 && pose.getX() <= FieldConstants.kFieldLengthX && pose.getY() >= 0
-        && pose.getY() <= FieldConstants.kFieldWidthY;
-  }
-
-  public boolean isOnGround(Pose3d pose) {
-    return pose.getZ() <= PhotonConstants.kHeightTolerance && pose.getZ() >= -PhotonConstants.kHeightTolerance;
-  }
-
-  public double distanceBetween(Pose3d pose1, Pose3d pose2) {
-    return Math.sqrt(Math.pow(pose1.getX() - pose2.getX(), 2) + Math.pow(pose1.getY() - pose2.getY(), 2));
-  }
-
-  public boolean isOnBlueSide() {
-    double robotX = getPose().getTranslation().getX();
-    return robotX - FieldConstants.kBargeX < 0;
-  }
-
   public double getXDistanceToBarge() {
     double robotX = getPose().getTranslation().getX();
-    return Math.abs(robotX - FieldConstants.kBargeX);
+    return Math.abs(robotX - FieldConstants.kBargeX.in(Meters));
   }
 
   public double distanceToBardge() {
@@ -607,7 +596,7 @@ public class Drivetrain extends SubsystemBase {
 
   public Command moveToNearestBargeLaunchingZone() {
     Pose2d startingPose = getPose();
-    boolean onBlueSide = isOnBlueSide();
+    boolean onBlueSide = PoseHelpers.isOnBlueSide(getPose());
     double targetRadians;
     if (DriverStation.getAlliance().isPresent()) {
       Alliance alliance = DriverStation.getAlliance().get();
@@ -616,7 +605,8 @@ public class Drivetrain extends SubsystemBase {
       targetRadians = startingPose.getRotation().getRadians();
     }
     Pose2d targetPose = new Pose2d(
-        FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge), startingPose.getY(),
+        FieldConstants.kBargeX.plus(LaunchingDistances.kDistanceFromBarge.times(onBlueSide ? -1 : 1)).in(Meters),
+        startingPose.getY(),
         new Rotation2d(targetRadians));
 
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startingPose, targetPose);
@@ -628,5 +618,31 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput("PathPlanner/GoToBarge/TargetPose", targetPose);
 
     return AutoBuilder.followPath(path);
+  }
+
+  /**
+   * Calculates the target pose for the robot at the nearest barge launching zone.
+   * 
+   * @param targetAngle Angle that robot should face in its target pose, in
+   *                    radians. CCW is positive.
+   * @return The calculated target pose for the robot at the barge.
+   */
+  public Pose2d getBargeTargetPose(Angle targetAngle) {
+    Pose2d currentPose = getPose();
+
+    // Y coordinate stays the same as current pose
+    double targetY = currentPose.getY();
+
+    boolean onBlueSide = PoseHelpers.isOnBlueSide(currentPose);
+
+    // Calculate target translation
+    // (0,0) is ALWAYS on the blue alliance side
+    double targetX = FieldConstants.kBargeX.plus(LaunchingDistances.kDistanceFromBarge.times(onBlueSide ? -1 : 1))
+        .in(Meters);
+
+    // Calculate target rotation based on side of field that robot is currently on
+    double targetRadians = (onBlueSide ? Math.PI : 0) + targetAngle.in(Radians);
+
+    return new Pose2d(targetX, targetY, new Rotation2d(targetRadians));
   }
 }

@@ -4,12 +4,19 @@
 
 package frc.robot.commands.drivetrain;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,16 +24,18 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.utils.PoseHelpers;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveToNearestBargeLaunchingZoneBangBangCmd extends Command {
   private final Drivetrain driveSub;
   private final BangBangController translationController = new BangBangController(
-      LaunchingDistances.kToleranceMetersFromBarge);
+      LaunchingDistances.kToleranceDistanceFromBarge.in(Meters));
   private final BangBangController rotationController = new BangBangController(
-      LaunchingDistances.kToleranceRadiansFromBarge);
+      LaunchingDistances.kToleranceAngleFromBarge.in(Radians));
 
-  private double targetX, targetRadians;
+  private Distance targetX;
+  private Angle targetAngle;
 
   private boolean translationFinish = false, rotationFinish = false;
 
@@ -50,20 +59,20 @@ public class MoveToNearestBargeLaunchingZoneBangBangCmd extends Command {
     Pose2d currentPose = driveSub.getPose();
 
     // Calculate target pose
-    boolean onBlueSide = driveSub.isOnBlueSide();
+    boolean onBlueSide = PoseHelpers.isOnBlueSide(currentPose);
 
     // Calculate target translation
     // (0,0) is ALWAYS on the blue alliance side
-    targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
+    targetX = FieldConstants.kBargeX.plus(LaunchingDistances.kDistanceFromBarge.times((onBlueSide ? -1 : 1)));
 
     // Calculate target rotation based on side of field that robot is currently on
-    targetRadians = onBlueSide ? Math.PI : 0;
+    targetAngle = Radians.of(onBlueSide ? Math.PI : 0);
 
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/CurrentPose",
         currentPose);
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/TargetPose",
-        new Pose2d(targetX, currentPose.getY(),
-            Rotation2d.fromRadians(targetRadians)));
+        new Pose2d(targetX.in(Meters), currentPose.getY(),
+            Rotation2d.fromRadians(targetAngle.in(Radians))));
 
     // Make adjustments to the robot
     double directionX = 0;
@@ -73,7 +82,7 @@ public class MoveToNearestBargeLaunchingZoneBangBangCmd extends Command {
     if (!translationFinish) {
       // Bang bang controller returns 0 or 1
       // Multiply calculated output by 2 and subtract 1 to get -1 or 1
-      directionX = (translationController.calculate(currentPose.getX(), targetX) * 2) - 1;
+      directionX = (translationController.calculate(currentPose.getX(), targetX.in(Meters)) * 2) - 1;
 
       // Reverse direction if on red alliance
       if (DriverStation.getAlliance().isPresent()) {
@@ -88,19 +97,20 @@ public class MoveToNearestBargeLaunchingZoneBangBangCmd extends Command {
 
     // Calculate rotation from bang bang controller
     if (!rotationFinish) {
-      double currentRotation = currentPose.getRotation().getRadians();
+      Rotation2d currentRotation = currentPose.getRotation();
 
       // Bang bang controller returns 0 or 1
       // Multiply calculated output by 2 and subtract 1 to get -1 or 1
-      directionRot = (rotationController.calculate(currentRotation, targetRadians * Math.signum(currentRotation)) * 2)
-          - 1;
+      directionRot = (rotationController.calculate(
+          currentRotation.getRadians(),
+          targetAngle.times(Math.signum(currentRotation.getRadians())).in(Radians)) * 2) - 1;
 
       rotationFinish = rotationController.atSetpoint();
     }
 
     // Convert calculated value to velocity
-    double xVel = DriveConstants.kBangBangTranslationalVelocityMetersPerSecond * directionX;
-    double rotVel = DriveConstants.kBangBangRotationalVelocityRadiansPerSecond * directionRot;
+    double xVel = DriveConstants.kBangBangTranslationalVelocity.in(MetersPerSecond) * directionX;
+    double rotVel = DriveConstants.kBangBangRotationalVelocity.in(RadiansPerSecond) * directionRot;
 
     // Set drivetrain to run at calculated velocity
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel, 0, rotVel);

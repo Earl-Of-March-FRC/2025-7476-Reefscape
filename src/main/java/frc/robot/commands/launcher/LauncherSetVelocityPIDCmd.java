@@ -4,8 +4,9 @@
 
 package frc.robot.commands.launcher;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.launcher.Launcher;
 
@@ -18,8 +19,8 @@ import frc.robot.subsystems.launcher.Launcher;
 public class LauncherSetVelocityPIDCmd extends Command {
 
   private final Launcher launcherSub;
-  private final DoubleSupplier frontReferenceVelocity;
-  private final DoubleSupplier backReferenceVelocity;
+  private final Supplier<AngularVelocity> frontReferenceVelocity;
+  private final Supplier<AngularVelocity> backReferenceVelocity;
 
   /**
    * Constructs a new LauncherSetVelocityPID.
@@ -30,8 +31,8 @@ public class LauncherSetVelocityPIDCmd extends Command {
    *                               RPM.
    * @param backReferenceVelocity  The target speed for the back launcher, in RPM.
    */
-  public LauncherSetVelocityPIDCmd(Launcher launcherSub, DoubleSupplier frontReferenceVelocity,
-      DoubleSupplier backReferenceVelocity) {
+  public LauncherSetVelocityPIDCmd(Launcher launcherSub, Supplier<AngularVelocity> frontReferenceVelocity,
+      Supplier<AngularVelocity> backReferenceVelocity) {
     this.launcherSub = launcherSub;
     this.frontReferenceVelocity = frontReferenceVelocity;
     this.backReferenceVelocity = backReferenceVelocity;
@@ -47,8 +48,8 @@ public class LauncherSetVelocityPIDCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    launcherSub.setFrontReferenceVelocity(frontReferenceVelocity.getAsDouble());
-    launcherSub.setBackReferenceVelocity(backReferenceVelocity.getAsDouble());
+    launcherSub.setFrontReferenceVelocity(frontReferenceVelocity.get());
+    launcherSub.setBackReferenceVelocity(backReferenceVelocity.get());
   }
 
   // Called once the command ends or is interrupted.

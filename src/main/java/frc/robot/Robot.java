@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
 import frc.robot.commands.drivetrain.CalibrateGyroCmd;
-import frc.robot.utils.LocalADStarAK;
+import frc.utils.LocalADStarAK;
 
 /**
  * The methods in this class are called automatically corresponding to each

@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.*;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.RelativeEncoder;
@@ -11,9 +13,10 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.IntakeConfigs;
-import frc.robot.Constants.IntakeConstants;
 
 /**
  * The IntakeSubsystem class represents the robot's intake subsystem. It manages
@@ -37,11 +40,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Convert radians per second to Rot per Minute
     Logger.recordOutput("Rollers/Measured/Velocity",
-        getVelocity() / IntakeConstants.kVelocityConversionFactor);
-    // Logger.recordOutput("Intake/Rollers/Measured/VelocityRad",
-    // getVelocity());
+        new Rotation2d(getVelocity().in(RPM)));
   }
 
   /**
@@ -49,8 +49,8 @@ public class IntakeSubsystem extends SubsystemBase {
    * 
    * @return The current velocity of the intake, in radians per second.
    */
-  public double getVelocity() {
-    return intakeEncoder.getVelocity();
+  public AngularVelocity getVelocity() {
+    return RadiansPerSecond.of(intakeEncoder.getVelocity());
   }
 
   /**

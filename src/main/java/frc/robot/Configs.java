@@ -3,7 +3,13 @@ package frc.robot;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import static edu.wpi.first.units.Units.*;
 
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.IndexerConstants;
@@ -18,17 +24,16 @@ public final class Configs {
 
     static {
       // Use module constants to calculate conversion factors and feed forward gain.
-      double drivingFactor = ModuleConstants.kWheelDiameterMeters * Math.PI
-          / ModuleConstants.kDrivingMotorReduction;
-      double turningFactor = 2 * Math.PI;
-      double drivingVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeedRps;
+      Distance drivingFactor = ModuleConstants.kWheelCircumference.div(ModuleConstants.kDrivingMotorReduction);
+      Angle turningFactor = Radians.of(2 * Math.PI);
+      double drivingVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeed.in(RotationsPerSecond);
 
       drivingConfig
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(50);
       drivingConfig.encoder
-          .positionConversionFactor(drivingFactor) // meters
-          .velocityConversionFactor(drivingFactor / 60.0); // meters per second
+          .positionConversionFactor(drivingFactor.in(Meters)) // meters
+          .velocityConversionFactor(drivingFactor.div(60.0).in(Meters)); // meters per second
       drivingConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // These are example gains you may need to them for your own robot!
@@ -43,8 +48,8 @@ public final class Configs {
           // Invert the turning encoder, since the output shaft rotates in the opposite
           // direction of the steering motor in the MAXSwerve Module.
           .inverted(true)
-          .positionConversionFactor(turningFactor) // radians
-          .velocityConversionFactor(turningFactor / 60.0); // radians per second
+          .positionConversionFactor(turningFactor.in(Radians)) // radians
+          .velocityConversionFactor(turningFactor.div(60.0).in(Radians)); // radians per second
       turningConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
           // These are example gains you may need to them for your own robot!
@@ -55,7 +60,7 @@ public final class Configs {
           // to 10 degrees will go through 0 rather than the other direction which is a
           // longer route.
           .positionWrappingEnabled(true)
-          .positionWrappingInputRange(0, turningFactor);
+          .positionWrappingInputRange(0, turningFactor.in(Radians));
     }
   }
 
@@ -69,8 +74,8 @@ public final class Configs {
           .smartCurrentLimit(40); // Adjust current limit as needed
 
       armConfig.encoder
-          .positionConversionFactor(ArmConstants.kPositionConversionFactor) // Radians
-          .velocityConversionFactor(ArmConstants.kVelocityConversionFactor); // Radians per second
+          .positionConversionFactor(ArmConstants.kPositionConversionFactor.in(Radians)) // Radians
+          .velocityConversionFactor(ArmConstants.kVelocityConversionFactor.in(RadiansPerSecond)); // Radians per second
 
       armConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -96,8 +101,8 @@ public final class Configs {
           .smartCurrentLimit(30); // Adjust current limit as needed
 
       intakeConfig.encoder
-          .positionConversionFactor(IntakeConstants.kPositionConversionFactor * IntakeConstants.kMotorReduction)
-          .velocityConversionFactor(IntakeConstants.kVelocityConversionFactor * IntakeConstants.kMotorReduction);
+          .positionConversionFactor(IntakeConstants.kPositionConversionFactor.in(Radians))
+          .velocityConversionFactor(IntakeConstants.kVelocityConversionFactor.in(RadiansPerSecond));
     }
   }
 
@@ -109,7 +114,7 @@ public final class Configs {
       indexerConfig.idleMode(IdleMode.kBrake);
       indexerConfig.smartCurrentLimit(40);
       indexerConfig.encoder
-          .velocityConversionFactor(IndexerConstants.kWheelDiameterMeters * Math.PI
+          .velocityConversionFactor(IndexerConstants.kWheelDiameter.times(Math.PI).in(Meters)
               / IndexerConstants.kMotorReduction / 60);
     }
   }
@@ -125,7 +130,7 @@ public final class Configs {
           .voltageCompensation(10);
       frontLauncherConfig.encoder
           .positionConversionFactor(1)
-          .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
+          .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor.in(RadiansPerSecond));
       frontLauncherConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           .pidf(LauncherConstants.kPVelocityController,
@@ -142,7 +147,7 @@ public final class Configs {
           .voltageCompensation(10);
       backLauncherConfig.encoder
           .positionConversionFactor(1)
-          .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
+          .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor.in(RadiansPerSecond));
       backLauncherConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           .pidf(LauncherConstants.kPVelocityController,

@@ -4,8 +4,9 @@
 
 package frc.robot.commands.arm;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
@@ -15,7 +16,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 public class ArmSetPositionPIDCmd extends InstantCommand {
 
   private ArmSubsystem armSub;
-  private DoubleSupplier referenceAngle;
+  private Supplier<Angle> referenceAngle;
 
   /**
    * Sets the reference value for the arm subsystem's closed-loop controller. It
@@ -24,7 +25,7 @@ public class ArmSetPositionPIDCmd extends InstantCommand {
    * @param armSub         The instance of the ArmSubsystem class to be used.
    * @param referenceAngle The goal angle for the arm to move to, in degrees.
    */
-  public ArmSetPositionPIDCmd(ArmSubsystem armSub, DoubleSupplier referenceAngle) {
+  public ArmSetPositionPIDCmd(ArmSubsystem armSub, Supplier<Angle> referenceAngle) {
 
     this.armSub = armSub;
     this.referenceAngle = referenceAngle;
@@ -35,6 +36,6 @@ public class ArmSetPositionPIDCmd extends InstantCommand {
   @Override
   public void initialize() {
     armSub.clearOffset();
-    armSub.setReferencePosition(referenceAngle.getAsDouble());
+    armSub.setReferencePosition(referenceAngle.get());
   }
 }
