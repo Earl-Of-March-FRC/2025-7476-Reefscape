@@ -49,6 +49,10 @@ public class MoveToTargetPoseCmd extends Command {
     initialTargetPose = targetPose.get();
   }
 
+  public MoveToTargetPoseCmd(Drivetrain driveSub, Pose2d targetPose) {
+    this(driveSub, () -> targetPose, false);
+  }
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
