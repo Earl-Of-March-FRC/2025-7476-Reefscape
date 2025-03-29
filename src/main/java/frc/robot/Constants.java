@@ -329,8 +329,8 @@ public final class Constants {
     // Velocities in RPM
     // public static final double kVelocityFront = 2100; // 220 rad/s
     // public static final double kVelocityBack = 2626.056561; // 275 rad/s
-    public static final double kVelocityFront = 202 / kVelocityConversionFactor; // 205 rad/s
-    public static final double kVelocityBack = 257 / kVelocityConversionFactor; // 260 rad/s
+    public static final double kVelocityFront = 193 / kVelocityConversionFactor; // 205 rad/s
+    public static final double kVelocityBack = 248 / kVelocityConversionFactor; // 260 rad/s
     public static final double kVelocityYeetBack = 4964;
     public static final double kVelocityYeetForward = 4964;
     public static final double kVelocityFrontTolerance = 247.8;
