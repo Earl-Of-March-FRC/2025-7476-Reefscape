@@ -339,10 +339,10 @@ public final class Constants {
     // public static final AngularVelocity kVelocityFront =
     // RadiansPerSecond.of(220);
     // public static final AngularVelocity kVelocityBack = RadiansPerSecond.of(275);
-    public static final AngularVelocity kVelocityFront = RadiansPerSecond.of(1957.6058);
-    public static final AngularVelocity kVelocityBack = RadiansPerSecond.of(2482.817112);
-    public static final AngularVelocity kVelocityYeetBack = RadiansPerSecond.of(4964);
-    public static final AngularVelocity kVelocityYeetForward = RadiansPerSecond.of(4964);
+    public static final AngularVelocity kVelocityFront = RadiansPerSecond.of(202); // 205
+    public static final AngularVelocity kVelocityBack = RadiansPerSecond.of(257); // 260
+    public static final AngularVelocity kVelocityYeetBack = RadiansPerSecond.of(520);
+    public static final AngularVelocity kVelocityYeetForward = RadiansPerSecond.of(520);
     public static final AngularVelocity kVelocityFrontTolerance = RPM.of(247.8);
     public static final AngularVelocity kVelocityBackTolerance = RPM.of(247.8);
   }
