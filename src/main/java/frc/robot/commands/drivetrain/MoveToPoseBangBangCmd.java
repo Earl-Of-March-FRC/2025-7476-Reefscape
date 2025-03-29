@@ -25,7 +25,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.utils.PoseHelpers;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class MoveToTargetPoseCmd extends Command {
+public class MoveToPoseBangBangCmd extends Command {
   private final Drivetrain driveSub;
   private final BangBangController translationXController = new BangBangController(
       ReefConstants.kToleranceMetersFromSpot);
@@ -39,7 +39,7 @@ public class MoveToTargetPoseCmd extends Command {
   private boolean dynamicPose;
 
   /** Creates a new MoveToTargetPoseCmd. */
-  public MoveToTargetPoseCmd(Drivetrain driveSub, Supplier<Pose2d> targetPose, boolean dynamicPose) {
+  public MoveToPoseBangBangCmd(Drivetrain driveSub, Supplier<Pose2d> targetPose, boolean dynamicPose) {
     this.driveSub = driveSub;
     addRequirements(driveSub);
 
@@ -49,7 +49,7 @@ public class MoveToTargetPoseCmd extends Command {
     initialTargetPose = targetPose.get();
   }
 
-  public MoveToTargetPoseCmd(Drivetrain driveSub, Pose2d targetPose) {
+  public MoveToPoseBangBangCmd(Drivetrain driveSub, Pose2d targetPose) {
     this(driveSub, () -> targetPose, false);
   }
 

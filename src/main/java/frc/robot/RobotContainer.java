@@ -197,16 +197,15 @@ public class RobotContainer {
 
     // Drive commands
     driverController.b().onTrue(new CalibrateGyroCmd(driveSub));
-    driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneBangBangCmd(driveSub));
     driverController.x().whileTrue(new MoveToNearestBargeLaunchingZonePIDCmd(driveSub));
 
     // Move to barge launching zone, facing in the specified direction
     driverController.povLeft().whileTrue(
-        new MoveToTargetPoseCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft)));
+        new MoveToPoseBangBangCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft)));
     driverController.povUp().whileTrue(
-        new MoveToTargetPoseCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight)));
+        new MoveToPoseBangBangCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight)));
     driverController.povRight().whileTrue(
-        new MoveToTargetPoseCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight)));
+        new MoveToPoseBangBangCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight)));
 
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
