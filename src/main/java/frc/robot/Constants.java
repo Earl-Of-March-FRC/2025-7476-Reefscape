@@ -49,7 +49,7 @@ public final class Constants {
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
     public static final double kBangBangTranslationalVelocityMetersPerSecond = 1.5;
-    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 10;
+    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 5;
 
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
         kMaxAccelerationMetersPerSecondSquaredPathfinding, kMaxAngularSpeedRadiansPerSecond,
@@ -287,7 +287,7 @@ public final class Constants {
       public static final double kHeightTolerance = 0.5; // meters above and below ground
       public static final double kAmbiguityDiscardThreshold = 0.7; // ignore targets above this value
       public static final double kAmbiguityThreshold = 0.3; // targets above this need to be checked
-      public static final double kMinSingleTagArea = 0.3;
+      public static final double kMinSingleTagArea = 0;
     }
   }
 
