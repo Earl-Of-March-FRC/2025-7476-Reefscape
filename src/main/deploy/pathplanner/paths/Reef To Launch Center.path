@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.829965753424658,
-        "y": 4.002461472602739
+        "x": 6.5688643962513105,
+        "y": 4.8387420807277515
       },
       "isLocked": false,
       "linkedName": "Algae"
     },
     {
       "anchor": {
-        "x": 6.896789383561644,
-        "y": 4.002461472602739
+        "x": 7.39641393442623,
+        "y": 5.6013831967213115
       },
       "prevControl": {
-        "x": 5.896789383561644,
-        "y": 4.002461472602739
+        "x": 6.730906469936015,
+        "y": 5.096633322304935
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Launch Start"
+      "linkedName": "Launch Center"
     }
   ],
   "rotationTargets": [],
@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.93335434916654
+    "rotation": -146.63363399894033
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Reef Stripping",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

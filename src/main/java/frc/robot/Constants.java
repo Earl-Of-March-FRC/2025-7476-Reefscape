@@ -14,6 +14,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -21,6 +22,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.MultUnit;
 import edu.wpi.first.units.measure.*;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -93,6 +97,22 @@ public final class Constants {
       public static final Distance kDistanceFromBarge = Meters.of(1.30); // 1.30 before March 20
       public static final Distance kToleranceDistanceFromBarge = Meters.of(0.1);
       public static final Angle kToleranceAngleFromBarge = Radians.of(5 * Math.PI / 180);
+
+      public static final double kTargetBargeAngle = 45 * Math.PI / 180;
+      public static final double kTargetBargeAngleLeft = kTargetBargeAngle;
+      public static final double kTargetBargeAngleStraight = 0;
+      public static final double kTargetBargeAngleRight = -kTargetBargeAngle;
+    }
+
+    public static class ReefConstants {
+      // Tag oriented offset from center of robot. +x is in front of tag, +y is left
+      // of tag)
+      public static final Transform2d kOffsetFromTag = new Transform2d(new Translation2d(0.5, 0),
+          new Rotation2d(Math.PI));
+      public static final double kToleranceMetersFromSpot = 0.1;
+      public static final double kToleranceRadiansFromSpot = 5 * Math.PI / 180;
+
+      public static final int[] kReefTagIds = { 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
     }
   }
 
@@ -206,6 +226,12 @@ public final class Constants {
 
     // Limit switch stuff
     public static final int kLimitSwitchChannel = 9;
+
+    // Color sensor
+    public static final I2C.Port kColorSensorI2CPort = I2C.Port.kOnboard;
+    public static final Color kAlgaeColor = Color.kTurquoise;
+    public static final double kColorMatchThreshold = 0;
+    public static final int kColorSensorProximityThreshold = 2000;
   }
 
   public static final class IntakeConstants {
@@ -300,11 +326,11 @@ public final class Constants {
     public static final int kBackCanId = 13;
     public static MotorType kMotorType = MotorType.kBrushless;
 
-    public static final double kPVelocityController = 0;
+    public static final double kPVelocityController = 0.003;
     public static final double kIVelocityController = 0;
     public static final double kDVelocityController = 0;
     public static final double frontKVelocityFF = 0.0021;
-    public static final double backKVelocityFF = 0.00215;
+    public static final double backKVelocityFF = 0.0021;
 
     public static final Angle kMotorReduction = Rotations.of(1);
     public static final AngularVelocity kVelocityConversionFactor = kMotorReduction.div(Seconds.of(60));

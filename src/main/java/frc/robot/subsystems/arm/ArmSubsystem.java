@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.revrobotics.ColorSensorV3;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
@@ -32,9 +33,11 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.ArmConfigs;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.utils.ColorHelpers;
 
 /**
  * The ArmSubsystem class represents the robot's arm subsystem. It uses PIDF to
@@ -54,10 +57,17 @@ public class ArmSubsystem extends SubsystemBase {
   private MechanismRoot2d armMechRoot = armMech.getRoot("arm", 0, 0);
   private MechanismLigament2d armMechLig;
 
+  private final ColorSensorV3 colorSensor = new ColorSensorV3(ArmConstants.kColorSensorI2CPort);
+  private boolean algaeOnArm = false;
+  private Color detectedColor;
+  private int proximity;
+
   /**
    * The constructor for the ArmSubsystem class configures the arm motor.
    */
-  public ArmSubsystem(SparkMax armSpark, int limitSwitchChannel) {
+  public ArmSubsystem(
+      SparkMax armSpark,
+      int limitSwitchChannel) {
     this.armSpark = armSpark;
 
     armEncoder = armSpark.getEncoder();
@@ -92,6 +102,10 @@ public class ArmSubsystem extends SubsystemBase {
           gravityCompensationFFVoltage);
       Logger.recordOutput("Arm/Setpoint/PositionOk", isOk);
     }
+
+    // Check whether algae is on arm
+    detectAlgae();
+    Logger.recordOutput("Arm/ColorSensor/AlgaeDetected", algaeOnArm);
   }
 
   /**
@@ -256,4 +270,49 @@ public class ArmSubsystem extends SubsystemBase {
   public void increaseAngularOffset(Angle offset) {
     angularOffset = angularOffset.plus(offset);
   }
+
+  /**
+   * Returns whether algae is detected to be currently on the arm.
+   * 
+   * @return algaeOnArm boolean variable
+   */
+  public boolean getAlgaeOnArm() {
+    return algaeOnArm;
+  }
+
+  /**
+   * Sets the value for whether algae is detected to be currently on the arm.
+   * 
+   * @param algaeDetected boolean value
+   */
+  public void setAlgaeOnArm(boolean algaeDetected) {
+    algaeOnArm = algaeDetected;
+  }
+
+  /**
+   * Called periodically to determine whether algae is currently on the arm, using
+   * the color sensor.
+   */
+  public void detectAlgae() {
+    // Get values from color sensor
+    detectedColor = colorSensor.getColor();
+
+    // The IR sensor detects the object's proximity
+    // Returns a value from 0 to 2047, with 2047 being the closest
+    proximity = colorSensor.getProximity();
+
+    Logger.recordOutput("Arm/ColorSensor/DetectedColorHex", detectedColor.toHexString());
+    Logger.recordOutput("Arm/ColorSensor/DetectedColorName", detectedColor.toString());
+    Logger.recordOutput("Arm/ColorSensor/Proximity", proximity);
+
+    // Check if detected color is within the proximity threshold and whether it
+    // matches the color of algae
+    if (proximity < ArmConstants.kColorSensorProximityThreshold
+        && ColorHelpers.colorsMatch(detectedColor, ArmConstants.kAlgaeColor, ArmConstants.kColorMatchThreshold)) {
+      setAlgaeOnArm(true);
+    } else {
+      setAlgaeOnArm(false);
+    }
+  }
+
 }
