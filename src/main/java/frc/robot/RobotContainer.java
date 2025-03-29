@@ -202,14 +202,11 @@ public class RobotContainer {
 
     // Move to barge launching zone, facing in the specified direction
     driverController.povLeft().whileTrue(
-        new MoveToTargetPoseCmd(driveSub, () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft),
-            false));
+        new MoveToTargetPoseCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft)));
     driverController.povUp().whileTrue(
-        new MoveToTargetPoseCmd(driveSub,
-            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight), false));
+        new MoveToTargetPoseCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight)));
     driverController.povRight().whileTrue(
-        new MoveToTargetPoseCmd(driveSub, () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight),
-            false));
+        new MoveToTargetPoseCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight)));
 
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
