@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems.drivetrain;
 
-import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Meters;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +24,10 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -448,7 +449,7 @@ public class Drivetrain extends SubsystemBase {
         Logger.recordOutput("Vision/" + camera.getName() + "/RawEstimatedPose", estimation.estimatedPose);
 
         if (PoseHelpers.isInField(estimation.estimatedPose) &&
-            PoseHelpers.isOnGround(estimation.estimatedPose, PhotonConstants.kHeightTolerance)) {
+            PoseHelpers.isOnGround(estimation.estimatedPose, PhotonConstants.kHeightTolerance.in(Meters))) {
 
           // ignore the result if it only has one tag and the tag is too small
           if (camResult.getTargets().size() == 1
@@ -498,9 +499,9 @@ public class Drivetrain extends SubsystemBase {
 
             // check if they are reasonable
             boolean isBestPoseValid = PoseHelpers.isInField(bestRobotPose) &&
-                PoseHelpers.isOnGround(bestRobotPose, PhotonConstants.kHeightTolerance);
+                PoseHelpers.isOnGround(bestRobotPose, PhotonConstants.kHeightTolerance.in(Meters));
             boolean isAltPoseValid = PoseHelpers.isInField(altRobotPose)
-                && PoseHelpers.isOnGround(altRobotPose, PhotonConstants.kHeightTolerance);
+                && PoseHelpers.isOnGround(altRobotPose, PhotonConstants.kHeightTolerance.in(Meters));
             if (isBestPoseValid && isAltPoseValid) {
               targetsUsed.add(target);
               // if both are valid, use the one that is closer to the previous estimation
@@ -526,7 +527,8 @@ public class Drivetrain extends SubsystemBase {
           // robotTransform = tagTransform - camToTarget - robotToCam
           Pose3d robotPose = tagPose.transformBy(camToTarget.inverse()).transformBy(robotToCam.inverse());
           // check if the pose is reasonable
-          if (PoseHelpers.isInField(robotPose) && PoseHelpers.isOnGround(robotPose, PhotonConstants.kHeightTolerance)) {
+          if (PoseHelpers.isInField(robotPose)
+              && PoseHelpers.isOnGround(robotPose, PhotonConstants.kHeightTolerance.in(Meters))) {
             validPoses.add(robotPose);
             targetsUsed.add(target);
           }
@@ -625,7 +627,7 @@ public class Drivetrain extends SubsystemBase {
    *                    radians. CCW is positive.
    * @return The calculated target pose for the robot at the barge.
    */
-  public Pose2d getBargeTargetPose(double targetAngle) {
+  public Pose2d getBargeTargetPose(Angle targetAngle) {
     Pose2d currentPose = getPose();
 
     // Y coordinate stays the same as current pose
@@ -635,10 +637,11 @@ public class Drivetrain extends SubsystemBase {
 
     // Calculate target translation
     // (0,0) is ALWAYS on the blue alliance side
-    double targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
+    double targetX = FieldConstants.kBargeX.plus(LaunchingDistances.kDistanceFromBarge.times(onBlueSide ? -1 : 1))
+        .in(Meters);
 
     // Calculate target rotation based on side of field that robot is currently on
-    double targetRadians = (onBlueSide ? Math.PI : 0) + targetAngle;
+    double targetRadians = (onBlueSide ? Math.PI : 0) + targetAngle.in(Radians);
 
     return new Pose2d(targetX, targetY, new Rotation2d(targetRadians));
   }

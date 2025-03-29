@@ -1,5 +1,9 @@
 package frc.robot.utils;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,8 +20,8 @@ public class PoseHelpers {
    * @return True if the pose is within the field boundaries
    */
   public static boolean isInField(Pose3d pose) {
-    return pose.getX() >= 0 && pose.getX() <= FieldConstants.kFieldLengthX && pose.getY() >= 0
-        && pose.getY() <= FieldConstants.kFieldWidthY;
+    return pose.getX() >= 0 && pose.getX() <= FieldConstants.kFieldLengthX.in(Meters) && pose.getY() >= 0
+        && pose.getY() <= FieldConstants.kFieldWidthY.in(Meters);
   }
 
   /**
@@ -77,7 +81,7 @@ public class PoseHelpers {
    */
   public static boolean isOnBlueSide(Pose3d pose) {
     double robotX = pose.getX();
-    return robotX - FieldConstants.kBargeX < 0;
+    return robotX - FieldConstants.kBargeX.in(Meters) < 0;
   }
 
   /**

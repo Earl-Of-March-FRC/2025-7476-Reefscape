@@ -98,10 +98,10 @@ public final class Constants {
       public static final Distance kToleranceDistanceFromBarge = Meters.of(0.1);
       public static final Angle kToleranceAngleFromBarge = Radians.of(5 * Math.PI / 180);
 
-      public static final double kTargetBargeAngle = 45 * Math.PI / 180;
-      public static final double kTargetBargeAngleLeft = kTargetBargeAngle;
-      public static final double kTargetBargeAngleStraight = 0;
-      public static final double kTargetBargeAngleRight = -kTargetBargeAngle;
+      public static final Angle kTargetBargeAngle = Degrees.of(45);
+      public static final Angle kTargetBargeAngleLeft = kTargetBargeAngle;
+      public static final Angle kTargetBargeAngleStraight = Degrees.of(0);
+      public static final Angle kTargetBargeAngleRight = kTargetBargeAngle.times(-1);
     }
 
     public static class ReefConstants {
