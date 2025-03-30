@@ -38,6 +38,7 @@ import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.SimulationVideoConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.commands.drivetrain.*;
 import frc.robot.commands.StripAlgaeCmd;
@@ -48,6 +49,7 @@ import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
 import frc.robot.commands.launcher.LauncherStopCmd;
+import frc.robot.commands.videoplayer.PlayVideoCmd;
 import frc.robot.commands.vision.GoToAlgaeCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -60,6 +62,7 @@ import frc.robot.subsystems.indexer.BeamBreakSensor;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
+import frc.robot.subsystems.videoplayer.VideoPlayer;
 import frc.robot.subsystems.vision.AlgaeSubsystem;
 
 /**
@@ -81,6 +84,7 @@ public class RobotContainer {
   private final Indexer indexerSub;
   private final Launcher launcherSub;
   private final AlgaeSubsystem algaeSubsystem;
+  private final VideoPlayer videoPlayer;
   public final SwerveDriveSimulation swerveDriveSimulation;
 
   private final CommandXboxController driverController = new CommandXboxController(
@@ -159,6 +163,8 @@ public class RobotContainer {
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 
     algaeSubsystem = new AlgaeSubsystem(() -> driveSub.getPose());
+
+    videoPlayer = new VideoPlayer(SimulationVideoConstants.kInputSourceLocation);
 
     // Register named Commands
     NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
@@ -325,6 +331,7 @@ public class RobotContainer {
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
     autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
     autoChooser.addOption("EncoderAutoDrive", new EncoderAutoDrive(driveSub));
+    autoChooser.addOption("PlayVideo", new PlayVideoCmd(videoPlayer));
     SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
   }
 

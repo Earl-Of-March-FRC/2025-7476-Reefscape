@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import org.bytedeco.javacpp.Loader;
+
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -14,6 +16,11 @@ import edu.wpi.first.wpilibj.RobotBase;
  * call.
  */
 public final class Main {
+  // I don't know apparently this works??? - Wilson
+  static {
+    Loader.load(org.bytedeco.opencv.global.opencv_core.class);
+  }
+
   private Main() {
   }
 

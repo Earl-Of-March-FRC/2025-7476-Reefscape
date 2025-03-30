@@ -359,6 +359,16 @@ public final class Constants {
     public static final double kBargeX = kFieldLengthX / 2; // meters from drivestation wall to middle of barge
   }
 
+  public static class SimulationVideoConstants {
+    public static final String kInputSourceLocation = "BadApple.mp4"; // Video path relative to the deploy folder.
+    public static final int kDisplayWidth = 48;
+    public static final int kDisplayHeight = 36;
+    public static final double kDisplayOffsetX = 2;
+    public static final double kDisplayOffsetY = 0;
+    public static final double kDisplayGap = 0.25;
+    public static final double kDisplayDeltaSeconds = 0.25;
+  }
+
   // PDP CAN IDs
   public static final int kPDPCanId = 0;
 }
