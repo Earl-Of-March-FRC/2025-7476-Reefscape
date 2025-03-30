@@ -54,6 +54,9 @@ public class PlayVideoCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if (!videoPlayer.isAllowed()) {
+      return;
+    }
     if (timer.hasElapsed(SimulationVideoConstants.kDisplayDeltaSeconds)) {
       timer.restart();
       Boolean[][] frame = videoPlayer.getFrame(currentFrame);
@@ -92,6 +95,6 @@ public class PlayVideoCmd extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return currentFrame >= videoPlayer.getFrameCount();
+    return currentFrame >= videoPlayer.getFrameCount() || !videoPlayer.isAllowed();
   }
 }

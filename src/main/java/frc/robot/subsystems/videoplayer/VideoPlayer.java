@@ -15,12 +15,12 @@ import org.littletonrobotics.junction.Logger;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
@@ -39,15 +39,19 @@ public class VideoPlayer extends SubsystemBase {
    */
   public VideoPlayer(String videoPath) {
     this.videoPath = videoPath;
-    processVideo();
-    resetPoses();
+    if (isAllowed()) {
+      processVideo();
+      resetPoses();
+    }
   }
 
   @Override
   public void periodic() {
-    Pose2d[] poseArray = new Pose2d[poses.size()];
-    poses.toArray(poseArray);
-    Logger.recordOutput("VideoPlayer/Display/Chunks", poseArray);
+    if (isAllowed()) {
+      Pose2d[] poseArray = new Pose2d[poses.size()];
+      poses.toArray(poseArray);
+      Logger.recordOutput("VideoPlayer/Display/Chunks", poseArray);
+    }
   }
 
   private void processVideo() {
@@ -148,6 +152,9 @@ public class VideoPlayer extends SubsystemBase {
     Logger.recordOutput("VideoPlayer/ChunkCount", chunkCount);
   }
 
+  /**
+   * Resets all poses to their default location
+   */
   public void resetPoses() {
     poses.clear();
     for (int x = 0; x < SimulationVideoConstants.kDisplayWidth; x++) {
@@ -157,6 +164,14 @@ public class VideoPlayer extends SubsystemBase {
     }
   }
 
+  /**
+   * Calculate the default position of a pose when it's enabled, given it's
+   * position relative to the display.
+   * 
+   * @param x X-axis
+   * @param y Y-axis
+   * @return New {@code Pose2d} object
+   */
   public Pose2d calculateDefaultPose(int x, int y) {
     return new Pose2d(
         (x * SimulationVideoConstants.kDisplayGap) + SimulationVideoConstants.kDisplayOffsetX,
@@ -165,6 +180,12 @@ public class VideoPlayer extends SubsystemBase {
         Rotation2d.kZero);
   }
 
+  /**
+   * Get a specidifc frame from the processed video
+   * 
+   * @param index The frame index
+   * @return The frame
+   */
   public Boolean[][] getFrame(int index) {
     if (index >= frames.size()) {
       System.err.println("Index " + index + " is out of bounds. There is no such frame!");
@@ -173,11 +194,30 @@ public class VideoPlayer extends SubsystemBase {
     return frames.get(index);
   }
 
+  /**
+   * Get the total frame count of the processed video
+   * 
+   * @return THe total frame count
+   */
   public int getFrameCount() {
     return frames.size();
   }
 
+  /**
+   * Get the list of poses being plotted on the field.
+   * 
+   * @return {@code ArrayList} of {@code Pose2d}s
+   */
   public List<Pose2d> getPoses() {
     return poses;
+  }
+
+  /**
+   * Safeguard in case someone runs this on the real robot.
+   * 
+   * @return {@cod true} if playback is allowed, {@code false} if not.
+   */
+  public boolean isAllowed() {
+    return RobotBase.isSimulation();
   }
 }
