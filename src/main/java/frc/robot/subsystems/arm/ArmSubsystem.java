@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.utils.ColorHelpers;
+import frc.utils.ColorHelpers;
 
 /**
  * The ArmSubsystem class represents the robot's arm subsystem. It uses PIDF to
