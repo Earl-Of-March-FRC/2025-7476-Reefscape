@@ -68,6 +68,8 @@ public class Launcher extends SubsystemBase {
     // Log in rad/s
     Logger.recordOutput("Launcher/Front/Measured/Velocity", getFrontVelocity());
     Logger.recordOutput("Launcher/Back/Measured/Velocity", getBackVelocity());
+    SmartDashboard.putBoolean("LauncherFrontAtSetpoint", frontRollerAtSetpoint());
+    SmartDashboard.putBoolean("LauncherBackAtSetpoint", backRollerAtSetpoint());
     SmartDashboard.putNumber("FrontVel", getFrontVelocity());
     SmartDashboard.putNumber("BackVel", getBackVelocity());
   }
@@ -98,9 +100,6 @@ public class Launcher extends SubsystemBase {
   public void setVelocity(double percent) {
     Logger.recordOutput("Launcher/Front/Setpoint/PercentVelocity", percent);
     Logger.recordOutput("Launcher/Back/Setpoint/PercentVelocity", percent);
-
-    SmartDashboard.putBoolean("LauncherFrontAtSetpoint", frontRollerAtSetpoint());
-    SmartDashboard.putBoolean("LauncherBackAtSetpoint", backRollerAtSetpoint());
 
     frontLauncherSpark.set(percent);
     backLauncherSpark.set(percent);

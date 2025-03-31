@@ -57,7 +57,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Vision.PhotonConstants;
-import frc.robot.utils.PoseHelpers;
+import frc.utils.PoseHelpers;
 
 /**
  * The Drivetrain class represents the robot's drivetrain subsystem.
@@ -460,13 +460,6 @@ public class Drivetrain extends SubsystemBase {
         modules[1].getState(),
         modules[2].getState(),
         modules[3].getState());
-  }
-
-  public Pose2d convertPose3d(Pose3d p) {
-    double x = p.getX();
-    double y = p.getY();
-    Rotation2d rot = new Rotation2d(p.getRotation().getAngle());
-    return new Pose2d(x, y, rot);
   }
 
   public List<EstimatedRobotPose> getEstimatedGlobalPose(PhotonPoseEstimator poseEstimator, PhotonCamera camera,
