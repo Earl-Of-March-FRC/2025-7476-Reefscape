@@ -4,6 +4,9 @@
 
 package frc.robot.commands.drivetrain;
 
+import static edu.wpi.first.units.Units.Rotation;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -36,7 +39,10 @@ public class CalibrateGyroCmd extends Command {
    */
   @Override
   public void initialize() {
-    driveSub.gyro.setAngle(new Rotation2d(180 * Math.PI / 180));
+    Pose2d currentPose = driveSub.getPose();
+    Rotation2d newAngle = new Rotation2d(180 * Math.PI / 180);
+    driveSub.gyro.setAngle(newAngle);
+    driveSub.setOdometry(new Pose2d(currentPose.getTranslation(), newAngle));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
