@@ -221,7 +221,6 @@ public class Drivetrain extends SubsystemBase {
         cameras[i] = cameraSims[i].getCamera();
       }
     } else {
-      cameraSims = null;
       visionSim = null;
     }
   }
@@ -247,6 +246,10 @@ public class Drivetrain extends SubsystemBase {
       };
       pose = odometry.update(gyroAngle, positions);
       visionlessPose = visionlessOdometry.update(gyroAngle, positions);
+    }
+
+    if (RobotBase.isSimulation()) {
+      visionSim.update(swerveDriveSimulation.getSimulatedDriveTrainPose());
     }
 
     hasVisionData = false;
