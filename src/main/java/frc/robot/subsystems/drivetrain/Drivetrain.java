@@ -398,13 +398,6 @@ public class Drivetrain extends SubsystemBase {
         modules[3].getState());
   }
 
-  public Pose2d convertPose3d(Pose3d p) {
-    double x = p.getX();
-    double y = p.getY();
-    Rotation2d rot = new Rotation2d(p.getRotation().getAngle());
-    return new Pose2d(x, y, rot);
-  }
-
   public List<EstimatedRobotPose> getEstimatedGlobalPose(PhotonPoseEstimator poseEstimator, PhotonCamera camera,
       Transform3d robotToCam,
       Pose2d prevEstimatedRobotPose) {
