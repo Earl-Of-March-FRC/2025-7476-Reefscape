@@ -164,7 +164,7 @@ public class Launcher extends SubsystemBase {
     double referenceVelocityWithOffset = referenceVelocity + velocityOffsetRPM;
     frontReferenceVelocityWithoutOffset = referenceVelocity;
     Logger.recordOutput("Launcher/Front/Setpoint/Velocity", referenceVelocity);
-    Logger.recordOutput("Launcher/Back/Setpoint/VelocityWithOffset", referenceVelocityWithOffset);
+    Logger.recordOutput("Launcher/Front/Setpoint/VelocityWithOffset", referenceVelocityWithOffset);
 
     // Converts RPM to radians per second
     frontLauncherClosedLoopController.setReference(
