@@ -57,13 +57,13 @@ public class Launcher extends SubsystemBase {
 
     // Log in rad/s
     SmartDashboard.putNumber("LauncherHighFrontVelocity",
-        LauncherConstants.kVelocityHighFront * LauncherConstants.kVelocityConversionFactor);
+        LauncherConstants.kVelocityHighFrontRPM * LauncherConstants.kVelocityConversionFactor);
     SmartDashboard.putNumber("LauncherHighBackVelocity",
-        LauncherConstants.kVelocityHighBack * LauncherConstants.kVelocityConversionFactor);
+        LauncherConstants.kVelocityHighBackRPM * LauncherConstants.kVelocityConversionFactor);
     SmartDashboard.putNumber("LauncherLowFrontVelocity",
-        LauncherConstants.kVelocityLowFront * LauncherConstants.kVelocityConversionFactor);
+        LauncherConstants.kVelocityLowFrontRPM * LauncherConstants.kVelocityConversionFactor);
     SmartDashboard.putNumber("LauncherLowBackVelocity",
-        LauncherConstants.kVelocityLowBack * LauncherConstants.kVelocityConversionFactor);
+        LauncherConstants.kVelocityLowBackRPM * LauncherConstants.kVelocityConversionFactor);
 
   }
 
@@ -141,6 +141,8 @@ public class Launcher extends SubsystemBase {
   public void setReferenceVelocityOffset(double offsetRPM) {
     velocityOffsetRPM = offsetRPM;
     Logger.recordOutput("Launcher/VelocityOffsetRPM", velocityOffsetRPM);
+    Logger.recordOutput("Launcher/VelocityOffsetRadPerSec",
+        velocityOffsetRPM * LauncherConstants.kVelocityConversionFactor);
 
     setReferenceVelocity(frontReferenceVelocityWithoutOffset, backReferenceVelocityWithoutOffset);
   }
@@ -203,11 +205,11 @@ public class Launcher extends SubsystemBase {
   public double getPreferredFrontVelocity() {
     if (useHighVelocities) {
       return SmartDashboard.getNumber("LauncherHighFrontVelocity",
-          LauncherConstants.kVelocityHighFront * LauncherConstants.kVelocityConversionFactor)
+          LauncherConstants.kVelocityHighFrontRPM * LauncherConstants.kVelocityConversionFactor)
           / LauncherConstants.kVelocityConversionFactor;
     }
     return SmartDashboard.getNumber("LauncherLowFrontVelocity",
-        LauncherConstants.kVelocityLowFront * LauncherConstants.kVelocityConversionFactor)
+        LauncherConstants.kVelocityLowFrontRPM * LauncherConstants.kVelocityConversionFactor)
         / LauncherConstants.kVelocityConversionFactor;
   }
 
@@ -219,11 +221,11 @@ public class Launcher extends SubsystemBase {
   public double getPreferredBackVelocity() {
     if (useHighVelocities) {
       return SmartDashboard.getNumber("LauncherHighBackVelocity",
-          LauncherConstants.kVelocityHighBack * LauncherConstants.kVelocityConversionFactor)
+          LauncherConstants.kVelocityHighBackRPM * LauncherConstants.kVelocityConversionFactor)
           / LauncherConstants.kVelocityConversionFactor;
     }
     return SmartDashboard.getNumber("LauncherLowBackVelocity",
-        LauncherConstants.kVelocityLowBack * LauncherConstants.kVelocityConversionFactor)
+        LauncherConstants.kVelocityLowBackRPM * LauncherConstants.kVelocityConversionFactor)
         / LauncherConstants.kVelocityConversionFactor;
   }
 
