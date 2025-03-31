@@ -68,6 +68,7 @@ public class PlayVideoCmd extends Command {
         for (int x = 0; x < row.length; x++) {
           Pose2d defaultPose = videoPlayer.calculateDefaultPose(x, y);
           Boolean chunkEnabled = (row[x] == null ? false : row[x]);
+
           poses.set((y * SimulationVideoConstants.kDisplayWidth) + x,
               chunkEnabled ? new Pose2d(defaultPose.getX(), defaultPose.getY(), Rotation2d.fromDegrees(degrees[y][x]))
                   : new Pose2d(defaultPose.getX() + 100, defaultPose.getY() + 100, defaultPose.getRotation()));
@@ -89,7 +90,6 @@ public class PlayVideoCmd extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    videoPlayer.resetPoses();
     timer.stop();
   }
 

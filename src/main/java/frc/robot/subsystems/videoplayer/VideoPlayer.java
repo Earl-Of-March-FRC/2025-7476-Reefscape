@@ -104,6 +104,10 @@ public class VideoPlayer extends SubsystemBase {
             255,
             Imgproc.THRESH_BINARY);
 
+        if (SimulationVideoConstants.kInverted) {
+          Core.bitwise_not(processedMat, processedMat);
+        }
+
         Boolean[][] status = new Boolean[SimulationVideoConstants.kDisplayHeight][SimulationVideoConstants.kDisplayWidth];
         Double[][] degrees = new Double[SimulationVideoConstants.kDisplayHeight][SimulationVideoConstants.kDisplayWidth];
 

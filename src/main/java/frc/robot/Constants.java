@@ -363,10 +363,11 @@ public final class Constants {
     public static final String kInputSourceLocation = "BadApple.mp4"; // Video path relative to the deploy folder.
     public static final int kDisplayWidth = 48;
     public static final int kDisplayHeight = 36;
-    public static final double kDisplayOffsetX = 2;
+    public static final double kDisplayOffsetX = 0;
     public static final double kDisplayOffsetY = 0;
-    public static final double kDisplayGap = 0.25;
+    public static final double kDisplayGap = 0.4;
     public static final double kDisplayDeltaSeconds = 1.0 / 30.0;
+    public static final boolean kInverted = false;
   }
 
   // PDP CAN IDs
