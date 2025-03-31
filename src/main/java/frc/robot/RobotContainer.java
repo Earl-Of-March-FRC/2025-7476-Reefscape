@@ -258,9 +258,15 @@ public class RobotContainer {
     operatorController.y().onTrue(Commands.runOnce(() -> launcherSub.setUseHighVelocities(true)));
     operatorController.a().onTrue(Commands.runOnce(() -> launcherSub.setUseHighVelocities(false)));
     operatorController.x()
-        .onTrue(Commands.runOnce(() -> launcherSub.increaseReferenceVelocityOffset(LauncherConstants.kBumpOffsetRPM)));
+        .onTrue(Commands.runOnce(() -> {
+          launcherSub.increaseReferenceVelocityOffset(LauncherConstants.kBumpOffsetRPM);
+          launcherSub.setReferenceVelocityOffset(0);
+        }));
     operatorController.b()
-        .onTrue(Commands.runOnce(() -> launcherSub.increaseReferenceVelocityOffset(-LauncherConstants.kBumpOffsetRPM)));
+        .onTrue(Commands.runOnce(() -> {
+          launcherSub.increaseReferenceVelocityOffset(-LauncherConstants.kBumpOffsetRPM);
+          launcherSub.setReferenceVelocityOffset(0);
+        }));
 
     // Bump arm setpoints
     operatorController.leftBumper().whileTrue(
