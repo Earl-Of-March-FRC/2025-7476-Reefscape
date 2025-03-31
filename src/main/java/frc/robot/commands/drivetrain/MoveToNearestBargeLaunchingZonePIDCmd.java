@@ -15,10 +15,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.utils.PoseHelpers;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveToNearestBargeLaunchingZonePIDCmd extends Command {
@@ -50,7 +50,7 @@ public class MoveToNearestBargeLaunchingZonePIDCmd extends Command {
     Pose2d currentPose = driveSub.getPose();
 
     // Calculate target pose
-    boolean onBlueSide = driveSub.isOnBlueSide();
+    boolean onBlueSide = PoseHelpers.isOnBlueSide(currentPose);
 
     // Calculate target translation
     // (0,0) is ALWAYS on the blue alliance side

@@ -1,4 +1,4 @@
-package frc.robot.utils;
+package frc.utils;
 
 public class Wrapper {
   public static double wrapRadian(double angle) {

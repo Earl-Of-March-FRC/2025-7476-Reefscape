@@ -12,13 +12,15 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -46,8 +48,8 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 2.5;
-    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 10;
+    public static final double kBangBangTranslationalVelocityMetersPerSecond = 1.5;
+    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 5;
 
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
         kMaxAccelerationMetersPerSecondSquaredPathfinding, kMaxAngularSpeedRadiansPerSecond,
@@ -87,6 +89,22 @@ public final class Constants {
       public static final double kMetersFromBarge = 1.30; // 1.30 before March 20
       public static final double kToleranceMetersFromBarge = 0.1;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
+
+      public static final double kTargetBargeAngle = 45 * Math.PI / 180;
+      public static final double kTargetBargeAngleLeft = kTargetBargeAngle;
+      public static final double kTargetBargeAngleStraight = 0;
+      public static final double kTargetBargeAngleRight = -kTargetBargeAngle;
+    }
+
+    public static class ReefConstants {
+      // Tag oriented offset from center of robot. +x is in front of tag, +y is left
+      // of tag)
+      public static final Transform2d kOffsetFromTag = new Transform2d(new Translation2d(0.5, 0),
+          new Rotation2d(Math.PI));
+      public static final double kToleranceMetersFromSpot = 0.1;
+      public static final double kToleranceRadiansFromSpot = 5 * Math.PI / 180;
+
+      public static final int[] kReefTagIds = { 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
     }
   }
 
@@ -211,6 +229,12 @@ public final class Constants {
 
     // Limit switch stuff
     public static final int kLimitSwitchChannel = 9;
+
+    // Color sensor
+    public static final I2C.Port kColorSensorI2CPort = I2C.Port.kOnboard;
+    public static final Color kAlgaeColor = Color.kTurquoise;
+    public static final double kColorMatchThreshold = 0;
+    public static final int kColorSensorProximityThreshold = 2000;
   }
 
   public static final class IntakeConstants {
@@ -260,11 +284,23 @@ public final class Constants {
       public static final double camera2Y = 0;
       public static final double camera2Z = 0.3175;
 
+      // NEED TO BE FOUND AND SET
+      public static final double camera3Roll = 0;
+      public static final double camera3Pitch = 0;
+      public static final double camera3Yaw = 0;
+      public static final double camera3X = 0;
+      public static final double camera3Y = 0;
+      public static final double camera3Z = 0;
+
       public static final int kAlgaePipeline = 1;
       public static final int kAprilTagPipeline = 0;
 
       public static final String kCamera1 = "camera1";
       public static final String kCamera2 = "camera2";
+      public static final String kCamera3 = "camera3";
+      public static final String[] kCameras = { kCamera1, kCamera2, kCamera3 };
+
+      public static final int numCameras = kCameras.length;
 
       public static final Transform3d kRobotToCam1 = new Transform3d(
           new Translation3d(PhotonConstants.camera1X, PhotonConstants.camera1Y, PhotonConstants.camera1Z),
@@ -272,11 +308,15 @@ public final class Constants {
       public static final Transform3d kRobotToCam2 = new Transform3d(
           new Translation3d(PhotonConstants.camera2X, PhotonConstants.camera2Y, PhotonConstants.camera2Z),
           new Rotation3d(PhotonConstants.camera2Roll, PhotonConstants.camera2Pitch, PhotonConstants.camera2Yaw));
+      public static final Transform3d kRobotToCam3 = new Transform3d(
+          new Translation3d(PhotonConstants.camera3X, PhotonConstants.camera3Y, PhotonConstants.camera3Z),
+          new Rotation3d(PhotonConstants.camera3Roll, PhotonConstants.camera3Pitch, PhotonConstants.camera3Yaw));
+      public static final Transform3d[] kRobotToCams = { kRobotToCam1, kRobotToCam2, kRobotToCam3 };
 
       public static final double kHeightTolerance = 0.5; // meters above and below ground
       public static final double kAmbiguityDiscardThreshold = 0.7; // ignore targets above this value
       public static final double kAmbiguityThreshold = 0.3; // targets above this need to be checked
-      public static final double kMinSingleTagArea = 0.3;
+      public static final double kMinSingleTagArea = 0;
     }
   }
 
@@ -307,19 +347,21 @@ public final class Constants {
     public static final int kBackCanId = 13;
     public static MotorType kMotorType = MotorType.kBrushless;
 
-    public static final double kPVelocityController = 0;
+    public static final double kPVelocityController = 0.003;
     public static final double kIVelocityController = 0;
     public static final double kDVelocityController = 0;
     public static final double frontKVelocityFF = 0.0021;
-    public static final double backKVelocityFF = 0.00215;
+    public static final double backKVelocityFF = 0.0021;
 
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
     // public static final double kVelocityFront = 2100; // 220 rad/s
     // public static final double kVelocityBack = 2626.056561; // 275 rad/s
-    public static final double kVelocityFront = 1957.6058; // 205 rad/s
-    public static final double kVelocityBack = 2482.817112; // 260 rad/s
+    public static final double kVelocityFront = 193 / kVelocityConversionFactor; // 205 rad/s
+    public static final double kVelocityBack = 248 / kVelocityConversionFactor; // 260 rad/s
+    public static final double kVelocityYeetBack = 4964;
+    public static final double kVelocityYeetForward = 4964;
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
   }

@@ -15,37 +15,33 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.commands.drivetrain.*;
+import frc.robot.commands.StripAlgaeCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
 import frc.robot.commands.indexer.IndexToBeamBreakCmd;
 import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
-import frc.robot.commands.vision.GoToAlgaeCmd;
+import frc.robot.commands.launcher.LauncherStopCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
@@ -159,7 +155,25 @@ public class RobotContainer {
 
     // Register named Commands
     NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
-
+    NamedCommands.registerCommand("ArmL2", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL2));
+    NamedCommands.registerCommand("ArmL3", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL3));
+    NamedCommands.registerCommand("ArmStow", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleStowed));
+    NamedCommands.registerCommand("StripAlgae", new StripAlgaeCmd(intakeSub, armSub));
+    NamedCommands.registerCommand("LauncherIntake",
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
+            () -> -launcherSub.getPreferredBackVelocity()));
+    NamedCommands.registerCommand("RevLauncher",
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
+            () -> launcherSub.getPreferredBackVelocity()));
+    NamedCommands.registerCommand("StopLauncher", new LauncherStopCmd(launcherSub));
+    NamedCommands.registerCommand("Launch", new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
+    NamedCommands.registerCommand("StopIndexer", new IndexerSetVelocityManualCmd(indexerSub, () -> 0));
+    NamedCommands.registerCommand("RunIntake", new IntakeSetVelocityManualCmd(intakeSub,
+        () -> -1));
+    NamedCommands.registerCommand("StopIntake", new IntakeSetVelocityManualCmd(intakeSub,
+        () -> 0));
+    NamedCommands.registerCommand("IndexerBack",
+        new IndexerSetVelocityManualCmd(indexerSub, () -> -1).until(() -> !indexerSub.getIntakeSensor()));
     configureAutos();
     configureBindings();
   }
@@ -218,8 +232,24 @@ public class RobotContainer {
 
     // Drive commands
     driverController.b().onTrue(new CalibrateGyroCmd(driveSub));
-    driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneBangBangCmd(driveSub));
-    driverController.x().whileTrue(new MoveToNearestBargeLaunchingZonePIDCmd(driveSub));
+    driverController.x().whileTrue(new RotateTowardsReefWithDriveCmd(
+        driveSub,
+        () -> MathUtil.applyDeadband(
+            -driverController.getRawAxis(
+                OIConstants.kDriverControllerYAxis),
+            OIConstants.kDriveDeadband),
+        () -> MathUtil.applyDeadband(
+            -driverController.getRawAxis(
+                OIConstants.kDriverControllerXAxis),
+            OIConstants.kDriveDeadband)));
+
+    // Move to barge launching zone, facing in the specified direction
+    driverController.povLeft().whileTrue(
+        new MoveToPoseBangBangCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft)));
+    driverController.povUp().whileTrue(
+        new MoveToPoseBangBangCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight)));
+    driverController.povRight().whileTrue(
+        new MoveToPoseBangBangCmd(driveSub, driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight)));
 
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
@@ -233,9 +263,8 @@ public class RobotContainer {
 
     // Indexer commands
     driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
-
     driverController.leftBumper().whileTrue(
-        new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
+        new IndexerSetVelocityManualCmd(indexerSub, () -> -0.75));
     driverController.rightBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
 
@@ -246,6 +275,9 @@ public class RobotContainer {
     driverController.rightTrigger().toggleOnTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
             () -> launcherSub.getPreferredBackVelocity()));
+    driverController.povDown().toggleOnTrue(
+        new LauncherSetVelocityPIDCmd(launcherSub, () -> LauncherConstants.kVelocityYeetForward,
+            () -> LauncherConstants.kVelocityYeetBack));
 
     // OPERATOR CONTROLLER
 

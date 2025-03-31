@@ -3,41 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.586270491803279,
-        "y": 4.222797131147541
+        "x": 7.2885245901639335,
+        "y": 4.690317622950819
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.71311475409836,
-        "y": 4.126895491803278
+        "x": 6.786860766755121,
+        "y": 4.206318382022925
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Launch Right"
     },
     {
       "anchor": {
-        "x": 6.605225409836065,
-        "y": 5.2897028688524586
+        "x": 5.829965753424658,
+        "y": 4.002461472602739
       },
       "prevControl": {
-        "x": 7.106818541590025,
-        "y": 5.005712639844702
-      },
-      "nextControl": {
-        "x": 4.974897540983607,
-        "y": 6.212756147540984
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 1.6183401639344261,
-        "y": 5.853125
-      },
-      "prevControl": {
-        "x": 3.776127049180327,
-        "y": 5.829149590163934
+        "x": 7.036782786885246,
+        "y": 4.04298155737705
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +29,21 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.5536799459824435,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -61,10 +59,10 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Reef Stripping",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -146.63363399894033
   },
   "useDefaultConstraints": true
 }

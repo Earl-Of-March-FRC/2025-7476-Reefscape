@@ -3,33 +3,47 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.6183401639344261,
-        "y": 5.853125
+        "x": 6.58125,
+        "y": 4.002461472602739
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.618340163934426,
-        "y": 5.853125
+        "x": 5.965196917808219,
+        "y": 4.002461472602739
       },
       "isLocked": false,
-      "linkedName": "Algae"
+      "linkedName": "Centered"
     },
     {
       "anchor": {
-        "x": 7.372438524590163,
-        "y": 6.104866803278688
+        "x": 5.829965753424658,
+        "y": 4.002461472602739
       },
       "prevControl": {
-        "x": 6.372438524590163,
-        "y": 6.104866803278688
+        "x": 6.079965753424658,
+        "y": 4.002461472602739
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Algae"
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.2052667116812915,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -45,7 +59,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Reef Stripping",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
