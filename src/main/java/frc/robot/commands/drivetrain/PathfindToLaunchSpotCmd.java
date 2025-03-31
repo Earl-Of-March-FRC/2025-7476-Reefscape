@@ -7,10 +7,7 @@ package frc.robot.commands.drivetrain;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 
 public class PathfindToLaunchSpotCmd extends SequentialCommandGroup {
