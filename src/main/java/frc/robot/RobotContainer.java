@@ -259,12 +259,12 @@ public class RobotContainer {
     operatorController.a().onTrue(Commands.runOnce(() -> launcherSub.setUseHighVelocities(false)));
     operatorController.x()
         .onTrue(Commands.runOnce(() -> {
-          launcherSub.increaseReferenceVelocityOffset(LauncherConstants.kBumpOffsetRPM);
+          launcherSub.increaseReferenceVelocityOffset(LauncherConstants.kBumpOffsetRadPerSec);
           launcherSub.setReferenceVelocityOffset(0);
         }));
     operatorController.b()
         .onTrue(Commands.runOnce(() -> {
-          launcherSub.increaseReferenceVelocityOffset(-LauncherConstants.kBumpOffsetRPM);
+          launcherSub.increaseReferenceVelocityOffset(-LauncherConstants.kBumpOffsetRadPerSec);
           launcherSub.setReferenceVelocityOffset(0);
         }));
 

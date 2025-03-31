@@ -356,7 +356,7 @@ public final class Constants {
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
 
-    public static final double kBumpOffsetRPM = 1;
+    public static final double kBumpOffsetRadPerSec = 1 / kVelocityConversionFactor;
   }
 
   public static class FieldConstants {
