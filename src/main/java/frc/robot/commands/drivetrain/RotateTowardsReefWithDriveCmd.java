@@ -83,17 +83,8 @@ public class RotateTowardsReefWithDriveCmd extends Command {
     targetRadians = targetReefSpot.getRotation().getRadians();
 
     // Make adjustments to the robot
-    double directionRot = 0;
-
-    if (!rotationController.atSetpoint()) {
-      double currentRotation = currentPose.getRotation().getRadians();
-
-      // Bang bang controller returns 0 or 1
-      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
-      // Offset the rotation such that the setpoint is always "0". This rids of
-      // wrap-around issues.
-      directionRot = (rotationController.calculate(MathUtil.angleModulus(currentRotation - targetRadians), 0) * 2) - 1;
-    }
+    double currentRotation = currentPose.getRotation().getRadians();
+    rotationController.calculate(MathUtil.angleModulus(currentRotation - targetRadians), 0);
 
   }
 
@@ -137,14 +128,15 @@ public class RotateTowardsReefWithDriveCmd extends Command {
     // Make adjustments to the robot
     double directionRot = 0;
 
-    if (!rotationController.atSetpoint()) {
-      double currentRotation = currentPose.getRotation().getRadians();
+    double currentRotation = currentPose.getRotation().getRadians();
 
-      // Bang bang controller returns 0 or 1
-      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
-      // Offset the rotation such that the setpoint is always "0". This rids of
-      // wrap-around issues.
-      directionRot = (rotationController.calculate(MathUtil.angleModulus(currentRotation - targetRadians), 0) * 2) - 1;
+    // Bang bang controller returns 0 or 1
+    // Multiply calculated output by 2 and subtract 1 to get -1 or 1
+    // Offset the rotation such that the setpoint is always "0". This rids of
+    // wrap-around issues.
+    directionRot = (rotationController.calculate(MathUtil.angleModulus(currentRotation - targetRadians), 0) * 2) - 1;
+    if (rotationController.atSetpoint()) {
+      directionRot = 0;
     }
 
     // Convert calculated value to velocity
