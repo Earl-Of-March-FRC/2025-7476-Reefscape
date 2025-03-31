@@ -33,7 +33,7 @@ public class Launcher extends SubsystemBase {
 
   private double frontReferenceVelocityWithoutOffset = 0.0;
   private double backReferenceVelocityWithoutOffset = 0.0;
-  private double velocityOffsetRadPerSec = 0.0;
+  private double velocityOffsetRPM = 0.0;
 
   private boolean useHighVelocities = true;
 
@@ -139,8 +139,8 @@ public class Launcher extends SubsystemBase {
    * @param offsetRPM New offset in RPM
    */
   public void setReferenceVelocityOffset(double offsetRPM) {
-    velocityOffsetRadPerSec = offsetRPM;
-    Logger.recordOutput("Launcher/VelocityOffsetRadPerSec", velocityOffsetRadPerSec);
+    velocityOffsetRPM = offsetRPM;
+    Logger.recordOutput("Launcher/VelocityOffsetRPM", velocityOffsetRPM);
 
     setReferenceVelocity(frontReferenceVelocityWithoutOffset, backReferenceVelocityWithoutOffset);
   }
@@ -151,7 +151,7 @@ public class Launcher extends SubsystemBase {
    * @param offsetRPM RPM to increase by
    */
   public void increaseReferenceVelocityOffset(double offsetRPM) {
-    setReferenceVelocityOffset(velocityOffsetRadPerSec + offsetRPM);
+    setReferenceVelocityOffset(velocityOffsetRPM + offsetRPM);
   }
 
   /**
@@ -160,7 +160,7 @@ public class Launcher extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setFrontReferenceVelocity(double referenceVelocity) {
-    double referenceVelocityWithOffset = referenceVelocity + velocityOffsetRadPerSec;
+    double referenceVelocityWithOffset = referenceVelocity + velocityOffsetRPM;
     frontReferenceVelocityWithoutOffset = referenceVelocity;
     Logger.recordOutput("Launcher/Front/Setpoint/Velocity", referenceVelocity);
     Logger.recordOutput("Launcher/Front/Setpoint/VelocityWithOffset", referenceVelocityWithOffset);
@@ -177,7 +177,7 @@ public class Launcher extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setBackReferenceVelocity(double referenceVelocity) {
-    double referenceVelocityWithOffset = referenceVelocity + velocityOffsetRadPerSec;
+    double referenceVelocityWithOffset = referenceVelocity + velocityOffsetRPM;
     backReferenceVelocityWithoutOffset = referenceVelocity;
     Logger.recordOutput("Launcher/Back/Setpoint/Velocity", referenceVelocity);
     Logger.recordOutput("Launcher/Back/Setpoint/VelocityWithOffset", referenceVelocityWithOffset);
@@ -243,7 +243,7 @@ public class Launcher extends SubsystemBase {
    * Check if the front roller has reached the setpoint
    */
   public boolean frontRollerAtSetpoint() {
-    return MathUtil.isNear(frontReferenceVelocityWithoutOffset + velocityOffsetRadPerSec,
+    return MathUtil.isNear(frontReferenceVelocityWithoutOffset + velocityOffsetRPM,
         getFrontVelocity() / LauncherConstants.kVelocityConversionFactor,
         LauncherConstants.kVelocityFrontTolerance);
   }
@@ -252,7 +252,7 @@ public class Launcher extends SubsystemBase {
    * Check if the back roller has reached the setpoint
    */
   public boolean backRollerAtSetpoint() {
-    return MathUtil.isNear(backReferenceVelocityWithoutOffset + velocityOffsetRadPerSec,
+    return MathUtil.isNear(backReferenceVelocityWithoutOffset + velocityOffsetRPM,
         getBackVelocity() / LauncherConstants.kVelocityConversionFactor,
         LauncherConstants.kVelocityBackTolerance);
   }
