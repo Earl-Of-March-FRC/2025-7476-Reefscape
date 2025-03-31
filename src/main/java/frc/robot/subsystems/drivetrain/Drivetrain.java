@@ -275,7 +275,8 @@ public class Drivetrain extends SubsystemBase {
 
         Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetIds",
             fiducialIds.stream().mapToInt(n -> n).toArray());
-        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetPoses", (Pose3d[]) fiducialIdPoses.toArray());
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetPoses",
+            fiducialIdPoses.toArray(new Pose3d[fiducialIdPoses.size()]));
 
         Pose2d estimatedPose = PoseHelpers.toPose2d(visionPose.estimatedPose);
         odometry.addVisionMeasurement(estimatedPose, visionPose.timestampSeconds);
@@ -658,6 +659,7 @@ public class Drivetrain extends SubsystemBase {
    * @return The calculated target pose for the robot at the barge.
    */
   public Pose2d getBargeTargetPose(double targetAngle) {
+    System.out.println("getBargeTargetPose");
     Pose2d currentPose = getPose();
 
     // Y coordinate stays the same as current pose

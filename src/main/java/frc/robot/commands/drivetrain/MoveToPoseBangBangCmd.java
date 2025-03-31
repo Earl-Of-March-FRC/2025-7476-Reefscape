@@ -40,17 +40,12 @@ public class MoveToPoseBangBangCmd extends Command {
 
     this.targetPose = targetPose;
     this.dynamicPose = dynamicPose;
-
-    initialTargetPose = targetPose.get();
-  }
-
-  public MoveToPoseBangBangCmd(Drivetrain driveSub, Pose2d targetPose) {
-    this(driveSub, () -> targetPose, false);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    this.initialTargetPose = targetPose.get();
 
     // Run calculations once to ensure that the three bang bang controllers have
     // setpoints
@@ -75,48 +70,11 @@ public class MoveToPoseBangBangCmd extends Command {
           initialTargetPose);
     }
 
-    // Make adjustments to the robot
-    double directionX = 0;
-    double directionY = 0;
-    double directionRot = 0;
+    translationXController.calculate(currentPose.getX(), targetX);
 
-    if (!translationXController.atSetpoint()) {
-      // Bang bang controller returns 0 or 1
-      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
-      directionX = (translationXController.calculate(currentPose.getX(), targetX) * 2) - 1;
-
-      // Reverse direction if on red alliance
-      if (DriverStation.getAlliance().isPresent()) {
-        Alliance alliance = DriverStation.getAlliance().get();
-        if (alliance == Alliance.Red) {
-          directionX *= -1;
-        }
-      }
-    }
-
-    if (!translationYController.atSetpoint()) {
-      // Bang bang controller returns 0 or 1
-      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
-      directionY = (translationYController.calculate(currentPose.getY(), targetY) * 2) - 1;
-
-      // Reverse direction if on red alliance
-      if (DriverStation.getAlliance().isPresent()) {
-        Alliance alliance = DriverStation.getAlliance().get();
-        if (alliance == Alliance.Red) {
-          directionY *= -1;
-        }
-      }
-    }
-
-    if (!rotationController.atSetpoint()) {
-      double currentRotation = currentPose.getRotation().getRadians();
-
-      // Bang bang controller returns 0 or 1
-      // Multiply calculated output by 2 and subtract 1 to get -1 or 1
-      // Offset the rotation such that the setpoint is always "0". This rids of
-      // wrap-around issues.
-      directionRot = (rotationController.calculate(MathUtil.angleModulus(currentRotation - targetRadians), 0) * 2) - 1;
-    }
+    translationYController.calculate(currentPose.getY(), targetY);
+    double currentRotation = currentPose.getRotation().getRadians();
+    rotationController.calculate(MathUtil.angleModulus(currentRotation - targetRadians));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
