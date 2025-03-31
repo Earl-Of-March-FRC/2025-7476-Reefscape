@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.wpilibj.RobotBase;
@@ -65,6 +66,8 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotInit() {
     Pathfinding.setPathfinder(new LocalADStarAK());
+
+    PathfindingCommand.warmupCommand().schedule();
   }
 
   /**
