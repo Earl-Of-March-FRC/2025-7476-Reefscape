@@ -5,6 +5,7 @@
 package frc.robot.subsystems.drivetrain;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,12 +75,10 @@ public class Drivetrain extends SubsystemBase {
   Pose2d visionlessPose = new Pose2d();
 
   // Cameras & Photonvision variables
-  private final PhotonCamera camera1;
-  private final PhotonCamera camera2;
+  private final PhotonCamera[] cameras = new PhotonCamera[PhotonConstants.numCameras];
 
   // Photonvision -> Guess where the robot is on the field
-  private final PhotonPoseEstimator photonPoseEstimator1;
-  private final PhotonPoseEstimator photonPoseEstimator2;
+  private final PhotonPoseEstimator[] photonPoseEstimators = new PhotonPoseEstimator[PhotonConstants.numCameras];
 
   // Odometry class for tracking the robot's position on the field
   SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(
@@ -154,19 +153,16 @@ public class Drivetrain extends SubsystemBase {
         this);
 
     // Setup cameras to see april tags. Wow! That makes me really happy.
-    camera1 = new PhotonCamera(PhotonConstants.kCamera1);
-    camera2 = new PhotonCamera(PhotonConstants.kCamera2);
+    for (int i = 0; i < PhotonConstants.numCameras; i++) {
+      cameras[i] = new PhotonCamera(PhotonConstants.kCameras[i]);
+      photonPoseEstimators[i] = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
+          PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+          PhotonConstants.kRobotToCams[i]);
+    }
 
     // Log april tag poses to logger
     FieldConstants.kfieldLayout.getTags()
         .forEach((tag) -> Logger.recordOutput("FieldLayout/AprilTags/" + tag.ID, tag.pose));
-
-    photonPoseEstimator1 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
-        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        PhotonConstants.kRobotToCam1);
-    photonPoseEstimator2 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
-        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        PhotonConstants.kRobotToCam2);
   }
 
   /**
@@ -192,61 +188,45 @@ public class Drivetrain extends SubsystemBase {
       visionlessPose = visionlessOdometry.update(gyroAngle, positions);
     }
 
-    photonPoseEstimator1.addHeadingData(Timer.getFPGATimestamp(), gyroAngle);
-    photonPoseEstimator2.addHeadingData(Timer.getFPGATimestamp(), gyroAngle);
-    photonPoseEstimator1.setReferencePose(pose);
-    photonPoseEstimator2.setReferencePose(pose);
-
-    List<EstimatedRobotPose> visionPoses1 = getEstimatedGlobalPose1(pose);
-    List<EstimatedRobotPose> visionPoses2 = getEstimatedGlobalPose2(pose);
-
     hasVisionData = false;
-    List<Integer> fiducialIds1 = new ArrayList<>();
-    List<Integer> fiducialIds2 = new ArrayList<>();
-    for (EstimatedRobotPose visionPose1 : visionPoses1) {
-      Logger.recordOutput("Vision/" + camera1.getName() + "/EstimatedPose", visionPose1.estimatedPose);
 
-      // Add targets to list
-      for (PhotonTrackedTarget target : visionPose1.targetsUsed) {
-        fiducialIds1.add(target.fiducialId);
+    for (int i = 0; i < PhotonConstants.numCameras; i++) {
+      List<EstimatedRobotPose> visionPoses = getEstimatedGlobalPose(photonPoseEstimators[i], cameras[i],
+          PhotonConstants.kRobotToCams[i],
+          pose);
+
+      List<Integer> fiducialIds = new ArrayList<>();
+      List<Pose3d> fiducialIdPoses = new ArrayList<>();
+      for (EstimatedRobotPose visionPose : visionPoses) {
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/EstimatedPose", visionPose.estimatedPose);
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/Timestamp", visionPose.timestampSeconds);
+
+        // Add targets to list
+        for (PhotonTrackedTarget target : visionPose.targetsUsed) {
+          fiducialIds.add(target.fiducialId);
+          if (FieldConstants.kfieldLayout.getTagPose(target.fiducialId).isPresent()) {
+            fiducialIdPoses.add(FieldConstants.kfieldLayout.getTagPose(target.fiducialId).get());
+          }
+        }
+
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetIds",
+            fiducialIds.stream().mapToInt(n -> n).toArray());
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetPoses", (Pose3d[]) fiducialIdPoses.toArray());
+
+        Pose2d estimatedPose = PoseHelpers.toPose2d(visionPose.estimatedPose);
+        odometry.addVisionMeasurement(estimatedPose, visionPose.timestampSeconds);
+        hasVisionData = true;
       }
-
-      Pose3d visionPose = visionPose1.estimatedPose;
-      Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
-          new Rotation2d(visionPose.getRotation().getZ()));
-      odometry.addVisionMeasurement(estimatedPose, visionPose1.timestampSeconds);
-      Logger.recordOutput("Vision/" + camera1.getName() + "/Timestamp", visionPose1.timestampSeconds);
-      hasVisionData = true;
-    }
-    if (visionPoses1.isEmpty()) {
-      Logger.recordOutput("Vision/" + camera1.getName() + "/EstimatedPose", new Pose3d(-1, -1, -1, new Rotation3d()));
-      Logger.recordOutput("Vision/" + camera1.getName() + "/Timestamp", -1.0);
-    }
-
-    for (EstimatedRobotPose visionPose2 : visionPoses2) {
-      Logger.recordOutput("Vision/" + camera2.getName() + "/EstimatedPose", visionPose2.estimatedPose);
-
-      // Add targets to list
-      for (PhotonTrackedTarget target : visionPose2.targetsUsed) {
-        fiducialIds2.add(target.fiducialId);
+      if (visionPoses.isEmpty()) {
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/EstimatedPose",
+            new Pose3d(-1, -1, -1, new Rotation3d()));
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/Timestamp", -1.0);
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetIds", new int[0]);
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetPoses", new Pose3d[0]);
       }
+    }
 
-      Pose3d visionPose = visionPose2.estimatedPose;
-      Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
-          new Rotation2d(visionPose.getRotation().getZ()));
-      odometry.addVisionMeasurement(estimatedPose, visionPose2.timestampSeconds);
-      Logger.recordOutput("Vision/" + camera2.getName() + "/Timestamp", visionPose2.timestampSeconds);
-      hasVisionData = true;
-    }
-    if (visionPoses2.isEmpty()) {
-      Logger.recordOutput("Vision/" + camera2.getName() + "/EstimatedPose", new Pose3d());
-      Logger.recordOutput("Vision/" + camera2.getName() + "/Timestamp", -1.0);
-    }
     SmartDashboard.putBoolean("HasVision", hasVisionData);
-
-    // Log april tags to the logger
-    Logger.recordOutput("Vision/" + camera1.getName() + "/TargetIds", fiducialIds1.toString());
-    Logger.recordOutput("Vision/" + camera2.getName() + "/TargetIds", fiducialIds2.toString());
 
     // Log the current pose to the logger
     Logger.recordOutput("Odometry/WithVisionInput", pose);
@@ -427,6 +407,8 @@ public class Drivetrain extends SubsystemBase {
   public List<EstimatedRobotPose> getEstimatedGlobalPose(PhotonPoseEstimator poseEstimator, PhotonCamera camera,
       Transform3d robotToCam,
       Pose2d prevEstimatedRobotPose) {
+    poseEstimator.setReferencePose(prevEstimatedRobotPose);
+
     List<EstimatedRobotPose> results = new ArrayList<>();
     List<PhotonPipelineResult> camResults = camera.getAllUnreadResults();
 
@@ -564,14 +546,6 @@ public class Drivetrain extends SubsystemBase {
       }
     }
     return results;
-  }
-
-  public List<EstimatedRobotPose> getEstimatedGlobalPose1(Pose2d prevEstimatedRobotPose) {
-    return getEstimatedGlobalPose(photonPoseEstimator1, camera1, PhotonConstants.kRobotToCam1, prevEstimatedRobotPose);
-  }
-
-  public List<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
-    return getEstimatedGlobalPose(photonPoseEstimator2, camera2, PhotonConstants.kRobotToCam2, prevEstimatedRobotPose);
   }
 
   public double getXDistanceToBarge() {

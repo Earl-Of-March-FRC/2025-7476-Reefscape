@@ -271,11 +271,23 @@ public final class Constants {
       public static final double camera2Y = 0;
       public static final double camera2Z = 0.3175;
 
+      // NEED TO BE FOUND AND SET
+      public static final double camera3Roll = 0;
+      public static final double camera3Pitch = 0;
+      public static final double camera3Yaw = 0;
+      public static final double camera3X = 0;
+      public static final double camera3Y = 0;
+      public static final double camera3Z = 0;
+
       public static final int kAlgaePipeline = 1;
       public static final int kAprilTagPipeline = 0;
 
       public static final String kCamera1 = "camera1";
       public static final String kCamera2 = "camera2";
+      public static final String kCamera3 = "camera3";
+      public static final String[] kCameras = { kCamera1, kCamera2, kCamera3 };
+
+      public static final int numCameras = kCameras.length;
 
       public static final Transform3d kRobotToCam1 = new Transform3d(
           new Translation3d(PhotonConstants.camera1X, PhotonConstants.camera1Y, PhotonConstants.camera1Z),
@@ -283,6 +295,10 @@ public final class Constants {
       public static final Transform3d kRobotToCam2 = new Transform3d(
           new Translation3d(PhotonConstants.camera2X, PhotonConstants.camera2Y, PhotonConstants.camera2Z),
           new Rotation3d(PhotonConstants.camera2Roll, PhotonConstants.camera2Pitch, PhotonConstants.camera2Yaw));
+      public static final Transform3d kRobotToCam3 = new Transform3d(
+          new Translation3d(PhotonConstants.camera3X, PhotonConstants.camera3Y, PhotonConstants.camera3Z),
+          new Rotation3d(PhotonConstants.camera3Roll, PhotonConstants.camera3Pitch, PhotonConstants.camera3Yaw));
+      public static final Transform3d[] kRobotToCams = { kRobotToCam1, kRobotToCam2, kRobotToCam3 };
 
       public static final double kHeightTolerance = 0.5; // meters above and below ground
       public static final double kAmbiguityDiscardThreshold = 0.7; // ignore targets above this value
