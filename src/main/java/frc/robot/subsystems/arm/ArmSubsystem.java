@@ -18,9 +18,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
@@ -38,12 +35,6 @@ public class ArmSubsystem extends SubsystemBase {
   private double angularOffsetDeg = 0;
   private double pidReferencePositionDegWithoutOffset;
 
-  private Mechanism2d armMech = new Mechanism2d(0.5, 0.5);
-  // arm length 0.473075 m
-  // arm width 0.0508 m
-  private MechanismRoot2d armMechRoot = armMech.getRoot("arm", 0, 0);
-  private MechanismLigament2d armMechLig;
-
   private final ColorSensorV3 colorSensor = new ColorSensorV3(ArmConstants.kColorSensorI2CPort);
   private boolean algaeOnArm = false;
   private Color detectedColor;
@@ -59,9 +50,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     armEncoder = armSpark.getEncoder();
     armClosedLoopController = armSpark.getClosedLoopController();
-
-    armMechLig = armMechRoot.append(
-        new MechanismLigament2d("shoulder", 0.473075, 0));
 
     resetPosition();
     stopArm();

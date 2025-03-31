@@ -42,7 +42,6 @@ import frc.robot.subsystems.indexer.BeamBreakSensor;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
-import frc.robot.subsystems.vision.AlgaeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -62,7 +61,6 @@ public class RobotContainer {
   private final IntakeSubsystem intakeSub;
   private final Indexer indexerSub;
   private final Launcher launcherSub;
-  private final AlgaeSubsystem algaeSubsystem;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
@@ -108,8 +106,6 @@ public class RobotContainer {
     launcherSub = new Launcher(
         new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
-
-    algaeSubsystem = new AlgaeSubsystem(() -> driveSub.getPose());
 
     // Register named Commands
     NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
