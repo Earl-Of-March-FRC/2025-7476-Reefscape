@@ -366,7 +366,7 @@ public final class Constants {
     public static final double kDisplayOffsetX = 2;
     public static final double kDisplayOffsetY = 0;
     public static final double kDisplayGap = 0.25;
-    public static final double kDisplayDeltaSeconds = 0.25;
+    public static final double kDisplayDeltaSeconds = 1.0 / 30.0;
   }
 
   // PDP CAN IDs

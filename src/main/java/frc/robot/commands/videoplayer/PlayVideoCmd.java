@@ -59,17 +59,18 @@ public class PlayVideoCmd extends Command {
     }
     if (timer.hasElapsed(SimulationVideoConstants.kDisplayDeltaSeconds)) {
       timer.restart();
-      Boolean[][] frame = videoPlayer.getFrame(currentFrame);
+      Boolean[][] status = videoPlayer.getChunkStatus(currentFrame);
+      Double[][] degrees = videoPlayer.getChunkDegress(currentFrame);
       String consoleScreen = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-      for (int y = 0; y < frame.length; y++) {
+      for (int y = 0; y < status.length; y++) {
         consoleScreen += "\n";
-        Boolean[] row = frame[y];
+        Boolean[] row = status[y];
         for (int x = 0; x < row.length; x++) {
           Pose2d defaultPose = videoPlayer.calculateDefaultPose(x, y);
           Boolean chunkEnabled = (row[x] == null ? false : row[x]);
           poses.set((y * SimulationVideoConstants.kDisplayWidth) + x,
-              chunkEnabled ? defaultPose
-                  : new Pose2d(defaultPose.getX() + 100, defaultPose.getY() + 100, Rotation2d.kZero));
+              chunkEnabled ? new Pose2d(defaultPose.getX(), defaultPose.getY(), Rotation2d.fromDegrees(degrees[y][x]))
+                  : new Pose2d(defaultPose.getX() + 100, defaultPose.getY() + 100, defaultPose.getRotation()));
           consoleScreen += chunkEnabled ? "###" : "   ";
         }
       }

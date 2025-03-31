@@ -14,7 +14,11 @@ import org.bytedeco.javacv.FFmpegFrameGrabber.Exception;
 import org.littletonrobotics.junction.Logger;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.RotatedRect;
 import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,7 +32,8 @@ import frc.robot.Constants.SimulationVideoConstants;
 
 public class VideoPlayer extends SubsystemBase {
   private final String videoPath;
-  private final List<Boolean[][]> frames = new ArrayList<>();
+  private final List<Boolean[][]> chunkStatus = new ArrayList<>();
+  private final List<Double[][]> chunkDegrees = new ArrayList<>();
   private final List<Pose2d> poses = new ArrayList<>();
 
   /**
@@ -55,7 +60,7 @@ public class VideoPlayer extends SubsystemBase {
   }
 
   private void processVideo() {
-    frames.clear();
+    chunkStatus.clear();
 
     double startTime = Timer.getFPGATimestamp();
     File videoFile = new File(Filesystem.getDeployDirectory().getPath() + "\\" + videoPath);
@@ -87,7 +92,11 @@ public class VideoPlayer extends SubsystemBase {
         System.out.println("[" + frameCount + "] Reading Mat...");
 
         Mat processedMat = new Mat();
-        Imgproc.cvtColor(inputMat, processedMat, Imgproc.COLOR_BGR2GRAY);
+        if (inputMat.channels() > 1) {
+          Imgproc.cvtColor(inputMat, processedMat, Imgproc.COLOR_BGR2GRAY);
+        } else {
+          processedMat = inputMat.clone();
+        }
         Imgproc.threshold(
             processedMat,
             processedMat,
@@ -95,7 +104,8 @@ public class VideoPlayer extends SubsystemBase {
             255,
             Imgproc.THRESH_BINARY);
 
-        Boolean[][] pixels = new Boolean[SimulationVideoConstants.kDisplayHeight][SimulationVideoConstants.kDisplayWidth];
+        Boolean[][] status = new Boolean[SimulationVideoConstants.kDisplayHeight][SimulationVideoConstants.kDisplayWidth];
+        Double[][] degrees = new Double[SimulationVideoConstants.kDisplayHeight][SimulationVideoConstants.kDisplayWidth];
 
         int imgWidth = inputMat.cols();
         int imgHeight = inputMat.rows();
@@ -113,13 +123,20 @@ public class VideoPlayer extends SubsystemBase {
 
             int brightPixels = Core.countNonZero(chunk);
             int totalPixels = chunk.rows() * chunk.cols();
-            pixels[y][x] = brightPixels > (totalPixels / 2);
+            boolean chunkStatus = brightPixels > (totalPixels / 2);
+            status[y][x] = chunkStatus;
+
+            degrees[y][x] = 0D;
+            if (chunkStatus && !(brightPixels >= (int) (totalPixels * 0.95f))) {
+              degrees[y][x] = calculateHeading(chunk);
+            }
 
             chunkCount++;
           }
         }
 
-        frames.add(pixels);
+        chunkStatus.add(status);
+        chunkDegrees.add(degrees);
       }
 
     } catch (Exception e) {
@@ -144,12 +161,38 @@ public class VideoPlayer extends SubsystemBase {
             "====================================================================================\n\n\n",
         validFrameCount, nullFrameCount, frameCount, chunkCount,
         Math.round((Timer.getFPGATimestamp() - startTime) * 1000.0) / 1000.0));
-    System.out.println(frames.get(0)[0].length + " x " + frames.get(0).length);
+    System.out.println(chunkStatus.get(0)[0].length + " x " + chunkStatus.get(0).length);
 
     Logger.recordOutput("VideoPlayer/ValidFrameCount", validFrameCount);
     Logger.recordOutput("VideoPlayer/NullFrameCount", nullFrameCount);
     Logger.recordOutput("VideoPlayer/TotalFrameCount", frameCount);
     Logger.recordOutput("VideoPlayer/ChunkCount", chunkCount);
+  }
+
+  private double calculateHeading(Mat binaryChunk) {
+    Mat edges = new Mat();
+    Imgproc.Canny(binaryChunk, edges, 0, 255);
+
+    List<MatOfPoint> contours = new ArrayList<>();
+    Imgproc.findContours(edges, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+    if (contours.isEmpty()) {
+      return 0;
+    }
+
+    int largestContourIndex = 0;
+    double maxArea = 0;
+    for (int contourIndex = 0; contourIndex < contours.size(); contourIndex++) {
+      double area = Imgproc.contourArea(contours.get(contourIndex));
+      if (area > maxArea) {
+        maxArea = area;
+        largestContourIndex = contourIndex;
+      }
+    }
+    MatOfPoint2f largestContour = new MatOfPoint2f();
+    contours.get(largestContourIndex).convertTo(largestContour, CvType.CV_32F);
+    RotatedRect rect = Imgproc.minAreaRect(largestContour);
+    return rect.angle + 45 + (rect.size.width < rect.size.height ? 90 : 0);
   }
 
   /**
@@ -181,17 +224,31 @@ public class VideoPlayer extends SubsystemBase {
   }
 
   /**
-   * Get a specidifc frame from the processed video
+   * Get the chunk status from a specific frame in the processed video
    * 
    * @param index The frame index
    * @return The frame
    */
-  public Boolean[][] getFrame(int index) {
-    if (index >= frames.size()) {
+  public Boolean[][] getChunkStatus(int index) {
+    if (index >= chunkStatus.size()) {
       System.err.println("Index " + index + " is out of bounds. There is no such frame!");
       return new Boolean[SimulationVideoConstants.kDisplayHeight][SimulationVideoConstants.kDisplayWidth];
     }
-    return frames.get(index);
+    return chunkStatus.get(index);
+  }
+
+  /**
+   * Get the chunk degree from a specific frame in the processed video
+   * 
+   * @param index The frame index
+   * @return The frame
+   */
+  public Double[][] getChunkDegress(int index) {
+    if (index >= chunkDegrees.size()) {
+      System.err.println("Index " + index + " is out of bounds. There is no such frame!");
+      return new Double[SimulationVideoConstants.kDisplayHeight][SimulationVideoConstants.kDisplayWidth];
+    }
+    return chunkDegrees.get(index);
   }
 
   /**
@@ -200,7 +257,7 @@ public class VideoPlayer extends SubsystemBase {
    * @return THe total frame count
    */
   public int getFrameCount() {
-    return frames.size();
+    return chunkStatus.size();
   }
 
   /**
