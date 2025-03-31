@@ -253,7 +253,14 @@ public class RobotContainer {
         new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleCoral));
 
     // Indexer command
-    operatorController.b().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
+    // operatorController.b().onTrue(new IndexToBeamBreakCmd(indexerSub, () ->
+    // 0.75));
+    operatorController.y().onTrue(Commands.runOnce(() -> launcherSub.setUseHighVelocities(true)));
+    operatorController.a().onTrue(Commands.runOnce(() -> launcherSub.setUseHighVelocities(false)));
+    operatorController.x()
+        .onTrue(Commands.runOnce(() -> launcherSub.increaseReferenceVelocityOffset(LauncherConstants.kBumpOffsetRPM)));
+    operatorController.b()
+        .onTrue(Commands.runOnce(() -> launcherSub.increaseReferenceVelocityOffset(-LauncherConstants.kBumpOffsetRPM)));
 
     // Bump arm setpoints
     operatorController.leftBumper().whileTrue(

@@ -31,8 +31,11 @@ public class Launcher extends SubsystemBase {
   private final RelativeEncoder backLauncherEncoder;
   private final SparkClosedLoopController backLauncherClosedLoopController;
 
-  private double frontReferenceVelocity = 0.0;
-  private double backReferenceVelocity = 0.0;
+  private double frontReferenceVelocityWithoutOffset = 0.0;
+  private double backReferenceVelocityWithoutOffset = 0.0;
+  private double velocityOffsetRPM = 0.0;
+
+  private boolean useHighVelocities = true;
 
   /**
    * Constructs a new LauncherSubsystem and configures the launcher motors.
@@ -53,10 +56,15 @@ public class Launcher extends SubsystemBase {
         PersistMode.kPersistParameters);
 
     // Log in rad/s
-    SmartDashboard.putNumber("LauncherFrontVelocity",
-        LauncherConstants.kVelocityFront * LauncherConstants.kVelocityConversionFactor);
-    SmartDashboard.putNumber("LauncherBackVelocity",
-        LauncherConstants.kVelocityBack * LauncherConstants.kVelocityConversionFactor);
+    SmartDashboard.putNumber("LauncherHighFrontVelocity",
+        LauncherConstants.kVelocityHighFront * LauncherConstants.kVelocityConversionFactor);
+    SmartDashboard.putNumber("LauncherHighBackVelocity",
+        LauncherConstants.kVelocityHighBack * LauncherConstants.kVelocityConversionFactor);
+    SmartDashboard.putNumber("LauncherLowFrontVelocity",
+        LauncherConstants.kVelocityLowFront * LauncherConstants.kVelocityConversionFactor);
+    SmartDashboard.putNumber("LauncherLowBackVelocity",
+        LauncherConstants.kVelocityLowBack * LauncherConstants.kVelocityConversionFactor);
+
   }
 
   /**
@@ -112,8 +120,39 @@ public class Launcher extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setReferenceVelocity(double referenceVelocity) {
-    setFrontReferenceVelocity(referenceVelocity);
-    setBackReferenceVelocity(referenceVelocity);
+    setReferenceVelocity(referenceVelocity, referenceVelocity);
+  }
+
+  /**
+   * Sets the reference velocity for both launcher closed loop controllers.
+   * 
+   * @param frontReferenceVelocity The front reference velocity, in RPM.
+   * @param backReferenceVelocity  The back reference velocity, in RPM.
+   */
+  public void setReferenceVelocity(double frontReferenceVelocity, double backReferenceVelocity) {
+    setFrontReferenceVelocity(frontReferenceVelocity);
+    setBackReferenceVelocity(backReferenceVelocity);
+  }
+
+  /**
+   * Override the velocity offset
+   * 
+   * @param offsetRPM New offset in RPM
+   */
+  public void setReferenceVelocityOffset(double offsetRPM) {
+    velocityOffsetRPM = offsetRPM;
+    Logger.recordOutput("Launcher/VelocityOffsetRPM", velocityOffsetRPM);
+
+    setReferenceVelocity(frontReferenceVelocityWithoutOffset, backReferenceVelocityWithoutOffset);
+  }
+
+  /**
+   * Increase the velocity offset
+   * 
+   * @param offsetRPM RPM to increase by
+   */
+  public void increaseReferenceVelocityOffset(double offsetRPM) {
+    setReferenceVelocityOffset(velocityOffsetRPM + offsetRPM);
   }
 
   /**
@@ -122,11 +161,14 @@ public class Launcher extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setFrontReferenceVelocity(double referenceVelocity) {
-    frontReferenceVelocity = referenceVelocity;
+    double referenceVelocityWithOffset = referenceVelocity + velocityOffsetRPM;
+    frontReferenceVelocityWithoutOffset = referenceVelocity;
     Logger.recordOutput("Launcher/Front/Setpoint/Velocity", referenceVelocity);
+    Logger.recordOutput("Launcher/Back/Setpoint/VelocityWithOffset", referenceVelocityWithOffset);
 
     // Converts RPM to radians per second
-    frontLauncherClosedLoopController.setReference(referenceVelocity * LauncherConstants.kVelocityConversionFactor,
+    frontLauncherClosedLoopController.setReference(
+        referenceVelocityWithOffset * LauncherConstants.kVelocityConversionFactor,
         ControlType.kVelocity);
   }
 
@@ -136,11 +178,14 @@ public class Launcher extends SubsystemBase {
    * @param referenceVelocity The reference velocity, in RPM.
    */
   public void setBackReferenceVelocity(double referenceVelocity) {
-    backReferenceVelocity = referenceVelocity;
+    double referenceVelocityWithOffset = referenceVelocity + velocityOffsetRPM;
+    backReferenceVelocityWithoutOffset = referenceVelocity;
     Logger.recordOutput("Launcher/Back/Setpoint/Velocity", referenceVelocity);
+    Logger.recordOutput("Launcher/Back/Setpoint/VelocityWithOffset", referenceVelocityWithOffset);
 
     // Converts RPM to radians per second
-    backLauncherClosedLoopController.setReference(referenceVelocity * LauncherConstants.kVelocityConversionFactor,
+    backLauncherClosedLoopController.setReference(
+        referenceVelocityWithOffset * LauncherConstants.kVelocityConversionFactor,
         ControlType.kVelocity);
   }
 
@@ -157,8 +202,13 @@ public class Launcher extends SubsystemBase {
    * @return Preferred velocity
    */
   public double getPreferredFrontVelocity() {
-    return SmartDashboard.getNumber("LauncherFrontVelocity",
-        LauncherConstants.kVelocityFront * LauncherConstants.kVelocityConversionFactor)
+    if (useHighVelocities) {
+      return SmartDashboard.getNumber("LauncherHighFrontVelocity",
+          LauncherConstants.kVelocityHighFront * LauncherConstants.kVelocityConversionFactor)
+          / LauncherConstants.kVelocityConversionFactor;
+    }
+    return SmartDashboard.getNumber("LauncherLowFrontVelocity",
+        LauncherConstants.kVelocityLowFront * LauncherConstants.kVelocityConversionFactor)
         / LauncherConstants.kVelocityConversionFactor;
   }
 
@@ -168,18 +218,43 @@ public class Launcher extends SubsystemBase {
    * @return Preferred velocity
    */
   public double getPreferredBackVelocity() {
-    return SmartDashboard.getNumber("LauncherBackVelocity",
-        LauncherConstants.kVelocityBack * LauncherConstants.kVelocityConversionFactor)
+    if (useHighVelocities) {
+      return SmartDashboard.getNumber("LauncherHighBackVelocity",
+          LauncherConstants.kVelocityHighBack * LauncherConstants.kVelocityConversionFactor)
+          / LauncherConstants.kVelocityConversionFactor;
+    }
+    return SmartDashboard.getNumber("LauncherLowBackVelocity",
+        LauncherConstants.kVelocityLowBack * LauncherConstants.kVelocityConversionFactor)
         / LauncherConstants.kVelocityConversionFactor;
   }
 
+  /**
+   * Set whether the preferred velocities should be the high velocities or low
+   * velocities.
+   * 
+   * @param use {@code true} if it should use the high velocities, {@false} if
+   *            it should use the low velocities
+   */
+  public void setUseHighVelocities(boolean use) {
+    useHighVelocities = use;
+    Logger.recordOutput("Launcher/UseHighVelocities", useHighVelocities);
+  }
+
+  /**
+   * Check if the front roller has reached the setpoint
+   */
   public boolean frontRollerAtSetpoint() {
-    return MathUtil.isNear(frontReferenceVelocity, getFrontVelocity() / LauncherConstants.kVelocityConversionFactor,
+    return MathUtil.isNear(frontReferenceVelocityWithoutOffset + velocityOffsetRPM,
+        getFrontVelocity() / LauncherConstants.kVelocityConversionFactor,
         LauncherConstants.kVelocityFrontTolerance);
   }
 
+  /**
+   * Check if the back roller has reached the setpoint
+   */
   public boolean backRollerAtSetpoint() {
-    return MathUtil.isNear(backReferenceVelocity, getBackVelocity() / LauncherConstants.kVelocityConversionFactor,
+    return MathUtil.isNear(backReferenceVelocityWithoutOffset + velocityOffsetRPM,
+        getBackVelocity() / LauncherConstants.kVelocityConversionFactor,
         LauncherConstants.kVelocityBackTolerance);
   }
 }
