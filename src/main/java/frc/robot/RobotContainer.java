@@ -200,13 +200,19 @@ public class RobotContainer {
     // Move to barge launching zone, facing in the specified direction
     driverController.povLeft().whileTrue(
         new MoveToPoseBangBangCmd(driveSub,
-            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft), false));
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft,
+                launcherSub.isUsingHighVelocities()),
+            false));
     driverController.povUp().whileTrue(
         new MoveToPoseBangBangCmd(driveSub,
-            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight), false));
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight,
+                launcherSub.isUsingHighVelocities()),
+            false));
     driverController.povRight().whileTrue(
         new MoveToPoseBangBangCmd(driveSub,
-            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight), false));
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight,
+                launcherSub.isUsingHighVelocities()),
+            false));
 
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
@@ -255,17 +261,21 @@ public class RobotContainer {
     // Indexer command
     // operatorController.b().onTrue(new IndexToBeamBreakCmd(indexerSub, () ->
     // 0.75));
-    operatorController.y().onTrue(Commands.runOnce(() -> launcherSub.setUseHighVelocities(true)));
-    operatorController.a().onTrue(Commands.runOnce(() -> launcherSub.setUseHighVelocities(false)));
+    operatorController.y().onTrue(Commands.runOnce(() -> {
+      launcherSub.setUseHighVelocities(true);
+      launcherSub.setReferenceVelocityOffset(0);
+    }));
+    operatorController.a().onTrue(Commands.runOnce(() -> {
+      launcherSub.setUseHighVelocities(false);
+      launcherSub.setReferenceVelocityOffset(0);
+    }));
     operatorController.x()
         .onTrue(Commands.runOnce(() -> {
           launcherSub.increaseReferenceVelocityOffset(LauncherConstants.kBumpOffsetRPM);
-          launcherSub.setReferenceVelocityOffset(0);
         }));
     operatorController.b()
         .onTrue(Commands.runOnce(() -> {
           launcherSub.increaseReferenceVelocityOffset(-LauncherConstants.kBumpOffsetRPM);
-          launcherSub.setReferenceVelocityOffset(0);
         }));
 
     // Bump arm setpoints

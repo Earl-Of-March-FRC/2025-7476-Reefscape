@@ -170,7 +170,7 @@ public class Launcher extends SubsystemBase {
     // Converts RPM to radians per second
     frontLauncherClosedLoopController.setReference(
         referenceVelocityWithOffset * LauncherConstants.kVelocityConversionFactor,
-        ControlType.kVelocity);
+        ControlType.kVelocity, isUsingHighVelocities() ? LauncherConstants.kSlotHigh : LauncherConstants.kSlotLow);
   }
 
   /**
@@ -187,7 +187,7 @@ public class Launcher extends SubsystemBase {
     // Converts RPM to radians per second
     backLauncherClosedLoopController.setReference(
         referenceVelocityWithOffset * LauncherConstants.kVelocityConversionFactor,
-        ControlType.kVelocity);
+        ControlType.kVelocity, isUsingHighVelocities() ? LauncherConstants.kSlotHigh : LauncherConstants.kSlotLow);
   }
 
   /**
@@ -239,6 +239,16 @@ public class Launcher extends SubsystemBase {
   public void setUseHighVelocities(boolean use) {
     useHighVelocities = use;
     Logger.recordOutput("Launcher/UseHighVelocities", useHighVelocities);
+  }
+
+  /**
+   * Check if the launcher is using high velocities
+   * 
+   * @return {@code true} if it is using high velocities, {@code false} if it is
+   *         using low velocities
+   */
+  public boolean isUsingHighVelocities() {
+    return useHighVelocities;
   }
 
   /**

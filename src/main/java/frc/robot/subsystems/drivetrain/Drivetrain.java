@@ -585,7 +585,7 @@ public class Drivetrain extends SubsystemBase {
    *                    radians. CCW is positive.
    * @return The calculated target pose for the robot at the barge.
    */
-  public Pose2d getBargeTargetPose(double targetAngle) {
+  public Pose2d getBargeTargetPose(double targetAngle, boolean isUsingHighVelocities) {
     System.out.println("getBargeTargetPose");
     Pose2d currentPose = getPose();
 
@@ -594,9 +594,12 @@ public class Drivetrain extends SubsystemBase {
 
     boolean onBlueSide = PoseHelpers.isOnBlueSide(currentPose);
 
+    double metersFromBarge = isUsingHighVelocities ? LaunchingDistances.kMetersFromBargeHigh
+        : LaunchingDistances.kMetersFromBargeLow;
+
     // Calculate target translation
     // (0,0) is ALWAYS on the blue alliance side
-    double targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
+    double targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * metersFromBarge);
 
     // Calculate target rotation based on side of field that robot is currently on
     double targetRadians = (onBlueSide ? Math.PI : 0) + targetAngle;
