@@ -91,7 +91,7 @@ public final class Constants {
       // NORTH BAY
       public static final double kMetersFromBargeHigh = 1.30;
       // NEW SETPOINTS
-      public static final double kMetersFromBargeLow = 1.30;
+      public static final double kMetersFromBargeLow = 1.2;
 
       public static final double kToleranceMetersFromBarge = 0.1;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
@@ -263,15 +263,17 @@ public final class Constants {
     }
 
     public static final class PhotonConstants {
+      // Camera offsets. Rotations are in radians. Translations are in meters.
+      // +x is in front of the robot, +y is to the left of the robot, +z is up
       public static final double camera1Roll = 0;
-      public static final double camera1Pitch = 10 * Math.PI / 180; // in rad
+      public static final double camera1Pitch = 10 * Math.PI / 180;
       public static final double camera1Yaw = 0;
-      public static final double camera1X = 0.2921; // forward (pos)
-      public static final double camera1Y = 0.127; // left (pos)
-      public static final double camera1Z = 0.4699; // up (pos)
+      public static final double camera1X = 0.2921;
+      public static final double camera1Y = 0.127;
+      public static final double camera1Z = 0.4699;
 
       public static final double camera2Roll = 0;
-      public static final double camera2Pitch = 0; // 10 * Math.PI / 180; // in rad
+      public static final double camera2Pitch = 0;
       public static final double camera2Yaw = Math.PI;
       public static final double camera2X = -0.2921;
       public static final double camera2Y = 0;
@@ -280,7 +282,7 @@ public final class Constants {
       // NEED TO BE FOUND AND SET
       public static final double camera3Roll = 0;
       public static final double camera3Pitch = 0;
-      public static final double camera3Yaw = 0;
+      public static final double camera3Yaw = 42 * Math.PI / 180;
       public static final double camera3X = 0;
       public static final double camera3Y = 0;
       public static final double camera3Z = 0;
@@ -369,13 +371,15 @@ public final class Constants {
     // public static final double kVelocityFront = 2100; // 220 rad/s
     // public static final double kVelocityBack = 2626.056561; // 275 rad/s
 
+    // Dividing by conversion factor: rad/s -> RPM
+
     // NORTH BAY
-    public static final double kVelocityHighFrontRPM = 200 / kVelocityConversionFactor; // 205 rad/s
-    public static final double kVelocityHighBackRPM = 253 / kVelocityConversionFactor; // 260 rad/s
+    public static final double kVelocityHighFrontRPM = 200 / kVelocityConversionFactor;
+    public static final double kVelocityHighBackRPM = 253 / kVelocityConversionFactor;
 
     // NEW SETPOINTS
-    public static final double kVelocityLowFrontRPM = 193 / kVelocityConversionFactor; // 205 rad/s
-    public static final double kVelocityLowBackRPM = 248 / kVelocityConversionFactor; // 260 rad/s
+    public static final double kVelocityLowFrontRPM = 193 / kVelocityConversionFactor;
+    public static final double kVelocityLowBackRPM = 248 / kVelocityConversionFactor;
 
     public static final double kVelocityYeetBack = 4964;
     public static final double kVelocityYeetForward = 4964;
