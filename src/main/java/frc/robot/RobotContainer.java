@@ -105,7 +105,7 @@ public class RobotContainer {
         new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
             DriveConstants.kRearRightTurningCanId,
             DriveConstants.kBackRightChassisAngularOffset),
-        gyro);
+        gyro, launcherSub::isUsingHighVelocities);
 
     // Register named Commands
     NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
