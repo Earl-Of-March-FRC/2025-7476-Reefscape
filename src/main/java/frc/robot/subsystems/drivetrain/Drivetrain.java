@@ -75,7 +75,7 @@ public class Drivetrain extends SubsystemBase {
   public boolean gyroDisconnected;
   public boolean hasVisionData = false;
   public boolean isFieldRelative = true;
-  public Supplier<Boolean> isUsingHighVelocities = () -> false;
+  public Supplier<Boolean> isUsingHighVelocities = () -> true;
   Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   // Current pose of the robot
@@ -126,6 +126,17 @@ public class Drivetrain extends SubsystemBase {
     this.swerveDriveSimulation = swerveDriveSimulation;
   }
 
+  /**
+   * Constructor for the Drivetrain class.
+   * Initializes the swerve modules and gyro sensor.
+   * 
+   * @param moduleFL              Front-left swerve module
+   * @param moduleFR              Front-right swerve module
+   * @param moduleBL              Back-left swerve module
+   * @param moduleBR              Back-right swerve module
+   * @param gyro                  Gyro sensor
+   * @param isUsingHighVelocities If the robot is launching with high velocities
+   */
   public Drivetrain(MAXSwerveModule moduleFL, MAXSwerveModule moduleFR, MAXSwerveModule moduleBL,
       MAXSwerveModule moduleBR, Gyro gyro, Supplier<Boolean> isUsingHighVelocities) {
     this(moduleFL, moduleFR, moduleBL, moduleBR, gyro);
@@ -135,6 +146,9 @@ public class Drivetrain extends SubsystemBase {
   /**
    * Constructor for the Drivetrain class.
    * Initializes the swerve modules and gyro sensor.
+   * Assumes the robot is launching with high velocities.
+   * See
+   * {@link #Drivetrain(MAXSwerveModule, MAXSwerveModule, MAXSwerveModule, MAXSwerveModule, Gyro, Supplier)}
    * 
    * @param moduleFL Front-left swerve module
    * @param moduleFR Front-right swerve module
@@ -352,7 +366,10 @@ public class Drivetrain extends SubsystemBase {
   /**
    * Runs the drivetrain at the specified velocities relative to the field.
    * 
-   * @param speeds The desired chassis speeds
+   * @see #runVelocity(ChassisSpeeds, Boolean)
+   * @see #runVelocityRobotRelative(ChassisSpeeds)
+   * 
+   * @param speeds The desired field relative chassis speeds
    */
   public void runVelocityFieldRelative(ChassisSpeeds speeds) {
     runVelocity(speeds, true);
@@ -361,7 +378,10 @@ public class Drivetrain extends SubsystemBase {
   /**
    * Runs the drivetrain at the specified velocities relative to the robot.
    * 
-   * @param speeds The desired chassis speeds
+   * @see #runVelocity(ChassisSpeeds, Boolean)
+   * @see #runVelocityFieldRelative(ChassisSpeeds)
+   * 
+   * @param speeds The desired robot relative chassis speeds
    */
   public void runVelocityRobotRelative(ChassisSpeeds speeds) {
     runVelocity(speeds, false);
@@ -369,6 +389,9 @@ public class Drivetrain extends SubsystemBase {
 
   /**
    * Runs the drivetrain at the specified velocities.
+   * 
+   * @see #runVelocityFieldRelative(ChassisSpeeds)
+   * @see #runVelocityRobotRelative(ChassisSpeeds)
    * 
    * @param speeds          The desired chassis speeds
    * @param isFieldRelative Whether the speeds are relative to the field
@@ -432,19 +455,10 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /**
-   * Gets the current chassis speeds relative to the robot.
+   * Sets the current pose of the robot into odometry.
    * 
-   * @return A ChassisSpeeds object representing the robot-relative chassis
-   *         speeds.
+   * @param pose A Pose2d object representing the current pose of the robot.
    */
-  public ChassisSpeeds getRobotRelativeChassisSpeeds() {
-    return DriveConstants.kDriveKinematics.toChassisSpeeds(
-        modules[0].getState(),
-        modules[1].getState(),
-        modules[2].getState(),
-        modules[3].getState());
-  }
-
   public void setOdometry(Pose2d pose) {
     odometry.resetPosition(gyro.getRotation2d(), getModulePositions(), pose);
     visionlessOdometry.resetPosition(gyro.getRotation2d(), getModulePositions(), pose);
@@ -466,6 +480,12 @@ public class Drivetrain extends SubsystemBase {
     return pose;
   }
 
+  /**
+   * Gets the current chassis speeds relative to the robot.
+   * 
+   * @return A ChassisSpeeds object representing the robot-relative chassis
+   *         speeds.
+   */
   public ChassisSpeeds getChassisSpeedsRobotRelative() {
     return DriveConstants.kDriveKinematics.toChassisSpeeds(
         modules[0].getState(),
@@ -474,6 +494,16 @@ public class Drivetrain extends SubsystemBase {
         modules[3].getState());
   }
 
+  /**
+   * Get an estimate of the robot's pose using vision data from PhotonVisision.
+   * This method will filter out invalid and unprobable results.
+   * 
+   * @param poseEstimator The PhotonPoseEstimator object to use for
+   *                      estimating the robot's pose
+   * @param camera        The PhotonCamera object to use for getting vision data
+   * @param robotToCam    The Transform3d object representing the transformation
+   *                      from the robot to the camera
+   */
   public List<EstimatedRobotPose> getEstimatedGlobalPose(PhotonPoseEstimator poseEstimator, PhotonCamera camera,
       Transform3d robotToCam,
       Pose2d prevEstimatedRobotPose) {
@@ -618,11 +648,26 @@ public class Drivetrain extends SubsystemBase {
     return results;
   }
 
+  /**
+   * Gets the distance between the robot and the barge, in a straight line.
+   * 
+   * @see #distanceToBardge()
+   * 
+   * @return The distance between the robot and the barge. In meters.
+   */
   public double getXDistanceToBarge() {
     double robotX = getPose().getTranslation().getX();
     return Math.abs(robotX - FieldConstants.kBargeX);
   }
 
+  /**
+   * Gets the distance between the robot and the barge considering the robot's
+   * angle. This is essentially how far the algae has to travel.
+   * 
+   * @see #getXDistanceToBarge()
+   * 
+   * @return The distance between the robot and the barge. In meters.
+   */
   public double distanceToBardge() {
     double robotYaw = getPose().getRotation().getRadians();
     if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
@@ -661,6 +706,7 @@ public class Drivetrain extends SubsystemBase {
 
   /**
    * Calculates the target pose for the robot at the nearest barge launching zone.
+   * This takes in account if the launcher is set to high or low.
    * 
    * @param targetAngle Angle that robot should face in its target pose, in
    *                    radians. CCW is positive.

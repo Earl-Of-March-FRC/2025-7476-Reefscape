@@ -134,7 +134,7 @@ public class Launcher extends SubsystemBase {
   }
 
   /**
-   * Override the velocity offset
+   * Override the velocity offset.
    * 
    * @param offsetRPM New offset in RPM
    */
@@ -148,7 +148,7 @@ public class Launcher extends SubsystemBase {
   }
 
   /**
-   * Increase the velocity offset
+   * Increase the velocity offset.
    * 
    * @param offsetRPM RPM to increase by
    */

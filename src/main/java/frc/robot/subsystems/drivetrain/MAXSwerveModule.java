@@ -37,6 +37,10 @@ public class MAXSwerveModule implements SwerveModule {
    * encoder, and PID controller. This configuration is specific to the REV
    * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
    * Encoder.
+   * 
+   * @param drivingCANId         The CAN ID of the driving SPARK MAX.
+   * @param turningCANId         The CAN ID of the turning SPARK MAX.
+   * @param chassisAngularOffset The angle of the module relative to the chassis.
    */
   public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
     driveSpark = new SparkMax(drivingCANId, MotorType.kBrushless);
@@ -107,7 +111,9 @@ public class MAXSwerveModule implements SwerveModule {
     m_desiredState = desiredState;
   }
 
-  /** Zeroes all the SwerveModule encoders. */
+  /**
+   * Zeroes all the SwerveModule encoders.
+   */
   public void resetEncoders() {
     driveEncoder.setPosition(0);
   }
