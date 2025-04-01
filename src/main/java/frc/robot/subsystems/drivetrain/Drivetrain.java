@@ -67,7 +67,7 @@ public class Drivetrain extends SubsystemBase {
   public boolean gyroDisconnected;
   public boolean hasVisionData = false;
   public boolean isFieldRelative = true;
-  public Supplier<Boolean> isUsingHighVelocities = () -> false;
+  public Supplier<Boolean> isUsingHighVelocities = () -> true;
   Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   // Current pose of the robot
