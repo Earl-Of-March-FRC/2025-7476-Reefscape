@@ -9,16 +9,13 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.utils.PoseHelpers;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveToNearestBargeLaunchingZonePIDCmd extends Command {
@@ -49,21 +46,17 @@ public class MoveToNearestBargeLaunchingZonePIDCmd extends Command {
   public void execute() {
     Pose2d currentPose = driveSub.getPose();
 
-    // Calculate target pose
-    boolean onBlueSide = PoseHelpers.isOnBlueSide(currentPose);
+    Pose2d targetPose = driveSub.getBargeTargetPose(0);
 
-    // Calculate target translation
-    // (0,0) is ALWAYS on the blue alliance side
-    targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
+    targetX = targetPose.getX();
 
     // Calculate target rotation based on side of field that robot is currently on
-    targetRadians = onBlueSide ? Math.PI : 0;
+    targetRadians = targetPose.getRotation().getRadians();
 
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/CurrentPose",
         currentPose);
     Logger.recordOutput("Odometry/MoveToNearestBargeLaunchingZone/TargetPose",
-        new Pose2d(targetX, currentPose.getY(),
-            Rotation2d.fromRadians(targetRadians)));
+        targetPose);
 
     double xVel = MathUtil.clamp(translationController.calculate(currentPose.getX(), targetX),
         -AutoConstants.kMaxSpeedMetersPerSecond,
