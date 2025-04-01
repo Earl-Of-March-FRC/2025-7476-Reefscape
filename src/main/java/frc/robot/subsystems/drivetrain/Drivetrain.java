@@ -7,6 +7,7 @@ package frc.robot.subsystems.drivetrain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
@@ -66,6 +67,7 @@ public class Drivetrain extends SubsystemBase {
   public boolean gyroDisconnected;
   public boolean hasVisionData = false;
   public boolean isFieldRelative = true;
+  public Supplier<Boolean> isUsingHighVelocities = () -> false;
   Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   // Current pose of the robot
@@ -104,6 +106,12 @@ public class Drivetrain extends SubsystemBase {
       new Pose2d(0, 0, new Rotation2d()));
 
   private final Field2d dashField = new Field2d();
+
+  public Drivetrain(MAXSwerveModule moduleFL, MAXSwerveModule moduleFR, MAXSwerveModule moduleBL,
+      MAXSwerveModule moduleBR, Gyro gyro, Supplier<Boolean> isUsingHighVelocities) {
+    this(moduleFL, moduleFR, moduleBL, moduleBR, gyro);
+    this.isUsingHighVelocities = isUsingHighVelocities;
+  }
 
   /**
    * Constructor for the Drivetrain class.
@@ -255,9 +263,13 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Distance to Barge", distanceToBarge);
     SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBarge);
 
-    SmartDashboard.putBoolean("FarFromBargeLaunchingRange", xDistanceToBarge > LaunchingDistances.kMetersFromBarge);
+    SmartDashboard.putBoolean("FarFromBargeLaunchingRange",
+        xDistanceToBarge > (isUsingHighVelocities.get() ? LaunchingDistances.kMetersFromBargeHigh
+            : LaunchingDistances.kMetersFromBargeLow));
     SmartDashboard.putBoolean("WithinBargeLaunchingRange", MathUtil.isNear(xDistanceToBarge,
-        LaunchingDistances.kMetersFromBarge, LaunchingDistances.kToleranceMetersFromBarge));
+        (isUsingHighVelocities.get() ? LaunchingDistances.kMetersFromBargeHigh
+            : LaunchingDistances.kMetersFromBargeLow),
+        LaunchingDistances.kToleranceMetersFromBarge));
 
     Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBarge);
     Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBarge);
@@ -564,7 +576,10 @@ public class Drivetrain extends SubsystemBase {
       targetRadians = startingPose.getRotation().getRadians();
     }
     Pose2d targetPose = new Pose2d(
-        FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge), startingPose.getY(),
+        FieldConstants.kBargeX
+            + ((onBlueSide ? -1 : 1) * (isUsingHighVelocities.get() ? LaunchingDistances.kMetersFromBargeHigh
+                : LaunchingDistances.kMetersFromBargeLow)),
+        startingPose.getY(),
         new Rotation2d(targetRadians));
 
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startingPose, targetPose);

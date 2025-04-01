@@ -77,21 +77,6 @@ public class RobotContainer {
   public RobotContainer() {
     gyro = new GyroNavX();
 
-    driveSub = new Drivetrain(
-        new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
-            DriveConstants.kFrontLeftTurningCanId,
-            DriveConstants.kFrontLeftChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
-            DriveConstants.kFrontRightTurningCanId,
-            DriveConstants.kFrontRightChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
-            DriveConstants.kRearLeftTurningCanId,
-            DriveConstants.kBackLeftChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
-            DriveConstants.kRearRightTurningCanId,
-            DriveConstants.kBackRightChassisAngularOffset),
-        gyro);
-
     armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType),
         ArmConstants.kLimitSwitchChannel);
     armSub.calibrate();
@@ -106,6 +91,21 @@ public class RobotContainer {
     launcherSub = new Launcher(
         new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
+
+    driveSub = new Drivetrain(
+        new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
+            DriveConstants.kFrontLeftTurningCanId,
+            DriveConstants.kFrontLeftChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
+            DriveConstants.kFrontRightTurningCanId,
+            DriveConstants.kFrontRightChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
+            DriveConstants.kRearLeftTurningCanId,
+            DriveConstants.kBackLeftChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
+            DriveConstants.kRearRightTurningCanId,
+            DriveConstants.kBackRightChassisAngularOffset),
+        gyro);
 
     // Register named Commands
     NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
