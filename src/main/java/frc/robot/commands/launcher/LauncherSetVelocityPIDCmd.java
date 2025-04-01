@@ -47,8 +47,7 @@ public class LauncherSetVelocityPIDCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    launcherSub.setFrontReferenceVelocity(frontReferenceVelocity.getAsDouble());
-    launcherSub.setBackReferenceVelocity(backReferenceVelocity.getAsDouble());
+    launcherSub.setReferenceVelocity(frontReferenceVelocity.getAsDouble(), backReferenceVelocity.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
