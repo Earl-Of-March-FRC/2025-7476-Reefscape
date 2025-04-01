@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -74,6 +75,7 @@ public class Drivetrain extends SubsystemBase {
   public boolean gyroDisconnected;
   public boolean hasVisionData = false;
   public boolean isFieldRelative = true;
+  public Supplier<Boolean> isUsingHighVelocities = () -> false;
   Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   // Current pose of the robot
@@ -122,6 +124,12 @@ public class Drivetrain extends SubsystemBase {
       SwerveModule moduleBR, Gyro gyro, SwerveDriveSimulation swerveDriveSimulation) {
     this(moduleFL, moduleFR, moduleBL, moduleBR, gyro);
     this.swerveDriveSimulation = swerveDriveSimulation;
+  }
+
+  public Drivetrain(MAXSwerveModule moduleFL, MAXSwerveModule moduleFR, MAXSwerveModule moduleBL,
+      MAXSwerveModule moduleBR, Gyro gyro, Supplier<Boolean> isUsingHighVelocities) {
+    this(moduleFL, moduleFR, moduleBL, moduleBR, gyro);
+    this.isUsingHighVelocities = isUsingHighVelocities;
   }
 
   /**
@@ -321,9 +329,13 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Distance to Barge", distanceToBarge);
     SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBarge);
 
-    SmartDashboard.putBoolean("FarFromBargeLaunchingRange", xDistanceToBarge > LaunchingDistances.kMetersFromBarge);
+    SmartDashboard.putBoolean("FarFromBargeLaunchingRange",
+        xDistanceToBarge > (isUsingHighVelocities.get() ? LaunchingDistances.kMetersFromBargeHigh
+            : LaunchingDistances.kMetersFromBargeLow));
     SmartDashboard.putBoolean("WithinBargeLaunchingRange", MathUtil.isNear(xDistanceToBarge,
-        LaunchingDistances.kMetersFromBarge, LaunchingDistances.kToleranceMetersFromBarge));
+        (isUsingHighVelocities.get() ? LaunchingDistances.kMetersFromBargeHigh
+            : LaunchingDistances.kMetersFromBargeLow),
+        LaunchingDistances.kToleranceMetersFromBarge));
 
     Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBarge);
     Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBarge);
@@ -630,7 +642,10 @@ public class Drivetrain extends SubsystemBase {
       targetRadians = startingPose.getRotation().getRadians();
     }
     Pose2d targetPose = new Pose2d(
-        FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge), startingPose.getY(),
+        FieldConstants.kBargeX
+            + ((onBlueSide ? -1 : 1) * (isUsingHighVelocities.get() ? LaunchingDistances.kMetersFromBargeHigh
+                : LaunchingDistances.kMetersFromBargeLow)),
+        startingPose.getY(),
         new Rotation2d(targetRadians));
 
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startingPose, targetPose);
@@ -651,7 +666,7 @@ public class Drivetrain extends SubsystemBase {
    *                    radians. CCW is positive.
    * @return The calculated target pose for the robot at the barge.
    */
-  public Pose2d getBargeTargetPose(double targetAngle) {
+  public Pose2d getBargeTargetPose(double targetAngle, boolean isUsingHighVelocities) {
     System.out.println("getBargeTargetPose");
     Pose2d currentPose = getPose();
 
@@ -660,9 +675,12 @@ public class Drivetrain extends SubsystemBase {
 
     boolean onBlueSide = PoseHelpers.isOnBlueSide(currentPose);
 
+    double metersFromBarge = isUsingHighVelocities ? LaunchingDistances.kMetersFromBargeHigh
+        : LaunchingDistances.kMetersFromBargeLow;
+
     // Calculate target translation
     // (0,0) is ALWAYS on the blue alliance side
-    double targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge);
+    double targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * metersFromBarge);
 
     // Calculate target rotation based on side of field that robot is currently on
     double targetRadians = (onBlueSide ? Math.PI : 0) + targetAngle;

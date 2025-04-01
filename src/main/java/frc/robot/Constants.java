@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.path.PathConstraints;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -86,7 +87,12 @@ public final class Constants {
     public static final boolean kGyroReversed = false;
 
     public static class LaunchingDistances {
-      public static final double kMetersFromBarge = 1.30; // 1.30 before March 20
+      // 1.30 before March 20
+      // NORTH BAY
+      public static final double kMetersFromBargeHigh = 1.30;
+      // NEW SETPOINTS
+      public static final double kMetersFromBargeLow = 1.30;
+
       public static final double kToleranceMetersFromBarge = 0.1;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
 
@@ -347,23 +353,50 @@ public final class Constants {
     public static final int kBackCanId = 13;
     public static MotorType kMotorType = MotorType.kBrushless;
 
-    public static final double kPVelocityController = 0.003;
-    public static final double kIVelocityController = 0;
-    public static final double kDVelocityController = 0;
-    public static final double frontKVelocityFF = 0.0021;
-    public static final double backKVelocityFF = 0.0021;
+    // NORTH BAY
+    // public static final double kPVelocityControllerHigh = 0;
+    // public static final double kIVelocityControllerHigh = 0;
+    // public static final double kDVelocityControllerHigh = 0;
+    // public static final double frontKVelocityFFHigh = 0.0021;
+    // public static final double backKVelocityFFHigh = 0.00215;
+    // public static final ClosedLoopSlot kSlotHigh = ClosedLoopSlot.kSlot0;
+    // Using new gains but with North Bay setpoint (defined below)
+    public static final double kPVelocityControllerHigh = 0.003;
+    public static final double kIVelocityControllerHigh = 0;
+    public static final double kDVelocityControllerHigh = 0;
+    public static final double frontKVelocityFFHigh = 0.0021;
+    public static final double backKVelocityFFHigh = 0.0021;
+    public static final ClosedLoopSlot kSlotHigh = ClosedLoopSlot.kSlot0;
+
+    // NEW GAINS
+    public static final double kPVelocityControllerLow = 0.003;
+    public static final double kIVelocityControllerLow = 0;
+    public static final double kDVelocityControllerLow = 0;
+    public static final double frontKVelocityFFLow = 0.0021;
+    public static final double backKVelocityFFLow = 0.0021;
+    public static final ClosedLoopSlot kSlotLow = ClosedLoopSlot.kSlot1;
 
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
     // public static final double kVelocityFront = 2100; // 220 rad/s
     // public static final double kVelocityBack = 2626.056561; // 275 rad/s
-    public static final double kVelocityFront = 193 / kVelocityConversionFactor; // 205 rad/s
-    public static final double kVelocityBack = 248 / kVelocityConversionFactor; // 260 rad/s
+
+    // NORTH BAY
+    public static final double kVelocityHighFrontRPM = 200 / kVelocityConversionFactor; // 205 rad/s
+    public static final double kVelocityHighBackRPM = 253 / kVelocityConversionFactor; // 260 rad/s
+
+    // NEW SETPOINTS
+    public static final double kVelocityLowFrontRPM = 193 / kVelocityConversionFactor; // 205 rad/s
+    public static final double kVelocityLowBackRPM = 248 / kVelocityConversionFactor; // 260 rad/s
+
     public static final double kVelocityYeetBack = 4964;
     public static final double kVelocityYeetForward = 4964;
+
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
+
+    public static final double kBumpOffsetRPM = 1 / kVelocityConversionFactor;
   }
 
   public static class FieldConstants {

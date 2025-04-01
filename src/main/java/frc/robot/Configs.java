@@ -128,10 +128,14 @@ public final class Configs {
           .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
       frontLauncherConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .pidf(LauncherConstants.kPVelocityController,
-              LauncherConstants.kIVelocityController,
-              LauncherConstants.kDVelocityController,
-              LauncherConstants.frontKVelocityFF)
+          .pidf(LauncherConstants.kPVelocityControllerHigh,
+              LauncherConstants.kIVelocityControllerHigh,
+              LauncherConstants.kDVelocityControllerHigh,
+              LauncherConstants.frontKVelocityFFHigh, LauncherConstants.kSlotHigh)
+          .pidf(LauncherConstants.kPVelocityControllerLow,
+              LauncherConstants.kIVelocityControllerLow,
+              LauncherConstants.kDVelocityControllerLow,
+              LauncherConstants.frontKVelocityFFLow, LauncherConstants.kSlotLow)
           .outputRange(-1, 1);
     }
 
@@ -145,10 +149,14 @@ public final class Configs {
           .velocityConversionFactor(LauncherConstants.kVelocityConversionFactor);
       backLauncherConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .pidf(LauncherConstants.kPVelocityController,
-              LauncherConstants.kIVelocityController,
-              LauncherConstants.kDVelocityController,
-              LauncherConstants.backKVelocityFF)
+          .pidf(LauncherConstants.kPVelocityControllerHigh,
+              LauncherConstants.kIVelocityControllerHigh,
+              LauncherConstants.kDVelocityControllerHigh,
+              LauncherConstants.backKVelocityFFHigh, LauncherConstants.kSlotHigh)
+          .pidf(LauncherConstants.kPVelocityControllerLow,
+              LauncherConstants.kIVelocityControllerLow,
+              LauncherConstants.kDVelocityControllerLow,
+              LauncherConstants.backKVelocityFFLow, LauncherConstants.kSlotLow)
           .outputRange(-1, 1);
     }
   }

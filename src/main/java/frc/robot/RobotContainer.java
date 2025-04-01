@@ -87,6 +87,21 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType),
+        ArmConstants.kLimitSwitchChannel);
+    armSub.calibrate();
+
+    intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
+
+    indexerSub = new Indexer(
+        new SparkMax(IndexerConstants.kMotorCanId, IndexerConstants.kMotorType),
+        new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel),
+        new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel));
+
+    launcherSub = new Launcher(
+        new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
+        new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
+
     if (RobotBase.isReal()) {
       gyro = new GyroNavX();
 
@@ -103,7 +118,7 @@ public class RobotContainer {
           new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
               DriveConstants.kRearRightTurningCanId,
               DriveConstants.kBackRightChassisAngularOffset),
-          gyro);
+          gyro, launcherSub::isUsingHighVelocities);
 
       swerveDriveSimulation = null;
     } else {
@@ -133,21 +148,6 @@ public class RobotContainer {
 
       SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
     }
-
-    armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType),
-        ArmConstants.kLimitSwitchChannel);
-    armSub.calibrate();
-
-    intakeSub = new IntakeSubsystem(new SparkMax(IntakeConstants.kMotorCanId, IntakeConstants.kMotorType));
-
-    indexerSub = new Indexer(
-        new SparkMax(IndexerConstants.kMotorCanId, IndexerConstants.kMotorType),
-        new BeamBreakSensor(IndexerConstants.kIntakeSensorChannel),
-        new BeamBreakSensor(IndexerConstants.kLauncherSensorChannel));
-
-    launcherSub = new Launcher(
-        new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
-        new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 
     // Register named Commands
     NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
@@ -242,13 +242,19 @@ public class RobotContainer {
     // Move to barge launching zone, facing in the specified direction
     driverController.povLeft().whileTrue(
         new MoveToPoseBangBangCmd(driveSub,
-            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft), false));
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft,
+                launcherSub.isUsingHighVelocities()),
+            false));
     driverController.povUp().whileTrue(
         new MoveToPoseBangBangCmd(driveSub,
-            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight), false));
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight,
+                launcherSub.isUsingHighVelocities()),
+            false));
     driverController.povRight().whileTrue(
         new MoveToPoseBangBangCmd(driveSub,
-            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight), false));
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight,
+                launcherSub.isUsingHighVelocities()),
+            false));
 
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
@@ -295,7 +301,24 @@ public class RobotContainer {
         new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleCoral));
 
     // Indexer command
-    operatorController.b().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
+    // operatorController.b().onTrue(new IndexToBeamBreakCmd(indexerSub, () ->
+    // 0.75));
+    operatorController.y().onTrue(Commands.runOnce(() -> {
+      launcherSub.setUseHighVelocities(true);
+      launcherSub.setReferenceVelocityOffset(0);
+    }));
+    operatorController.a().onTrue(Commands.runOnce(() -> {
+      launcherSub.setUseHighVelocities(false);
+      launcherSub.setReferenceVelocityOffset(0);
+    }));
+    operatorController.x()
+        .onTrue(Commands.runOnce(() -> {
+          launcherSub.increaseReferenceVelocityOffset(LauncherConstants.kBumpOffsetRPM);
+        }));
+    operatorController.b()
+        .onTrue(Commands.runOnce(() -> {
+          launcherSub.increaseReferenceVelocityOffset(-LauncherConstants.kBumpOffsetRPM);
+        }));
 
     // Bump arm setpoints
     operatorController.leftBumper().whileTrue(
