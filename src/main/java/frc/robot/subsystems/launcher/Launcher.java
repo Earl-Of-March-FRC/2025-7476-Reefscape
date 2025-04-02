@@ -194,6 +194,7 @@ public class Launcher extends SubsystemBase {
    * Stops the launcher motors.
    */
   public void stopLauncher() {
+    setReferenceVelocityOffset(0);
     setReferenceVelocity(0);
   }
 
