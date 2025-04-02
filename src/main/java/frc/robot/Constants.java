@@ -284,7 +284,7 @@ public final class Constants {
       public static final double camera2Roll = 0;
       public static final double camera2Pitch = 0;
       public static final double camera2Yaw = Math.PI;
-      public static final double camera2X = -0.2921;
+      public static final double camera2X = -0.3327;// -0.2921;
       public static final double camera2Y = 0;
       public static final double camera2Z = 0.3175;
 
