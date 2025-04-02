@@ -59,6 +59,7 @@ import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Vision.PhotonConstants;
 import frc.utils.PoseHelpers;
+import frc.utils.TagUtils;
 
 /**
  * The Drivetrain class represents the robot's drivetrain subsystem.
@@ -293,6 +294,16 @@ public class Drivetrain extends SubsystemBase {
           if (FieldConstants.kfieldLayout.getTagPose(target.fiducialId).isPresent()) {
             fiducialIdPoses.add(FieldConstants.kfieldLayout.getTagPose(target.fiducialId).get());
           }
+          if (target.fiducialId == 10) {
+            Transform3d camToTarget = target.bestCameraToTarget;
+            Transform3d robotToTag = new Transform3d(0.825, 0, 0.5715, new Rotation3d(0, 0,
+                Math.PI));
+            // Transform3d robotToTag = new Transform3d(2, 0, 0.5715, new Rotation3d());
+            // Pose3d robotToCam = TagUtils.getRobotPose3dFromCamera(camToTarget,
+            // robotToTag);
+            Transform3d robotToCam = TagUtils.getRobotPose3dFromCamera(camToTarget, robotToTag);
+            Logger.recordOutput("Vision/" + cameras[i].getName() + "/TagUtil", robotToCam);
+          }
         }
 
         Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetIds",
@@ -524,7 +535,7 @@ public class Drivetrain extends SubsystemBase {
 
         Logger.recordOutput("Vision/" + camera.getName() + "/RawEstimatedPose", estimation.estimatedPose);
 
-        if (PoseHelpers.isInField(estimation.estimatedPose) &&
+        if (true || PoseHelpers.isInField(estimation.estimatedPose) &&
             PoseHelpers.isOnGround(estimation.estimatedPose, PhotonConstants.kHeightTolerance)) {
 
           // ignore the result if it only has one tag and the tag is too small
