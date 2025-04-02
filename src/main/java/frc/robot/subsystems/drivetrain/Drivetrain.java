@@ -469,7 +469,7 @@ public class Drivetrain extends SubsystemBase {
 
         Logger.recordOutput("Vision/" + camera.getName() + "/RawEstimatedPose", estimation.estimatedPose);
 
-        if (true || PoseHelpers.isInField(estimation.estimatedPose) &&
+        if (PoseHelpers.isInField(estimation.estimatedPose) &&
             PoseHelpers.isOnGround(estimation.estimatedPose, PhotonConstants.kHeightTolerance)) {
 
           // ignore the result if it only has one tag and the tag is too small

@@ -316,8 +316,8 @@ public final class Constants {
           new Rotation3d(PhotonConstants.camera3Roll, PhotonConstants.camera3Pitch, PhotonConstants.camera3Yaw));
       public static final Transform3d[] kRobotToCams = { kRobotToCam1, kRobotToCam2, kRobotToCam3 };
 
-      public static final double kHeightTolerance = 99999; // 0.5; // meters above and below ground
-      public static final double kAmbiguityDiscardThreshold = 0;// 0.7; // ignore targets above this value
+      public static final double kHeightTolerance = 0.5; // meters above and below ground
+      public static final double kAmbiguityDiscardThreshold = 0.8; // ignore targets above this value
       public static final double kAmbiguityThreshold = 0.3; // targets above this need to be checked
       public static final double kMinSingleTagArea = 0;
     }
