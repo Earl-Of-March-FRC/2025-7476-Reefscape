@@ -265,27 +265,27 @@ public final class Constants {
     public static final class PhotonConstants {
       // Camera offsets. Rotations are in radians. Translations are in meters.
       // +x is in front of the robot, +y is to the left of the robot, +z is up
-      public static final double camera1Roll = 0;
-      public static final double camera1Pitch = 10 * Math.PI / 180;
-      public static final double camera1Yaw = 0;
-      public static final double camera1X = 0.2921;
-      public static final double camera1Y = 0.127;
-      public static final double camera1Z = 0.4699;
+      public static final double camera1Roll = 0.0;
+      public static final double camera1Pitch = 0.1301;
+      public static final double camera1Yaw = 0.0;
+      public static final double camera1X = 0.307;
+      public static final double camera1Y = 0.180;
+      public static final double camera1Z = 0.750;
 
-      public static final double camera2Roll = 0;
-      public static final double camera2Pitch = 0;
-      public static final double camera2Yaw = Math.PI;
-      public static final double camera2X = -0.2921;
-      public static final double camera2Y = 0;
-      public static final double camera2Z = 0.3175;
+      public static final double camera2Roll = 0.0;
+      public static final double camera2Pitch = 0.0;
+      public static final double camera2Yaw = 0.0;
+      public static final double camera2X = 0.72;
+      public static final double camera2Y = 0.037;
+      public static final double camera2Z = 0.407;
 
       // NEED TO BE FOUND AND SET
-      public static final double camera3Roll = 0;
-      public static final double camera3Pitch = 0;
-      public static final double camera3Yaw = 42 * Math.PI / 180;
-      public static final double camera3X = 0;
-      public static final double camera3Y = 0;
-      public static final double camera3Z = 0;
+      public static final double camera3Roll = 0.0;
+      public static final double camera3Pitch = 0.0;
+      public static final double camera3Yaw = 0.7069;
+      public static final double camera3X = 0.238;
+      public static final double camera3Y = -0.294;
+      public static final double camera3Z = 0.625;
 
       public static final int kAlgaePipeline = 1;
       public static final int kAprilTagPipeline = 0;
@@ -308,8 +308,8 @@ public final class Constants {
           new Rotation3d(PhotonConstants.camera3Roll, PhotonConstants.camera3Pitch, PhotonConstants.camera3Yaw));
       public static final Transform3d[] kRobotToCams = { kRobotToCam1, kRobotToCam2, kRobotToCam3 };
 
-      public static final double kHeightTolerance = 0.5; // meters above and below ground
-      public static final double kAmbiguityDiscardThreshold = 0.7; // ignore targets above this value
+      public static final double kHeightTolerance = 99999; // 0.5; // meters above and below ground
+      public static final double kAmbiguityDiscardThreshold = 0;// 0.7; // ignore targets above this value
       public static final double kAmbiguityThreshold = 0.3; // targets above this need to be checked
       public static final double kMinSingleTagArea = 0;
     }

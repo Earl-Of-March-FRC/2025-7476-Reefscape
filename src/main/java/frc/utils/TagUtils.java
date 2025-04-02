@@ -1,6 +1,9 @@
 package frc.utils;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 /**
  * Utility class for calculating transformations related to tags and cameras.
@@ -20,10 +23,25 @@ public class TagUtils {
    * @return The transformation from the robot's coordinate system to the camera's
    *         coordinate system.
    */
-  public static Transform3d getRobotToCam(Transform3d camToTag, Transform3d robotToTag) {
-    // Invert camToTag to get tag to camera transform
+
+  /*
+   * 
+   * public static Pose3d getRobotPose3dFromCamera(Transform3d camToTag,
+   * Transform3d robotToTag) {
+   * Transform3d tagToCam = camToTag.inverse();
+   * 
+   * Pose3d robotToTPose3d = new Pose3d(robotToTag.getX(), robotToTag.getY(),
+   * robotToTag.getZ(),
+   * robotToTag.getRotation());
+   * 
+   * return robotToTPose3d.transformBy(tagToCam);
+   * }
+   * 
+   */
+
+  public static Transform3d getRobotPose3dFromCamera(Transform3d camToTag, Transform3d robotToTag) {
     Transform3d tagToCam = camToTag.inverse();
-    // Combine robotToTag and tagToCam to get robotToCam
+
     return robotToTag.plus(tagToCam);
   }
 
