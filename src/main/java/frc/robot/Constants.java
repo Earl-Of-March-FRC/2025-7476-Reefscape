@@ -272,21 +272,12 @@ public final class Constants {
       public static final double camera1Y = 0.180;
       public static final double camera1Z = 0.750;
 
-      // NEW DATA FROM APRIL 1 (SEEMS TO BE WRONG)
-      // public static final double camera2Roll = 0.0;
-      // public static final double camera2Pitch = 0.0;
-      // public static final double camera2Yaw = 0.0;
-      // public static final double camera2X = 0.72;
-      // public static final double camera2Y = 0.037;
-      // public static final double camera2Z = 0.407;
-
-      // FROM NORTH BAY
       public static final double camera2Roll = 0;
       public static final double camera2Pitch = 0;
       public static final double camera2Yaw = Math.PI;
-      public static final double camera2X = -0.3327;// -0.2921;
+      public static final double camera2X = -0.3327;
       public static final double camera2Y = 0;
-      public static final double camera2Z = 0.3175;
+      public static final double camera2Z = 0.3708;
 
       public static final double camera3Roll = 0.0;
       public static final double camera3Pitch = 0.0;
