@@ -169,7 +169,8 @@ public class Launcher extends SubsystemBase {
 
     // Converts RPM to radians per second
     frontLauncherClosedLoopController.setReference(
-        referenceVelocityWithOffset * LauncherConstants.kVelocityConversionFactor,
+        (referenceVelocity == 0 ? referenceVelocity : referenceVelocityWithOffset)
+            * LauncherConstants.kVelocityConversionFactor,
         ControlType.kVelocity, isUsingHighVelocities() ? LauncherConstants.kSlotHigh : LauncherConstants.kSlotLow);
   }
 
@@ -186,7 +187,8 @@ public class Launcher extends SubsystemBase {
 
     // Converts RPM to radians per second
     backLauncherClosedLoopController.setReference(
-        referenceVelocityWithOffset * LauncherConstants.kVelocityConversionFactor,
+        (referenceVelocity == 0 ? referenceVelocity : referenceVelocityWithOffset)
+            * LauncherConstants.kVelocityConversionFactor,
         ControlType.kVelocity, isUsingHighVelocities() ? LauncherConstants.kSlotHigh : LauncherConstants.kSlotLow);
   }
 
@@ -194,6 +196,7 @@ public class Launcher extends SubsystemBase {
    * Stops the launcher motors.
    */
   public void stopLauncher() {
+    setReferenceVelocityOffset(0);
     setReferenceVelocity(0);
   }
 
