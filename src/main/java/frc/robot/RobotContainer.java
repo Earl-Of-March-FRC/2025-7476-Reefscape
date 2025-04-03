@@ -26,6 +26,7 @@ import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.commands.drivetrain.*;
+import frc.robot.commands.LaunchAlgaeCmd;
 import frc.robot.commands.StripAlgaeCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
@@ -115,7 +116,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("ArmL2", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL2));
     NamedCommands.registerCommand("ArmL3", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL3));
     NamedCommands.registerCommand("ArmStow", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleStowed));
-    NamedCommands.registerCommand("StripAlgae", new StripAlgaeCmd(intakeSub, armSub));
+    NamedCommands.registerCommand("StripAlgae", new StripAlgaeCmd(intakeSub, armSub, launcherSub, indexerSub));
     NamedCommands.registerCommand("LauncherIntake",
         new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
             () -> -launcherSub.getPreferredBackVelocity()));
@@ -131,6 +132,9 @@ public class RobotContainer {
         () -> 0));
     NamedCommands.registerCommand("IndexerBack",
         new IndexerSetVelocityManualCmd(indexerSub, () -> -1).until(() -> !indexerSub.getIntakeSensor()));
+    NamedCommands.registerCommand("LaunchAlgae",
+        new LaunchAlgaeCmd(indexerSub, launcherSub).until(() -> !indexerSub.getLauncherSensor()).withTimeout(3));
+    NamedCommands.registerCommand("", getAutonomousCommand());
     configureAutos();
     configureBindings();
   }

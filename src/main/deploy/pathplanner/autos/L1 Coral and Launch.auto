@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Centered To Reef"
+            "pathName": "Centered To Algae"
           }
         },
         {
@@ -35,9 +35,34 @@
           }
         },
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Algae To Launch"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "RevLauncher"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LaunchAlgae"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "Reef To Launch Right"
+            "pathName": "Launch To Centered"
           }
         },
         {

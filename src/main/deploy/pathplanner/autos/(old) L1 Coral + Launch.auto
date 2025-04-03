@@ -61,7 +61,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Centered To Reef"
+            "pathName": "Centered To Algae"
           }
         },
         {
@@ -73,7 +73,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Reef To Launch Right"
+            "pathName": "Algae To Launch"
           }
         },
         {
