@@ -17,46 +17,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "ArmL2"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Centered To Algae"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "StripAlgae"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Algae To Launch"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RevLauncher"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "LaunchAlgae"
+            "pathName": "Algae To Launch"
           }
         },
         {
