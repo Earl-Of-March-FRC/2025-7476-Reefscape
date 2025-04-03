@@ -250,11 +250,11 @@ public class Drivetrain extends SubsystemBase {
         Pose2d estimatedPose = PoseHelpers.toPose2d(visionPose.estimatedPose);
         Vector<N3> standardDeviation = PhotonConstants.kCameraStandardDeviations.get(i);
 
-        if (i != 1) {
-          odometry.setVisionMeasurementStdDevs(standardDeviation);
-          odometry.addVisionMeasurement(estimatedPose, visionPose.timestampSeconds);
-          hasVisionData = true;
-        }
+        // if (i != 1) {
+        odometry.setVisionMeasurementStdDevs(standardDeviation);
+        odometry.addVisionMeasurement(estimatedPose, visionPose.timestampSeconds);
+        hasVisionData = true;
+        // }
 
       }
       if (visionPoses.isEmpty()) {
