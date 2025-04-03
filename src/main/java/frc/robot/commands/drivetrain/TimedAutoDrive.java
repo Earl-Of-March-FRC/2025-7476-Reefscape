@@ -68,7 +68,7 @@ public class TimedAutoDrive extends Command {
   @Override
   public void execute() {
     if (timer.get() < seconds) {
-      driveSub.runVelocityFieldRelative(new ChassisSpeeds(xVel, yVel, omega));
+      driveSub.runVelocityRobotRelative(new ChassisSpeeds(xVel, yVel, omega));
     }
   }
 
@@ -78,7 +78,7 @@ public class TimedAutoDrive extends Command {
    */
   @Override
   public void end(boolean interrupted) {
-    driveSub.runVelocityFieldRelative(new ChassisSpeeds(0, 0, 0));
+    driveSub.runVelocityRobotRelative(new ChassisSpeeds(0, 0, 0));
   }
 
   /**
