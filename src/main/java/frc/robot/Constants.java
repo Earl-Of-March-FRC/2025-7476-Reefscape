@@ -284,7 +284,7 @@ public final class Constants {
       public static final double camera2X = -0.3327;
       public static final double camera2Y = 0;
       public static final double camera2Z = 0.3708;
-      public static final Vector<N3> kCamera2StandardDeviation = VecBuilder.fill(0.9, 0.9, 0.9);
+      public static final Vector<N3> kCamera2StandardDeviation = VecBuilder.fill(0.6, 0.6, 0.6);
 
       public static final double camera3Roll = 0.0;
       public static final double camera3Pitch = 0.0;
