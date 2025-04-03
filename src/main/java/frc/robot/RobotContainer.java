@@ -206,6 +206,10 @@ public class RobotContainer {
         new MoveToPoseBangBangCmd(driveSub,
             () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight),
             false));
+    driverController.a().whileTrue(
+        new MoveToPoseBangBangCmd(driveSub,
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight),
+            false));
     driverController.povRight().whileTrue(
         new MoveToPoseBangBangCmd(driveSub,
             () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight),
