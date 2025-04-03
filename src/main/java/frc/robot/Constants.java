@@ -322,7 +322,7 @@ public final class Constants {
       public static final double kHeightTolerance = 0.5; // meters above and below ground
       public static final double kAmbiguityDiscardThreshold = 0.8; // ignore targets above this value
       public static final double kAmbiguityThreshold = 0.3; // targets above this need to be checked
-      public static final double kMinSingleTagArea = 0.1;
+      public static final double kMinSingleTagArea = 0.2;
     }
   }
 
