@@ -113,9 +113,10 @@ public class MoveToPosePIDCmd extends Command {
     // Reverse direction if on red alliance
 
     // Convert calculated value to velocity
-    double xVel = translationXController.calculate(targetX) * AutoConstants.kMaxSpeedMetersPerSecond;
-    double yVel = translationYController.calculate(targetY) * AutoConstants.kMaxSpeedMetersPerSecond;
-    double rotVel = rotationController.calculate(targetRadians) * AutoConstants.kMaxAngularSpeedRadiansPerSecond;
+    double xVel = translationXController.calculate(currentPose.getX()) * AutoConstants.kMaxSpeedMetersPerSecond;
+    double yVel = translationYController.calculate(currentPose.getY()) * AutoConstants.kMaxSpeedMetersPerSecond;
+    double rotVel = rotationController.calculate(currentPose.getRotation().getRadians())
+        * AutoConstants.kMaxAngularSpeedRadiansPerSecond;
 
     if (DriverStation.getAlliance().isPresent()) {
       Alliance alliance = DriverStation.getAlliance().get();
