@@ -14,6 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
@@ -162,5 +163,21 @@ public class RotateTowardsReefWithDriveCmd extends Command {
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  public ChassisSpeeds snapToLine(Pose3d tagPose, Pose2d robotPose) {
+    double angle = tagPose.getRotation().getZ();
+
+    // define a normal line that extends out of the tag
+    double normalSlope = Math.tan(angle);
+    double normalYInt = tagPose.getY() - normalSlope * tagPose.getX();
+
+    // define a perpendiculat line intersecting the robot
+    double botSlope = 1 / normalSlope;
+    double botYInt = robotPose.getY() - botSlope * tagPose.getX();
+
+    double targetX = (normalYInt - botYInt) / (botSlope - normalSlope);
+    double targetY = normalSlope * targetX + normalYInt;
+
   }
 }
