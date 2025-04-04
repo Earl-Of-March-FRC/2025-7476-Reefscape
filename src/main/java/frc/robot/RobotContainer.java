@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -78,6 +79,8 @@ public class RobotContainer {
       OIConstants.kDriverControllerPort);
   private final CommandXboxController operatorController = new CommandXboxController(
       OIConstants.kOperatorControllerPort);
+
+  private final SlewRateLimiter intakeLimiter = new SlewRateLimiter(5);
 
   // Register Named Commands
 
@@ -219,10 +222,10 @@ public class RobotContainer {
     // Manual intake (arm roller) control with
     intakeSub.setDefaultCommand(
         new IntakeSetVelocityManualCmd(intakeSub,
-            () -> MathUtil.applyDeadband(
+            () -> intakeLimiter.calculate(MathUtil.applyDeadband(
                 operatorController.getRawAxis(
                     OIConstants.kOperatorIntakeManualAxis),
-                OIConstants.kIntakeDeadband)));
+                OIConstants.kIntakeDeadband))));
 
     // DRIVER CONTROLLER
 
@@ -233,10 +236,6 @@ public class RobotContainer {
         () -> MathUtil.applyDeadband(
             -driverController.getRawAxis(
                 OIConstants.kDriverControllerYAxis),
-            OIConstants.kDriveDeadband),
-        () -> MathUtil.applyDeadband(
-            -driverController.getRawAxis(
-                OIConstants.kDriverControllerXAxis),
             OIConstants.kDriveDeadband)));
 
     // Move to barge launching zone, facing in the specified direction
@@ -245,6 +244,10 @@ public class RobotContainer {
             () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft),
             false));
     driverController.povUp().whileTrue(
+        new MoveToPoseBangBangCmd(driveSub,
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight),
+            false));
+    driverController.a().whileTrue(
         new MoveToPoseBangBangCmd(driveSub,
             () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight),
             false));
@@ -335,6 +338,7 @@ public class RobotContainer {
   private void configureAutos() {
     autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+    autoChooser.addOption("CalibrateGyro", new CalibrateGyroCmd(driveSub));
     autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
     autoChooser.addOption("EncoderAutoDrive", new EncoderAutoDrive(driveSub));
     SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());

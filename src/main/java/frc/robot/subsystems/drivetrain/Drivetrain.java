@@ -34,6 +34,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -46,6 +47,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -59,7 +61,6 @@ import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Vision.PhotonConstants;
 import frc.utils.PoseHelpers;
-import frc.utils.TagUtils;
 
 /**
  * The Drivetrain class represents the robot's drivetrain subsystem.
@@ -284,6 +285,8 @@ public class Drivetrain extends SubsystemBase {
 
       List<Integer> fiducialIds = new ArrayList<>();
       List<Pose3d> fiducialIdPoses = new ArrayList<>();
+      List<Double> tagAreas = new ArrayList<>();
+      List<Double> tagAmbiguities = new ArrayList<>();
       for (EstimatedRobotPose visionPose : visionPoses) {
         Logger.recordOutput("Vision/" + cameras[i].getName() + "/EstimatedPose", visionPose.estimatedPose);
         Logger.recordOutput("Vision/" + cameras[i].getName() + "/Timestamp", visionPose.timestampSeconds);
@@ -294,26 +297,42 @@ public class Drivetrain extends SubsystemBase {
           if (FieldConstants.kfieldLayout.getTagPose(target.fiducialId).isPresent()) {
             fiducialIdPoses.add(FieldConstants.kfieldLayout.getTagPose(target.fiducialId).get());
           }
-          if (target.fiducialId == 10) {
-            Transform3d camToTarget = target.bestCameraToTarget;
-            Transform3d robotToTag = new Transform3d(0.825, 0, 0.5715, new Rotation3d(0, 0,
-                Math.PI));
-            // Transform3d robotToTag = new Transform3d(2, 0, 0.5715, new Rotation3d());
-            // Pose3d robotToCam = TagUtils.getRobotPose3dFromCamera(camToTarget,
-            // robotToTag);
-            Transform3d robotToCam = TagUtils.getRobotPose3dFromCamera(camToTarget, robotToTag);
-            Logger.recordOutput("Vision/" + cameras[i].getName() + "/TagUtil", robotToCam);
-          }
+          tagAreas.add(target.area);
+          tagAmbiguities.add(target.poseAmbiguity);
+
+          // if (target.fiducialId == 10) {
+          // Transform3d camToTarget = target.bestCameraToTarget;
+          // Transform3d robotToTag = new Transform3d(0.825, 0, 0.5715, new Rotation3d(0,
+          // 0,
+          // Math.PI));
+          // // Transform3d robotToTag = new Transform3d(2, 0, 0.5715, new Rotation3d());
+          // // Pose3d robotToCam = TagUtils.getRobotPose3dFromCamera(camToTarget,
+          // // robotToTag);
+          // Transform3d robotToCam = TagUtils.getRobotPose3dFromCamera(camToTarget,
+          // robotToTag);
+          // Logger.recordOutput("Vision/" + cameras[i].getName() + "/TagUtil",
+          // robotToCam);
+          // }
         }
 
         Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetIds",
             fiducialIds.stream().mapToInt(n -> n).toArray());
         Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetPoses",
             fiducialIdPoses.toArray(new Pose3d[fiducialIdPoses.size()]));
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetAreas",
+            tagAreas.stream().mapToDouble(n -> n).toArray());
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetAmbiguities",
+            tagAmbiguities.stream().mapToDouble(n -> n).toArray());
 
         Pose2d estimatedPose = PoseHelpers.toPose2d(visionPose.estimatedPose);
+        Vector<N3> standardDeviation = PhotonConstants.kCameraStandardDeviations.get(i);
+
+        // if (i != 1) {
+        odometry.setVisionMeasurementStdDevs(standardDeviation);
         odometry.addVisionMeasurement(estimatedPose, visionPose.timestampSeconds);
         hasVisionData = true;
+        // }
+
       }
       if (visionPoses.isEmpty()) {
         Logger.recordOutput("Vision/" + cameras[i].getName() + "/EstimatedPose",
@@ -535,7 +554,7 @@ public class Drivetrain extends SubsystemBase {
 
         Logger.recordOutput("Vision/" + camera.getName() + "/RawEstimatedPose", estimation.estimatedPose);
 
-        if (true || PoseHelpers.isInField(estimation.estimatedPose) &&
+        if (PoseHelpers.isInField(estimation.estimatedPose) &&
             PoseHelpers.isOnGround(estimation.estimatedPose, PhotonConstants.kHeightTolerance)) {
 
           // ignore the result if it only has one tag and the tag is too small
