@@ -141,7 +141,7 @@ public class AlignReefWithDriveCmd extends Command {
 
     targetX = (normalYInt - botYInt) / (botSlope - normalSlope);
     targetY = normalSlope * targetX + normalYInt;
-    targetRadians = targetReefTagPose.getRotation().getRadians();
+    targetRadians = targetReefTagPose.getRotation().getRadians() + Math.PI;
 
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/TargetPose",
         new Pose2d(targetX, targetY, Rotation2d.fromRadians(targetRadians)));
