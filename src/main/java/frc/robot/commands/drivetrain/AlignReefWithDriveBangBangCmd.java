@@ -225,6 +225,9 @@ public class AlignReefWithDriveBangBangCmd extends Command {
       }
     }
 
+    constrainedControllerX *= DriveConstants.kMaxSpeedMetersPerSecond;
+    constrainedControllerY *= DriveConstants.kMaxSpeedMetersPerSecond;
+
     xVel += constrainedControllerX;
     yVel += constrainedControllerY;
 
