@@ -26,7 +26,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.utils.PoseHelpers;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class RotateTowardsReefWithDriveCmd extends Command {
+public class AlignReefWithDriveCmd extends Command {
   private Supplier<Double> forwardsBackwardsSupplier;
 
   private final Drivetrain driveSub;
@@ -37,14 +37,14 @@ public class RotateTowardsReefWithDriveCmd extends Command {
   private double targetX, targetY, targetRadians;
 
   /** Creates a new PathfindToReefSpotCmd. */
-  public RotateTowardsReefWithDriveCmd(
+  public AlignReefWithDriveCmd(
       Drivetrain driveSub, Supplier<Double> forwardsBackwardsSupplier) {
     this.driveSub = driveSub;
     this.forwardsBackwardsSupplier = forwardsBackwardsSupplier;
     addRequirements(driveSub);
   }
 
-  public RotateTowardsReefWithDriveCmd(Drivetrain driveSub) {
+  public AlignReefWithDriveCmd(Drivetrain driveSub) {
     this(driveSub, () -> 0.0);
   }
 
@@ -141,7 +141,7 @@ public class RotateTowardsReefWithDriveCmd extends Command {
 
     targetX = (normalYInt - botYInt) / (botSlope - normalSlope);
     targetY = normalSlope * targetX + normalYInt;
-    targetRadians = targetReefTagPose.getRotation().getRadians();
+    targetRadians = targetReefTagPose.getRotation().getRadians() + Math.PI;
 
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/TargetPose",
         new Pose2d(targetX, targetY, Rotation2d.fromRadians(targetRadians)));
