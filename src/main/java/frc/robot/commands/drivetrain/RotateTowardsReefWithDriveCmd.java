@@ -134,7 +134,7 @@ public class RotateTowardsReefWithDriveCmd extends Command {
     double normalYInt = targetReefTagPose.getY() - normalSlope * targetReefTagPose.getX();
 
     // define a perpendiculat line intersecting the robot
-    double botSlope = 1 / normalSlope;
+    double botSlope = -1 / normalSlope;
     double botYInt = currentPose.getY() - botSlope * currentPose.getX();
 
     targetX = (normalYInt - botYInt) / (botSlope - normalSlope);
