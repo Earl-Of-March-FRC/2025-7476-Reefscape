@@ -194,50 +194,64 @@ public class AlignReefWithDriveBangBangCmd extends Command {
       }
     }
 
-    // Convert calculated value to velocity
-    double xVel = (directionX *
-        DriveConstants.kBangBangTranslationalVelocityMetersPerSecond);
-    double yVel = (directionY *
-        DriveConstants.kBangBangTranslationalVelocityMetersPerSecond);
+    double rotatedControllerX = controllerX * Math.cos(-targetRadians) - controllerY * Math.sin(-targetRadians);
+    double rotatedControllerY = controllerX * Math.sin(-targetRadians) + controllerY * Math.cos(-targetRadians);
 
-    // Keeping the x component constant and scaling y
-    double scaledXConstantX = controllerX;
-    double scaledXConstantY = controllerX * normalSlope;
-
-    double constrainedControllerX, constrainedControllerY;
-    if (Math.abs(scaledXConstantY) <= Math.abs(controllerY)) {
-      constrainedControllerX = scaledXConstantX;
-      constrainedControllerY = scaledXConstantY;
-    } else {
-      // Keeping the y component constant and scaling x
-      double scaledYConstantX = controllerX / normalSlope;
-      double scaledYConstantY = controllerY;
-      constrainedControllerX = scaledYConstantX;
-      constrainedControllerY = scaledYConstantY;
-    }
+    double constrainedVel = rotatedControllerX * DriveConstants.kMaxSpeedMetersPerSecond;
 
     if (DriverStation.getAlliance().isPresent()) {
       Alliance alliance = DriverStation.getAlliance().get();
       if (alliance == Alliance.Red) {
         // Blue based field coordinates -> Allianced based field coordinates
-        constrainedControllerX *= -1;
-        constrainedControllerY *= -1;
+        constrainedVel *= -1;
       }
     }
 
-    constrainedControllerX *= DriveConstants.kMaxSpeedMetersPerSecond;
-    constrainedControllerY *= DriveConstants.kMaxSpeedMetersPerSecond;
+    // Convert calculated value to velocity
+    double xVel = (directionX * DriveConstants.kBangBangTranslationalVelocityMetersPerSecond)
+        - (constrainedVel * Math.cos(targetRadians));
+    double yVel = (directionY * DriveConstants.kBangBangTranslationalVelocityMetersPerSecond)
+        - (constrainedVel * Math.sin(targetRadians));
 
-    xVel += constrainedControllerX;
-    yVel += constrainedControllerY;
+    // // Keeping the x component constant and scaling y
+    // double scaledXConstantX = controllerX;
+    // double scaledXConstantY = controllerX * normalSlope;
+
+    // double constrainedControllerX, constrainedControllerY;
+    // if (Math.abs(scaledXConstantY) <= Math.abs(controllerY)) {
+    // constrainedControllerX = scaledXConstantX;
+    // constrainedControllerY = scaledXConstantY;
+    // } else {
+    // // Keeping the y component constant and scaling x
+    // double scaledYConstantX = controllerX / normalSlope;
+    // double scaledYConstantY = controllerY;
+    // constrainedControllerX = scaledYConstantX;
+    // constrainedControllerY = scaledYConstantY;
+    // }
+
+    // if (DriverStation.getAlliance().isPresent()) {
+    // Alliance alliance = DriverStation.getAlliance().get();
+    // if (alliance == Alliance.Red) {
+    // // Blue based field coordinates -> Allianced based field coordinates
+    // constrainedControllerX *= -1;
+    // constrainedControllerY *= -1;
+    // }
+    // }
+
+    // constrainedControllerX *= DriveConstants.kMaxSpeedMetersPerSecond;
+    // constrainedControllerY *= DriveConstants.kMaxSpeedMetersPerSecond;
+
+    // xVel += constrainedControllerX;
+    // yVel += constrainedControllerY;
 
     double rotVel = DriveConstants.kBangBangRotationalVelocityRadiansPerSecond * directionRot;
 
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel, yVel, rotVel);
     driveSub.runVelocityFieldRelative(chassisSpeeds);
 
-    Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputDriverXVel", constrainedControllerX);
-    Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputDriverYVel", constrainedControllerY);
+    Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputDriverVel", constrainedVel);
+    // Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputDriverYVel",
+    // constrainedControllerY);
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputDirectionRotation", directionRot);
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputVelocityRotation", rotVel);
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputChassisSpeeds", chassisSpeeds);
