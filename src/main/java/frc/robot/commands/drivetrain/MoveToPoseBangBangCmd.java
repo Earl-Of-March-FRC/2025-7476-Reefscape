@@ -84,6 +84,8 @@ public class MoveToPoseBangBangCmd extends Command {
     Pose2d currentPose = driveSub.getPose();
     Logger.recordOutput("Odometry/MoveToTargetPose/CurrentPose",
         currentPose);
+    Logger.recordOutput("Odometry/MoveToTargetPose/IsDynamicPose",
+        dynamicPose);
 
     // Set target based on whether the target pose is dynamic
     if (dynamicPose) {
