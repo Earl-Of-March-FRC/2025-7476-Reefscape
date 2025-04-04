@@ -135,12 +135,17 @@ public class AlignReefWithDriveCmd extends Command {
     double normalSlope = Math.tan(angle);
     double normalYInt = targetReefTagPose.getY() - normalSlope * targetReefTagPose.getX();
 
-    // define a perpendiculat line intersecting the robot
-    double botSlope = -1 / normalSlope;
-    double botYInt = currentPose.getY() - botSlope * currentPose.getX();
+    if (normalSlope != 0) {
+      // define a perpendiculat line intersecting the robot
+      double botSlope = -1 / normalSlope;
+      double botYInt = currentPose.getY() - botSlope * currentPose.getX();
 
-    targetX = (normalYInt - botYInt) / (botSlope - normalSlope);
-    targetY = normalSlope * targetX + normalYInt;
+      targetX = (normalYInt - botYInt) / (botSlope - normalSlope);
+      targetY = normalSlope * targetX + normalYInt;
+    } else {
+      targetX = currentPose.getX();
+      targetY = targetReefTagPose.getY();
+    }
     targetRadians = targetReefTagPose.getRotation().getRadians() + Math.PI;
 
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/TargetPose",
@@ -171,15 +176,18 @@ public class AlignReefWithDriveCmd extends Command {
       directionY = 0;
     }
 
+    double forwardsBackwardsVel = forwardsBackwardsSupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
+
     if (DriverStation.getAlliance().isPresent()) {
       Alliance alliance = DriverStation.getAlliance().get();
       if (alliance == Alliance.Red) {
         directionX *= -1;
         directionY *= -1;
+        forwardsBackwardsVel *= -1;
       }
     }
 
-    double forwardsBackwardsVel = forwardsBackwardsSupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
+    
 
     // Convert calculated value to velocity
     double xVel = (directionX * DriveConstants.kMaxSpeedMetersPerSecond)

@@ -234,7 +234,7 @@ public class RobotContainer {
     driverController.x().whileTrue(new AlignReefWithDriveCmd(
         driveSub,
         () -> MathUtil.applyDeadband(
-            -driverController.getRawAxis(
+            driverController.getRawAxis(
                 OIConstants.kDriverControllerYAxis),
             OIConstants.kDriveDeadband)));
 
