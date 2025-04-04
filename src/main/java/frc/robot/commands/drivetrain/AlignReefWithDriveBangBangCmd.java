@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.security.sasl.SaslClient;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -27,7 +29,7 @@ import frc.utils.PoseHelpers;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AlignReefWithDriveBangBangCmd extends Command {
-  private Supplier<Double> forwardsBackwardsSupplier;
+  private Supplier<Double> xSupplier, ySupplier;
 
   private final Drivetrain driveSub;
   private final BangBangController rotationController = new BangBangController(ReefConstants.kToleranceRadiansFromSpot),
@@ -38,14 +40,15 @@ public class AlignReefWithDriveBangBangCmd extends Command {
 
   /** Creates a new PathfindToReefSpotCmd. */
   public AlignReefWithDriveBangBangCmd(
-      Drivetrain driveSub, Supplier<Double> forwardsBackwardsSupplier) {
+      Drivetrain driveSub, Supplier<Double> xSupplier, Supplier<Double> ySupplier) {
     this.driveSub = driveSub;
-    this.forwardsBackwardsSupplier = forwardsBackwardsSupplier;
+    this.xSupplier = xSupplier;
+    this.ySupplier = ySupplier;
     addRequirements(driveSub);
   }
 
   public AlignReefWithDriveBangBangCmd(Drivetrain driveSub) {
-    this(driveSub, () -> 0.0);
+    this(driveSub, () -> 0.0, () -> 0.0);
   }
 
   // Called when the command is initially scheduled.
@@ -98,6 +101,9 @@ public class AlignReefWithDriveBangBangCmd extends Command {
   @Override
   public void execute() {
     Pose2d currentPose = driveSub.getPose();
+
+    double controllerX = xSupplier.get();
+    double controllerY = ySupplier.get();
 
     // Get the closest reef spot
     ArrayList<Pose3d> reefTagPoses = new ArrayList<Pose3d>();
@@ -176,29 +182,59 @@ public class AlignReefWithDriveBangBangCmd extends Command {
       directionY = 0;
     }
 
-    double forwardsBackwardsVel = forwardsBackwardsSupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
-
     if (DriverStation.getAlliance().isPresent()) {
       Alliance alliance = DriverStation.getAlliance().get();
       if (alliance == Alliance.Red) {
         directionX *= -1;
         directionY *= -1;
-        forwardsBackwardsVel *= -1;
+
+        // Allianced based field coordinates -> Blue based field coordinates
+        controllerX *= -1;
+        controllerY *= -1;
       }
     }
 
     // Convert calculated value to velocity
-    double xVel = (directionX * DriveConstants.kBangBangTranslationalVelocityMetersPerSecond)
-        - (forwardsBackwardsVel * Math.cos(targetRadians));
-    double yVel = (directionY * DriveConstants.kBangBangTranslationalVelocityMetersPerSecond)
-        - (forwardsBackwardsVel * Math.sin(targetRadians));
+    double xVel = (directionX *
+        DriveConstants.kBangBangTranslationalVelocityMetersPerSecond);
+    double yVel = (directionY *
+        DriveConstants.kBangBangTranslationalVelocityMetersPerSecond);
+
+    // Keeping the x component constant and scaling y
+    double scaledXConstantX = controllerX;
+    double scaledXConstantY = controllerX * normalSlope;
+
+    double constrainedControllerX, constrainedControllerY;
+    if (Math.abs(scaledXConstantY) <= Math.abs(controllerY)) {
+      constrainedControllerX = scaledXConstantX;
+      constrainedControllerY = scaledXConstantY;
+    } else {
+      // Keeping the y component constant and scaling x
+      double scaledYConstantX = controllerX / normalSlope;
+      double scaledYConstantY = controllerY;
+      constrainedControllerX = scaledYConstantX;
+      constrainedControllerY = scaledYConstantY;
+    }
+
+    if (DriverStation.getAlliance().isPresent()) {
+      Alliance alliance = DriverStation.getAlliance().get();
+      if (alliance == Alliance.Red) {
+        // Blue based field coordinates -> Allianced based field coordinates
+        constrainedControllerX *= -1;
+        constrainedControllerY *= -1;
+      }
+    }
+
+    xVel += constrainedControllerX;
+    yVel += constrainedControllerY;
 
     double rotVel = DriveConstants.kBangBangRotationalVelocityRadiansPerSecond * directionRot;
 
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel, yVel, rotVel);
     driveSub.runVelocityFieldRelative(chassisSpeeds);
 
-    Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/InputForwardsBackwardsVel", forwardsBackwardsVel);
+    Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputDriverXVel", constrainedControllerX);
+    Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputDriverYVel", constrainedControllerY);
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputDirectionRotation", directionRot);
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputVelocityRotation", rotVel);
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputChassisSpeeds", chassisSpeeds);
