@@ -174,11 +174,14 @@ public class AlignReefWithDrivePIDCmd extends Command {
     double forwardsBackwardsVel = forwardsBackwardsSupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
 
     // Convert calculated value to velocity
-    double xVel = translationControllerX.calculate(currentPose.getX(), targetX)
+    double xVel = (translationControllerX.calculate(currentPose.getX(), targetX)
+        * AutoConstants.kMaxSpeedMetersPerSecond)
         - (forwardsBackwardsVel * Math.cos(targetRadians));
-    double yVel = translationControllerY.calculate(currentPose.getY(), targetY)
+    double yVel = (translationControllerY.calculate(currentPose.getY(), targetY)
+        * AutoConstants.kMaxSpeedMetersPerSecond)
         - (forwardsBackwardsVel * Math.sin(targetRadians));
-    double rotVel = rotationController.calculate(currentRotation, targetRadians);
+    double rotVel = rotationController.calculate(currentRotation, targetRadians)
+        * AutoConstants.kMaxAngularSpeedRadiansPerSecond;
 
     if (DriverStation.getAlliance().isPresent()) {
       Alliance alliance = DriverStation.getAlliance().get();
