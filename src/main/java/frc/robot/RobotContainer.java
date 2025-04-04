@@ -189,7 +189,7 @@ public class RobotContainer {
 
     // Drive commands
     driverController.b().onTrue(new CalibrateGyroCmd(driveSub));
-    driverController.x().whileTrue(new AlignReefWithDriveBangBangCmd(
+    driverController.x().whileTrue(new AlignReefWithDrivePIDCmd(
         driveSub,
         () -> MathUtil.applyDeadband(
             driverController.getRawAxis(
