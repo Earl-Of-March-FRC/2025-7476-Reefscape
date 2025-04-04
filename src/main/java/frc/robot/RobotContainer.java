@@ -194,10 +194,6 @@ public class RobotContainer {
         () -> MathUtil.applyDeadband(
             -driverController.getRawAxis(
                 OIConstants.kDriverControllerYAxis),
-            OIConstants.kDriveDeadband),
-        () -> MathUtil.applyDeadband(
-            -driverController.getRawAxis(
-                OIConstants.kDriverControllerXAxis),
             OIConstants.kDriveDeadband)));
 
     // Move to barge launching zone, facing in the specified direction

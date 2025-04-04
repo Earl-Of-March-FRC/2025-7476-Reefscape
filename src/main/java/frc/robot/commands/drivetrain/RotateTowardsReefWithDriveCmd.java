@@ -14,7 +14,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
@@ -25,67 +24,70 @@ import frc.utils.PoseHelpers;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class RotateTowardsReefWithDriveCmd extends Command {
-  private Supplier<Double> xSupplier;
-  private Supplier<Double> ySupplier;
+  private Supplier<Double> forwardsBackwardsSupplier;
 
   private final Drivetrain driveSub;
-  private final BangBangController rotationController = new BangBangController(ReefConstants.kToleranceRadiansFromSpot);
+  private final BangBangController rotationController = new BangBangController(ReefConstants.kToleranceRadiansFromSpot),
+      translationControllerY = new BangBangController(ReefConstants.kToleranceRadiansFromSpot),
+      translationControllerX = new BangBangController(ReefConstants.kToleranceMetersFromSpot);
 
-  private double targetRadians;
+  private double targetX, targetY, targetRadians;
 
   /** Creates a new PathfindToReefSpotCmd. */
   public RotateTowardsReefWithDriveCmd(
-      Drivetrain driveSub, Supplier<Double> xSupplier, Supplier<Double> ySupplier) {
+      Drivetrain driveSub, Supplier<Double> forwardsBackwardsSupplier) {
     this.driveSub = driveSub;
-    this.xSupplier = xSupplier;
-    this.ySupplier = ySupplier;
+    this.forwardsBackwardsSupplier = forwardsBackwardsSupplier;
     addRequirements(driveSub);
   }
 
   public RotateTowardsReefWithDriveCmd(Drivetrain driveSub) {
-    this(driveSub, () -> 0.0, () -> 0.0);
+    this(driveSub, () -> 0.0);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Pose2d currentPose = driveSub.getPose();
+    // Pose2d currentPose = driveSub.getPose();
 
-    // Get the closest reef spot
-    ArrayList<Pose3d> reefTagPoses = new ArrayList<Pose3d>();
-    for (int tagId : ReefConstants.kReefTagIds) {
-      Optional<Pose3d> optionalTagPose = FieldConstants.kfieldLayout.getTagPose(tagId);
-      if (optionalTagPose.isEmpty()) {
-        continue;
-      }
-      reefTagPoses.add(optionalTagPose.get());
-    }
+    // // Get the closest reef spot
+    // ArrayList<Pose3d> reefTagPoses = new ArrayList<Pose3d>();
+    // for (int tagId : ReefConstants.kReefTagIds) {
+    // Optional<Pose3d> optionalTagPose =
+    // FieldConstants.kfieldLayout.getTagPose(tagId);
+    // if (optionalTagPose.isEmpty()) {
+    // continue;
+    // }
+    // reefTagPoses.add(optionalTagPose.get());
+    // }
 
-    ArrayList<Pose2d> reefSpots = new ArrayList<Pose2d>();
-    for (Pose3d reefTagPose : reefTagPoses) {
-      reefSpots.add(PoseHelpers.toPose2d(reefTagPose).transformBy(ReefConstants.kOffsetFromTag));
-    }
+    // ArrayList<Pose2d> reefSpots = new ArrayList<Pose2d>();
+    // for (Pose3d reefTagPose : reefTagPoses) {
+    // reefSpots.add(PoseHelpers.toPose2d(reefTagPose).transformBy(ReefConstants.kOffsetFromTag));
+    // }
 
-    Pose2d targetReefSpot = reefSpots.get(0);
-    double nearestDistance = PoseHelpers.distanceBetween(currentPose, targetReefSpot);
-    for (Pose2d reefSpot : reefSpots) {
-      double distance = PoseHelpers.distanceBetween(currentPose, reefSpot);
-      if (distance < nearestDistance) {
-        targetReefSpot = reefSpot;
-        nearestDistance = distance;
-      }
-    }
+    // Pose2d targetReefSpot = reefSpots.get(0);
+    // double nearestDistance = PoseHelpers.distanceBetween(currentPose,
+    // targetReefSpot);
+    // for (Pose2d reefSpot : reefSpots) {
+    // double distance = PoseHelpers.distanceBetween(currentPose, reefSpot);
+    // if (distance < nearestDistance) {
+    // targetReefSpot = reefSpot;
+    // nearestDistance = distance;
+    // }
+    // }
 
-    Logger.recordOutput("Odometry/MoveToNearestReefSpot/CurrentPose",
-        currentPose);
-    Logger.recordOutput("Odometry/MoveToNearestReefSpot/TargetPose",
-        targetReefSpot);
+    // Logger.recordOutput("Odometry/MoveToNearestReefSpot/CurrentPose",
+    // currentPose);
+    // Logger.recordOutput("Odometry/MoveToNearestReefSpot/TargetPose",
+    // targetReefSpot);
 
-    targetRadians = targetReefSpot.getRotation().getRadians();
+    // targetRadians = targetReefSpot.getRotation().getRadians();
 
-    // Make adjustments to the robot
-    double currentRotation = currentPose.getRotation().getRadians();
-    rotationController.calculate(MathUtil.angleModulus(currentRotation - targetRadians), 0);
+    // // Make adjustments to the robot
+    // double currentRotation = currentPose.getRotation().getRadians();
+    // rotationController.calculate(MathUtil.angleModulus(currentRotation -
+    // targetRadians), 0);
 
   }
 
@@ -106,28 +108,42 @@ public class RotateTowardsReefWithDriveCmd extends Command {
 
     ArrayList<Pose2d> reefSpots = new ArrayList<Pose2d>();
     for (Pose3d reefTagPose : reefTagPoses) {
-      reefSpots.add(PoseHelpers.toPose2d(reefTagPose).transformBy(ReefConstants.kOffsetFromTag));
+      reefSpots.add(PoseHelpers.toPose2d(reefTagPose));
     }
 
-    Pose2d targetReefSpot = reefSpots.get(0);
-    double nearestDistance = PoseHelpers.distanceBetween(currentPose, targetReefSpot);
+    Pose2d targetReefTagPose = reefSpots.get(0);
+    double nearestDistance = PoseHelpers.distanceBetween(currentPose, targetReefTagPose);
     for (Pose2d reefSpot : reefSpots) {
       double distance = PoseHelpers.distanceBetween(currentPose, reefSpot);
       if (distance < nearestDistance) {
-        targetReefSpot = reefSpot;
+        targetReefTagPose = reefSpot;
         nearestDistance = distance;
       }
     }
 
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/CurrentPose",
         currentPose);
-    Logger.recordOutput("Odometry/MoveToNearestReefSpot/TargetPose",
-        targetReefSpot);
+    Logger.recordOutput("Odometry/MoveToNearestReefSpot/TargetReefTagPose",
+        targetReefTagPose);
 
-    targetRadians = targetReefSpot.getRotation().getRadians();
+    double angle = targetReefTagPose.getRotation().getRadians();
+
+    // define a normal line that extends out of the tag
+    double normalSlope = Math.tan(angle);
+    double normalYInt = targetReefTagPose.getY() - normalSlope * targetReefTagPose.getX();
+
+    // define a perpendiculat line intersecting the robot
+    double botSlope = 1 / normalSlope;
+    double botYInt = currentPose.getY() - botSlope * currentPose.getX();
+
+    targetX = (normalYInt - botYInt) / (botSlope - normalSlope);
+    targetY = normalSlope * targetX + normalYInt;
+    targetRadians = targetReefTagPose.getRotation().getRadians();
 
     // Make adjustments to the robot
     double directionRot = 0;
+    double directionX = 0;
+    double directionY = 0;
 
     double currentRotation = currentPose.getRotation().getRadians();
 
@@ -139,15 +155,32 @@ public class RotateTowardsReefWithDriveCmd extends Command {
     if (rotationController.atSetpoint()) {
       directionRot = 0;
     }
+    directionX = (translationControllerX.calculate(currentPose.getX(), targetX) * 2) - 1;
+    directionY = (translationControllerY.calculate(currentPose.getY(), targetY) * 2) - 1;
+    if (rotationController.atSetpoint()) {
+      directionRot = 0;
+    }
+    if (translationControllerX.atSetpoint()) {
+      directionX = 0;
+    }
+    if (translationControllerY.atSetpoint()) {
+      directionY = 0;
+    }
+
+    double forwardsBackwardsVel = forwardsBackwardsSupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
 
     // Convert calculated value to velocity
-    double xVel = xSupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
-    double yVel = ySupplier.get() * DriveConstants.kMaxSpeedMetersPerSecond;
+    double xVel = (directionX * DriveConstants.kMaxSpeedMetersPerSecond)
+        - (forwardsBackwardsVel * Math.cos(targetRadians));
+    double yVel = (directionY * DriveConstants.kMaxSpeedMetersPerSecond)
+        - (forwardsBackwardsVel * Math.sin(targetRadians));
+
     double rotVel = DriveConstants.kBangBangRotationalVelocityRadiansPerSecond * directionRot;
 
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel, yVel, rotVel);
-    driveSub.runVelocityRobotRelative(chassisSpeeds);
+    driveSub.runVelocityFieldRelative(chassisSpeeds);
 
+    Logger.recordOutput("Odometry/MoveToNearestReefSpot/InputForwardsBackwardsVel", forwardsBackwardsVel);
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/OutputDirectionRotation", directionRot);
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/OutputVelocityRotation", rotVel);
     Logger.recordOutput("Odometry/MoveToNearestReefSpot/OutputChassisSpeeds", chassisSpeeds);
@@ -163,21 +196,5 @@ public class RotateTowardsReefWithDriveCmd extends Command {
   @Override
   public boolean isFinished() {
     return false;
-  }
-
-  public ChassisSpeeds snapToLine(Pose3d tagPose, Pose2d robotPose) {
-    double angle = tagPose.getRotation().getZ();
-
-    // define a normal line that extends out of the tag
-    double normalSlope = Math.tan(angle);
-    double normalYInt = tagPose.getY() - normalSlope * tagPose.getX();
-
-    // define a perpendiculat line intersecting the robot
-    double botSlope = 1 / normalSlope;
-    double botYInt = robotPose.getY() - botSlope * tagPose.getX();
-
-    double targetX = (normalYInt - botYInt) / (botSlope - normalSlope);
-    double targetY = normalSlope * targetX + normalYInt;
-
   }
 }
