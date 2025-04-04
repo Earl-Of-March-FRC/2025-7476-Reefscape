@@ -14,6 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
@@ -139,6 +140,9 @@ public class RotateTowardsReefWithDriveCmd extends Command {
     targetX = (normalYInt - botYInt) / (botSlope - normalSlope);
     targetY = normalSlope * targetX + normalYInt;
     targetRadians = targetReefTagPose.getRotation().getRadians();
+
+    Logger.recordOutput("Odometry/MoveToNearestReefSpot/TargetPose",
+        new Pose2d(targetX, targetY, Rotation2d.fromRadians(targetRadians)));
 
     // Make adjustments to the robot
     double directionRot = 0;
