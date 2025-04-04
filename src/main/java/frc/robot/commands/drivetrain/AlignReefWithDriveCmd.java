@@ -187,12 +187,10 @@ public class AlignReefWithDriveCmd extends Command {
       }
     }
 
-    
-
     // Convert calculated value to velocity
-    double xVel = (directionX * DriveConstants.kMaxSpeedMetersPerSecond)
+    double xVel = (directionX * DriveConstants.kBangBangTranslationalVelocityMetersPerSecond)
         - (forwardsBackwardsVel * Math.cos(targetRadians));
-    double yVel = (directionY * DriveConstants.kMaxSpeedMetersPerSecond)
+    double yVel = (directionY * DriveConstants.kBangBangTranslationalVelocityMetersPerSecond)
         - (forwardsBackwardsVel * Math.sin(targetRadians));
 
     double rotVel = DriveConstants.kBangBangRotationalVelocityRadiansPerSecond * directionRot;
