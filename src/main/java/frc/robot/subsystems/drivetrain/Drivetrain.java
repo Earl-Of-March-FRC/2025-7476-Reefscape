@@ -525,6 +525,17 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /**
+   * Gets the current chassis speeds relative to the field.
+   * 
+   * @return A ChassisSpeeds object representing the field-relative chassis
+   *         speeds.
+   */
+  public ChassisSpeeds getChassisSpeedsFieldRelative() {
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeedsRobotRelative(),
+        odometry.getEstimatedPosition().getRotation());
+  }
+
+  /**
    * Get an estimate of the robot's pose using vision data from PhotonVisision.
    * This method will filter out invalid and unprobable results.
    * 

@@ -26,7 +26,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.utils.PoseHelpers;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class AlignReefWithDriveCmd extends Command {
+public class AlignReefWithDriveBangBangCmd extends Command {
   private Supplier<Double> forwardsBackwardsSupplier;
 
   private final Drivetrain driveSub;
@@ -37,14 +37,14 @@ public class AlignReefWithDriveCmd extends Command {
   private double targetX, targetY, targetRadians;
 
   /** Creates a new PathfindToReefSpotCmd. */
-  public AlignReefWithDriveCmd(
+  public AlignReefWithDriveBangBangCmd(
       Drivetrain driveSub, Supplier<Double> forwardsBackwardsSupplier) {
     this.driveSub = driveSub;
     this.forwardsBackwardsSupplier = forwardsBackwardsSupplier;
     addRequirements(driveSub);
   }
 
-  public AlignReefWithDriveCmd(Drivetrain driveSub) {
+  public AlignReefWithDriveBangBangCmd(Drivetrain driveSub) {
     this(driveSub, () -> 0.0);
   }
 
@@ -187,12 +187,10 @@ public class AlignReefWithDriveCmd extends Command {
       }
     }
 
-    
-
     // Convert calculated value to velocity
-    double xVel = (directionX * DriveConstants.kMaxSpeedMetersPerSecond)
+    double xVel = (directionX * DriveConstants.kBangBangTranslationalVelocityMetersPerSecond)
         - (forwardsBackwardsVel * Math.cos(targetRadians));
-    double yVel = (directionY * DriveConstants.kMaxSpeedMetersPerSecond)
+    double yVel = (directionY * DriveConstants.kBangBangTranslationalVelocityMetersPerSecond)
         - (forwardsBackwardsVel * Math.sin(targetRadians));
 
     double rotVel = DriveConstants.kBangBangRotationalVelocityRadiansPerSecond * directionRot;
@@ -200,10 +198,10 @@ public class AlignReefWithDriveCmd extends Command {
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVel, yVel, rotVel);
     driveSub.runVelocityFieldRelative(chassisSpeeds);
 
-    Logger.recordOutput("Odometry/MoveToNearestReefSpot/InputForwardsBackwardsVel", forwardsBackwardsVel);
-    Logger.recordOutput("Odometry/MoveToNearestReefSpot/OutputDirectionRotation", directionRot);
-    Logger.recordOutput("Odometry/MoveToNearestReefSpot/OutputVelocityRotation", rotVel);
-    Logger.recordOutput("Odometry/MoveToNearestReefSpot/OutputChassisSpeeds", chassisSpeeds);
+    Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/InputForwardsBackwardsVel", forwardsBackwardsVel);
+    Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputDirectionRotation", directionRot);
+    Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputVelocityRotation", rotVel);
+    Logger.recordOutput("Odometry/MoveToNearestReefSpot/BangBang/OutputChassisSpeeds", chassisSpeeds);
 
   }
 
