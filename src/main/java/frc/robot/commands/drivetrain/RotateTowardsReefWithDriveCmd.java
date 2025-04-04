@@ -162,12 +162,13 @@ public class RotateTowardsReefWithDriveCmd extends Command {
       directionRot = 0;
     }
     directionX = (translationControllerX.calculate(currentPose.getX(), targetX) * 2) - 1;
-    directionY = (translationControllerY.calculate(currentPose.getY(), targetY) * 2) - 1;
-    if (rotationController.atSetpoint()) {
-      directionRot = 0;
-    }
     if (translationControllerX.atSetpoint()) {
       directionX = 0;
+    }
+    directionY = (translationControllerY.calculate(currentPose.getY(), targetY) * 2) - 1;
+
+    if (translationControllerY.atSetpoint()) {
+      directionY = 0;
     }
 
     if (DriverStation.getAlliance().isPresent()) {
