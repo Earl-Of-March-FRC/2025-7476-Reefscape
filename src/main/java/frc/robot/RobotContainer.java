@@ -11,25 +11,22 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.commands.drivetrain.*;
+import frc.robot.commands.StripAlgaeCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
 import frc.robot.commands.indexer.IndexToBeamBreakCmd;
@@ -37,7 +34,6 @@ import frc.robot.commands.indexer.IndexerSetVelocityManualCmd;
 import frc.robot.commands.intake.IntakeSetVelocityManualCmd;
 import frc.robot.commands.launcher.LauncherSetVelocityPIDCmd;
 import frc.robot.commands.launcher.LauncherStopCmd;
-import frc.robot.commands.vision.GoToAlgaeCmd;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Gyro;
@@ -47,7 +43,6 @@ import frc.robot.subsystems.indexer.BeamBreakSensor;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
-import frc.robot.subsystems.vision.AlgaeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -67,12 +62,13 @@ public class RobotContainer {
   private final IntakeSubsystem intakeSub;
   private final Indexer indexerSub;
   private final Launcher launcherSub;
-  private final AlgaeSubsystem algaeSubsystem;
 
   private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
   private final CommandXboxController operatorController = new CommandXboxController(
       OIConstants.kOperatorControllerPort);
+
+  private final SlewRateLimiter intakeLimiter = new SlewRateLimiter(5);
 
   // Register Named Commands
 
@@ -83,21 +79,6 @@ public class RobotContainer {
    */
   public RobotContainer() {
     gyro = new GyroNavX();
-
-    driveSub = new Drivetrain(
-        new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
-            DriveConstants.kFrontLeftTurningCanId,
-            DriveConstants.kFrontLeftChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
-            DriveConstants.kFrontRightTurningCanId,
-            DriveConstants.kFrontRightChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
-            DriveConstants.kRearLeftTurningCanId,
-            DriveConstants.kBackLeftChassisAngularOffset),
-        new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
-            DriveConstants.kRearRightTurningCanId,
-            DriveConstants.kBackRightChassisAngularOffset),
-        gyro);
 
     armSub = new ArmSubsystem(new SparkMax(ArmConstants.kMotorCanId, ArmConstants.kMotorType),
         ArmConstants.kLimitSwitchChannel);
@@ -114,12 +95,27 @@ public class RobotContainer {
         new SparkMax(LauncherConstants.kFrontCanId, LauncherConstants.kMotorType),
         new SparkMax(LauncherConstants.kBackCanId, LauncherConstants.kMotorType));
 
-    algaeSubsystem = new AlgaeSubsystem(() -> driveSub.getPose());
+    driveSub = new Drivetrain(
+        new MAXSwerveModule(DriveConstants.kFrontLeftDrivingCanId,
+            DriveConstants.kFrontLeftTurningCanId,
+            DriveConstants.kFrontLeftChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kFrontRightDrivingCanId,
+            DriveConstants.kFrontRightTurningCanId,
+            DriveConstants.kFrontRightChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kRearLeftDrivingCanId,
+            DriveConstants.kRearLeftTurningCanId,
+            DriveConstants.kBackLeftChassisAngularOffset),
+        new MAXSwerveModule(DriveConstants.kRearRightDrivingCanId,
+            DriveConstants.kRearRightTurningCanId,
+            DriveConstants.kBackRightChassisAngularOffset),
+        gyro, launcherSub::isUsingHighVelocities);
 
     // Register named Commands
     NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
     NamedCommands.registerCommand("ArmL2", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL2));
+    NamedCommands.registerCommand("ArmL3", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL3));
     NamedCommands.registerCommand("ArmStow", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleStowed));
+    NamedCommands.registerCommand("StripAlgae", new StripAlgaeCmd(intakeSub, armSub));
     NamedCommands.registerCommand("LauncherIntake",
         new LauncherSetVelocityPIDCmd(launcherSub, () -> -launcherSub.getPreferredFrontVelocity(),
             () -> -launcherSub.getPreferredBackVelocity()));
@@ -184,17 +180,43 @@ public class RobotContainer {
     // Manual intake (arm roller) control with
     intakeSub.setDefaultCommand(
         new IntakeSetVelocityManualCmd(intakeSub,
-            () -> MathUtil.applyDeadband(
+            () -> intakeLimiter.calculate(MathUtil.applyDeadband(
                 operatorController.getRawAxis(
                     OIConstants.kOperatorIntakeManualAxis),
-                OIConstants.kIntakeDeadband)));
+                OIConstants.kIntakeDeadband))));
 
     // DRIVER CONTROLLER
 
     // Drive commands
     driverController.b().onTrue(new CalibrateGyroCmd(driveSub));
-    driverController.a().whileTrue(new MoveToNearestBargeLaunchingZoneBangBangCmd(driveSub));
-    driverController.x().whileTrue(new MoveToNearestBargeLaunchingZonePIDCmd(driveSub));
+    driverController.x().whileTrue(new AlignReefWithDriveBangBangCmd(
+        driveSub,
+        () -> MathUtil.applyDeadband(
+            driverController.getRawAxis(
+                OIConstants.kDriverControllerYAxis),
+            OIConstants.kDriveDeadband),
+        () -> MathUtil.applyDeadband(
+            driverController.getRawAxis(
+                OIConstants.kDriverControllerXAxis),
+            OIConstants.kDriveDeadband)));
+
+    // Move to barge launching zone, facing in the specified direction
+    driverController.povLeft().whileTrue(
+        new MoveToPoseBangBangCmd(driveSub,
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleLeft),
+            false));
+    driverController.povUp().whileTrue(
+        new MoveToPoseBangBangCmd(driveSub,
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight),
+            false));
+    driverController.a().whileTrue(
+        new MoveToPoseBangBangCmd(driveSub,
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight),
+            false));
+    driverController.povRight().whileTrue(
+        new MoveToPoseBangBangCmd(driveSub,
+            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight),
+            false));
 
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
@@ -208,9 +230,8 @@ public class RobotContainer {
 
     // Indexer commands
     driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
-
     driverController.leftBumper().whileTrue(
-        new IndexerSetVelocityManualCmd(indexerSub, () -> -1));
+        new IndexerSetVelocityManualCmd(indexerSub, () -> -0.75));
     driverController.rightBumper().whileTrue(
         new IndexerSetVelocityManualCmd(indexerSub, () -> 1));
 
@@ -242,7 +263,24 @@ public class RobotContainer {
         new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleCoral));
 
     // Indexer command
-    operatorController.b().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
+    // operatorController.b().onTrue(new IndexToBeamBreakCmd(indexerSub, () ->
+    // 0.75));
+    operatorController.y().onTrue(Commands.runOnce(() -> {
+      launcherSub.setUseHighVelocities(true);
+      launcherSub.setReferenceVelocityOffset(0);
+    }));
+    operatorController.a().onTrue(Commands.runOnce(() -> {
+      launcherSub.setUseHighVelocities(false);
+      launcherSub.setReferenceVelocityOffset(0);
+    }));
+    operatorController.x()
+        .onTrue(Commands.runOnce(() -> {
+          launcherSub.increaseReferenceVelocityOffset(LauncherConstants.kBumpOffsetRPM);
+        }));
+    operatorController.b()
+        .onTrue(Commands.runOnce(() -> {
+          launcherSub.increaseReferenceVelocityOffset(-LauncherConstants.kBumpOffsetRPM);
+        }));
 
     // Bump arm setpoints
     operatorController.leftBumper().whileTrue(
@@ -262,6 +300,7 @@ public class RobotContainer {
   private void configureAutos() {
     autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+    autoChooser.addOption("CalibrateGyro", new CalibrateGyroCmd(driveSub));
     autoChooser.addOption("TimedAutoDrive", new TimedAutoDrive(driveSub));
     autoChooser.addOption("EncoderAutoDrive", new EncoderAutoDrive(driveSub));
     SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());

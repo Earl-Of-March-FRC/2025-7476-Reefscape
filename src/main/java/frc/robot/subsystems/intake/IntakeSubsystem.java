@@ -64,7 +64,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   /**
-   * Stops the intake motor.
+   * Stops the intake motor using percent output.
    */
   public void stopIntake() {
     setVelocity(0);

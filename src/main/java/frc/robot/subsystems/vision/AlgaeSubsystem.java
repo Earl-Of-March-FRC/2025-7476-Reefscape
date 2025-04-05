@@ -11,7 +11,6 @@ import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import com.pathplanner.lib.path.EventMarker;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
@@ -52,13 +51,14 @@ public class AlgaeSubsystem extends SubsystemBase {
   }
 
   private boolean updateTargetPose() {
-    var result = camera1.getLatestResult();
-
+    var results = camera1.getAllUnreadResults();
     // If no targets, return false
-    if (!result.hasTargets()) {
+    if (results.isEmpty() || !results.get(0).hasTargets()) {
       SmartDashboard.putBoolean("Algae Detected", false);
       return false;
     }
+
+    var result = results.get(0);
 
     PhotonTrackedTarget target = result.getBestTarget();
     double targetYaw = target.getYaw();

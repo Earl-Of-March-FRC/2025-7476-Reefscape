@@ -7,6 +7,7 @@ package frc.robot.subsystems.drivetrain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
@@ -26,6 +27,7 @@ import com.pathplanner.lib.path.Waypoint;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -38,9 +40,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,6 +52,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Vision.PhotonConstants;
+import frc.utils.PoseHelpers;
 
 /**
  * The Drivetrain class represents the robot's drivetrain subsystem.
@@ -66,6 +69,7 @@ public class Drivetrain extends SubsystemBase {
   public boolean gyroDisconnected;
   public boolean hasVisionData = false;
   public boolean isFieldRelative = true;
+  public Supplier<Boolean> isUsingHighVelocities = () -> true;
   Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   // Current pose of the robot
@@ -73,12 +77,10 @@ public class Drivetrain extends SubsystemBase {
   Pose2d visionlessPose = new Pose2d();
 
   // Cameras & Photonvision variables
-  private final PhotonCamera camera1;
-  private final PhotonCamera camera2;
+  private final PhotonCamera[] cameras = new PhotonCamera[PhotonConstants.numCameras];
 
   // Photonvision -> Guess where the robot is on the field
-  private final PhotonPoseEstimator photonPoseEstimator1;
-  private final PhotonPoseEstimator photonPoseEstimator2;
+  private final PhotonPoseEstimator[] photonPoseEstimators = new PhotonPoseEstimator[PhotonConstants.numCameras];
 
   // Odometry class for tracking the robot's position on the field
   SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(
@@ -110,6 +112,26 @@ public class Drivetrain extends SubsystemBase {
   /**
    * Constructor for the Drivetrain class.
    * Initializes the swerve modules and gyro sensor.
+   * 
+   * @param moduleFL              Front-left swerve module
+   * @param moduleFR              Front-right swerve module
+   * @param moduleBL              Back-left swerve module
+   * @param moduleBR              Back-right swerve module
+   * @param gyro                  Gyro sensor
+   * @param isUsingHighVelocities If the robot is launching with high velocities
+   */
+  public Drivetrain(MAXSwerveModule moduleFL, MAXSwerveModule moduleFR, MAXSwerveModule moduleBL,
+      MAXSwerveModule moduleBR, Gyro gyro, Supplier<Boolean> isUsingHighVelocities) {
+    this(moduleFL, moduleFR, moduleBL, moduleBR, gyro);
+    this.isUsingHighVelocities = isUsingHighVelocities;
+  }
+
+  /**
+   * Constructor for the Drivetrain class.
+   * Initializes the swerve modules and gyro sensor.
+   * Assumes the robot is launching with high velocities.
+   * See
+   * {@link #Drivetrain(MAXSwerveModule, MAXSwerveModule, MAXSwerveModule, MAXSwerveModule, Gyro, Supplier)}
    * 
    * @param moduleFL Front-left swerve module
    * @param moduleFR Front-right swerve module
@@ -153,19 +175,16 @@ public class Drivetrain extends SubsystemBase {
         this);
 
     // Setup cameras to see april tags. Wow! That makes me really happy.
-    camera1 = new PhotonCamera(PhotonConstants.kCamera1);
-    camera2 = new PhotonCamera(PhotonConstants.kCamera2);
+    for (int i = 0; i < PhotonConstants.numCameras; i++) {
+      cameras[i] = new PhotonCamera(PhotonConstants.kCameras[i]);
+      photonPoseEstimators[i] = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
+          PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+          PhotonConstants.kRobotToCams[i]);
+    }
 
     // Log april tag poses to logger
     FieldConstants.kfieldLayout.getTags()
         .forEach((tag) -> Logger.recordOutput("FieldLayout/AprilTags/" + tag.ID, tag.pose));
-
-    photonPoseEstimator1 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
-        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        PhotonConstants.kRobotToCam1);
-    photonPoseEstimator2 = new PhotonPoseEstimator(FieldConstants.kfieldLayout,
-        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        PhotonConstants.kRobotToCam2);
   }
 
   /**
@@ -191,61 +210,74 @@ public class Drivetrain extends SubsystemBase {
       visionlessPose = visionlessOdometry.update(gyroAngle, positions);
     }
 
-    photonPoseEstimator1.addHeadingData(Timer.getFPGATimestamp(), gyroAngle);
-    photonPoseEstimator2.addHeadingData(Timer.getFPGATimestamp(), gyroAngle);
-    photonPoseEstimator1.setReferencePose(pose);
-    photonPoseEstimator2.setReferencePose(pose);
-
-    List<EstimatedRobotPose> visionPoses1 = getEstimatedGlobalPose1(pose);
-    List<EstimatedRobotPose> visionPoses2 = getEstimatedGlobalPose2(pose);
-
     hasVisionData = false;
-    List<Integer> fiducialIds1 = new ArrayList<>();
-    List<Integer> fiducialIds2 = new ArrayList<>();
-    for (EstimatedRobotPose visionPose1 : visionPoses1) {
-      Logger.recordOutput("Vision/" + camera1.getName() + "/EstimatedPose", visionPose1.estimatedPose);
 
-      // Add targets to list
-      for (PhotonTrackedTarget target : visionPose1.targetsUsed) {
-        fiducialIds1.add(target.fiducialId);
+    for (int i = 0; i < PhotonConstants.numCameras; i++) {
+      List<EstimatedRobotPose> visionPoses = getEstimatedGlobalPose(photonPoseEstimators[i], cameras[i],
+          PhotonConstants.kRobotToCams[i],
+          pose);
+
+      List<Integer> fiducialIds = new ArrayList<>();
+      List<Pose3d> fiducialIdPoses = new ArrayList<>();
+      List<Double> tagAreas = new ArrayList<>();
+      List<Double> tagAmbiguities = new ArrayList<>();
+      for (EstimatedRobotPose visionPose : visionPoses) {
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/EstimatedPose", visionPose.estimatedPose);
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/Timestamp", visionPose.timestampSeconds);
+
+        // Add targets to list
+        for (PhotonTrackedTarget target : visionPose.targetsUsed) {
+          fiducialIds.add(target.fiducialId);
+          if (FieldConstants.kfieldLayout.getTagPose(target.fiducialId).isPresent()) {
+            fiducialIdPoses.add(FieldConstants.kfieldLayout.getTagPose(target.fiducialId).get());
+          }
+          tagAreas.add(target.area);
+          tagAmbiguities.add(target.poseAmbiguity);
+
+          // if (target.fiducialId == 10) {
+          // Transform3d camToTarget = target.bestCameraToTarget;
+          // Transform3d robotToTag = new Transform3d(0.825, 0, 0.5715, new Rotation3d(0,
+          // 0,
+          // Math.PI));
+          // // Transform3d robotToTag = new Transform3d(2, 0, 0.5715, new Rotation3d());
+          // // Pose3d robotToCam = TagUtils.getRobotPose3dFromCamera(camToTarget,
+          // // robotToTag);
+          // Transform3d robotToCam = TagUtils.getRobotPose3dFromCamera(camToTarget,
+          // robotToTag);
+          // Logger.recordOutput("Vision/" + cameras[i].getName() + "/TagUtil",
+          // robotToCam);
+          // }
+        }
+
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetIds",
+            fiducialIds.stream().mapToInt(n -> n).toArray());
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetPoses",
+            fiducialIdPoses.toArray(new Pose3d[fiducialIdPoses.size()]));
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetAreas",
+            tagAreas.stream().mapToDouble(n -> n).toArray());
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetAmbiguities",
+            tagAmbiguities.stream().mapToDouble(n -> n).toArray());
+
+        Pose2d estimatedPose = PoseHelpers.toPose2d(visionPose.estimatedPose);
+        Vector<N3> standardDeviation = PhotonConstants.kCameraStandardDeviations.get(i);
+
+        // if (i != 1) {
+        odometry.setVisionMeasurementStdDevs(standardDeviation);
+        odometry.addVisionMeasurement(estimatedPose, visionPose.timestampSeconds);
+        hasVisionData = true;
+        // }
+
       }
-
-      Pose3d visionPose = visionPose1.estimatedPose;
-      Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
-          new Rotation2d(visionPose.getRotation().getZ()));
-      odometry.addVisionMeasurement(estimatedPose, visionPose1.timestampSeconds);
-      Logger.recordOutput("Vision/" + camera1.getName() + "/Timestamp", visionPose1.timestampSeconds);
-      hasVisionData = true;
-    }
-    if (visionPoses1.isEmpty()) {
-      Logger.recordOutput("Vision/" + camera1.getName() + "/EstimatedPose", new Pose3d(-1, -1, -1, new Rotation3d()));
-      Logger.recordOutput("Vision/" + camera1.getName() + "/Timestamp", -1.0);
-    }
-
-    for (EstimatedRobotPose visionPose2 : visionPoses2) {
-      Logger.recordOutput("Vision/" + camera2.getName() + "/EstimatedPose", visionPose2.estimatedPose);
-
-      // Add targets to list
-      for (PhotonTrackedTarget target : visionPose2.targetsUsed) {
-        fiducialIds2.add(target.fiducialId);
+      if (visionPoses.isEmpty()) {
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/EstimatedPose",
+            new Pose3d(-1, -1, -1, new Rotation3d()));
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/Timestamp", -1.0);
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetIds", new int[0]);
+        Logger.recordOutput("Vision/" + cameras[i].getName() + "/TargetPoses", new Pose3d[0]);
       }
+    }
 
-      Pose3d visionPose = visionPose2.estimatedPose;
-      Pose2d estimatedPose = new Pose2d(visionPose.getX(), visionPose.getY(),
-          new Rotation2d(visionPose.getRotation().getZ()));
-      odometry.addVisionMeasurement(estimatedPose, visionPose2.timestampSeconds);
-      Logger.recordOutput("Vision/" + camera2.getName() + "/Timestamp", visionPose2.timestampSeconds);
-      hasVisionData = true;
-    }
-    if (visionPoses2.isEmpty()) {
-      Logger.recordOutput("Vision/" + camera2.getName() + "/EstimatedPose", new Pose3d());
-      Logger.recordOutput("Vision/" + camera2.getName() + "/Timestamp", -1.0);
-    }
     SmartDashboard.putBoolean("HasVision", hasVisionData);
-
-    // Log april tags to the logger
-    Logger.recordOutput("Vision/" + camera1.getName() + "/TargetIds", fiducialIds1.toString());
-    Logger.recordOutput("Vision/" + camera2.getName() + "/TargetIds", fiducialIds2.toString());
 
     // Log the current pose to the logger
     Logger.recordOutput("Odometry/WithVisionInput", pose);
@@ -275,9 +307,13 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Distance to Barge", distanceToBarge);
     SmartDashboard.putNumber("Distance to Barge (x)", xDistanceToBarge);
 
-    SmartDashboard.putBoolean("FarFromBargeLaunchingRange", xDistanceToBarge > LaunchingDistances.kMetersFromBarge);
+    SmartDashboard.putBoolean("FarFromBargeLaunchingRange",
+        xDistanceToBarge > (isUsingHighVelocities.get() ? LaunchingDistances.kMetersFromBargeHigh
+            : LaunchingDistances.kMetersFromBargeLow));
     SmartDashboard.putBoolean("WithinBargeLaunchingRange", MathUtil.isNear(xDistanceToBarge,
-        LaunchingDistances.kMetersFromBarge, LaunchingDistances.kToleranceMetersFromBarge));
+        (isUsingHighVelocities.get() ? LaunchingDistances.kMetersFromBargeHigh
+            : LaunchingDistances.kMetersFromBargeLow),
+        LaunchingDistances.kToleranceMetersFromBarge));
 
     Logger.recordOutput("Vision/Bardge/DistanceToBardge", distanceToBarge);
     Logger.recordOutput("Vision/Bardge/DistanceToBargeX", xDistanceToBarge);
@@ -288,15 +324,16 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putBoolean("GyroDisconnected", gyroDisconnected);
 
     // Log which side the robot is on
-    Logger.recordOutput("Odometry/IsOnBlueSide",
-
-        isOnBlueSide());
+    Logger.recordOutput("Odometry/IsOnBlueSide", PoseHelpers.isOnBlueSide(getPose()));
   }
 
   /**
    * Runs the drivetrain at the specified velocities relative to the field.
    * 
-   * @param speeds The desired chassis speeds
+   * @see #runVelocity(ChassisSpeeds, Boolean)
+   * @see #runVelocityRobotRelative(ChassisSpeeds)
+   * 
+   * @param speeds The desired field relative chassis speeds
    */
   public void runVelocityFieldRelative(ChassisSpeeds speeds) {
     runVelocity(speeds, true);
@@ -305,7 +342,10 @@ public class Drivetrain extends SubsystemBase {
   /**
    * Runs the drivetrain at the specified velocities relative to the robot.
    * 
-   * @param speeds The desired chassis speeds
+   * @see #runVelocity(ChassisSpeeds, Boolean)
+   * @see #runVelocityFieldRelative(ChassisSpeeds)
+   * 
+   * @param speeds The desired robot relative chassis speeds
    */
   public void runVelocityRobotRelative(ChassisSpeeds speeds) {
     runVelocity(speeds, false);
@@ -313,6 +353,9 @@ public class Drivetrain extends SubsystemBase {
 
   /**
    * Runs the drivetrain at the specified velocities.
+   * 
+   * @see #runVelocityFieldRelative(ChassisSpeeds)
+   * @see #runVelocityRobotRelative(ChassisSpeeds)
    * 
    * @param speeds          The desired chassis speeds
    * @param isFieldRelative Whether the speeds are relative to the field
@@ -376,19 +419,10 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /**
-   * Gets the current chassis speeds relative to the robot.
+   * Sets the current pose of the robot into odometry.
    * 
-   * @return A ChassisSpeeds object representing the robot-relative chassis
-   *         speeds.
+   * @param pose A Pose2d object representing the current pose of the robot.
    */
-  public ChassisSpeeds getRobotRelativeChassisSpeeds() {
-    return DriveConstants.kDriveKinematics.toChassisSpeeds(
-        modules[0].getState(),
-        modules[1].getState(),
-        modules[2].getState(),
-        modules[3].getState());
-  }
-
   public void setOdometry(Pose2d pose) {
     odometry.resetPosition(gyro.getRotation2d(), getModulePositions(), pose);
     visionlessOdometry.resetPosition(gyro.getRotation2d(), getModulePositions(), pose);
@@ -410,6 +444,12 @@ public class Drivetrain extends SubsystemBase {
     return pose;
   }
 
+  /**
+   * Gets the current chassis speeds relative to the robot.
+   * 
+   * @return A ChassisSpeeds object representing the robot-relative chassis
+   *         speeds.
+   */
   public ChassisSpeeds getChassisSpeedsRobotRelative() {
     return DriveConstants.kDriveKinematics.toChassisSpeeds(
         modules[0].getState(),
@@ -418,16 +458,32 @@ public class Drivetrain extends SubsystemBase {
         modules[3].getState());
   }
 
-  public Pose2d convertPose3d(Pose3d p) {
-    double x = p.getX();
-    double y = p.getY();
-    Rotation2d rot = new Rotation2d(p.getRotation().getAngle());
-    return new Pose2d(x, y, rot);
+  /**
+   * Gets the current chassis speeds relative to the field.
+   * 
+   * @return A ChassisSpeeds object representing the field-relative chassis
+   *         speeds.
+   */
+  public ChassisSpeeds getChassisSpeedsFieldRelative() {
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeedsRobotRelative(),
+        odometry.getEstimatedPosition().getRotation());
   }
 
+  /**
+   * Get an estimate of the robot's pose using vision data from PhotonVisision.
+   * This method will filter out invalid and unprobable results.
+   * 
+   * @param poseEstimator The PhotonPoseEstimator object to use for
+   *                      estimating the robot's pose
+   * @param camera        The PhotonCamera object to use for getting vision data
+   * @param robotToCam    The Transform3d object representing the transformation
+   *                      from the robot to the camera
+   */
   public List<EstimatedRobotPose> getEstimatedGlobalPose(PhotonPoseEstimator poseEstimator, PhotonCamera camera,
       Transform3d robotToCam,
       Pose2d prevEstimatedRobotPose) {
+    poseEstimator.setReferencePose(prevEstimatedRobotPose);
+
     List<EstimatedRobotPose> results = new ArrayList<>();
     List<PhotonPipelineResult> camResults = camera.getAllUnreadResults();
 
@@ -443,8 +499,8 @@ public class Drivetrain extends SubsystemBase {
 
         Logger.recordOutput("Vision/" + camera.getName() + "/RawEstimatedPose", estimation.estimatedPose);
 
-        if (isInField(estimation.estimatedPose) &&
-            isOnGround(estimation.estimatedPose)) {
+        if (PoseHelpers.isInField(estimation.estimatedPose) &&
+            PoseHelpers.isOnGround(estimation.estimatedPose, PhotonConstants.kHeightTolerance)) {
 
           // ignore the result if it only has one tag and the tag is too small
           if (camResult.getTargets().size() == 1
@@ -493,14 +549,15 @@ public class Drivetrain extends SubsystemBase {
             Logger.recordOutput("Vision/" + camera.getName() + "/FallbackAltPose", altRobotPose);
 
             // check if they are reasonable
-            boolean isBestPoseValid = isInField(bestRobotPose) &&
-                isOnGround(bestRobotPose);
-            boolean isAltPoseValid = isInField(altRobotPose) && isOnGround(altRobotPose);
+            boolean isBestPoseValid = PoseHelpers.isInField(bestRobotPose) &&
+                PoseHelpers.isOnGround(bestRobotPose, PhotonConstants.kHeightTolerance);
+            boolean isAltPoseValid = PoseHelpers.isInField(altRobotPose)
+                && PoseHelpers.isOnGround(altRobotPose, PhotonConstants.kHeightTolerance);
             if (isBestPoseValid && isAltPoseValid) {
               targetsUsed.add(target);
               // if both are valid, use the one that is closer to the previous estimation
-              double bestDistance = distanceBetween(bestRobotPose, new Pose3d(prevEstimatedRobotPose));
-              double altDistance = distanceBetween(altRobotPose, new Pose3d(prevEstimatedRobotPose));
+              double bestDistance = PoseHelpers.distanceBetween(bestRobotPose, new Pose3d(prevEstimatedRobotPose));
+              double altDistance = PoseHelpers.distanceBetween(altRobotPose, new Pose3d(prevEstimatedRobotPose));
               if (bestDistance < altDistance) {
                 validPoses.add(bestRobotPose);
               } else {
@@ -521,7 +578,7 @@ public class Drivetrain extends SubsystemBase {
           // robotTransform = tagTransform - camToTarget - robotToCam
           Pose3d robotPose = tagPose.transformBy(camToTarget.inverse()).transformBy(robotToCam.inverse());
           // check if the pose is reasonable
-          if (isInField(robotPose) && isOnGround(robotPose)) {
+          if (PoseHelpers.isInField(robotPose) && PoseHelpers.isOnGround(robotPose, PhotonConstants.kHeightTolerance)) {
             validPoses.add(robotPose);
             targetsUsed.add(target);
           }
@@ -566,37 +623,26 @@ public class Drivetrain extends SubsystemBase {
     return results;
   }
 
-  public List<EstimatedRobotPose> getEstimatedGlobalPose1(Pose2d prevEstimatedRobotPose) {
-    return getEstimatedGlobalPose(photonPoseEstimator1, camera1, PhotonConstants.kRobotToCam1, prevEstimatedRobotPose);
-  }
-
-  public List<EstimatedRobotPose> getEstimatedGlobalPose2(Pose2d prevEstimatedRobotPose) {
-    return getEstimatedGlobalPose(photonPoseEstimator2, camera2, PhotonConstants.kRobotToCam2, prevEstimatedRobotPose);
-  }
-
-  public boolean isInField(Pose3d pose) {
-    return pose.getX() >= 0 && pose.getX() <= FieldConstants.kFieldLengthX && pose.getY() >= 0
-        && pose.getY() <= FieldConstants.kFieldWidthY;
-  }
-
-  public boolean isOnGround(Pose3d pose) {
-    return pose.getZ() <= PhotonConstants.kHeightTolerance && pose.getZ() >= -PhotonConstants.kHeightTolerance;
-  }
-
-  public double distanceBetween(Pose3d pose1, Pose3d pose2) {
-    return Math.sqrt(Math.pow(pose1.getX() - pose2.getX(), 2) + Math.pow(pose1.getY() - pose2.getY(), 2));
-  }
-
-  public boolean isOnBlueSide() {
-    double robotX = getPose().getTranslation().getX();
-    return robotX - FieldConstants.kBargeX < 0;
-  }
-
+  /**
+   * Gets the distance between the robot and the barge, in a straight line.
+   * 
+   * @see #distanceToBardge()
+   * 
+   * @return The distance between the robot and the barge. In meters.
+   */
   public double getXDistanceToBarge() {
     double robotX = getPose().getTranslation().getX();
     return Math.abs(robotX - FieldConstants.kBargeX);
   }
 
+  /**
+   * Gets the distance between the robot and the barge considering the robot's
+   * angle. This is essentially how far the algae has to travel.
+   * 
+   * @see #getXDistanceToBarge()
+   * 
+   * @return The distance between the robot and the barge. In meters.
+   */
   public double distanceToBardge() {
     double robotYaw = getPose().getRotation().getRadians();
     if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
@@ -607,7 +653,7 @@ public class Drivetrain extends SubsystemBase {
 
   public Command moveToNearestBargeLaunchingZone() {
     Pose2d startingPose = getPose();
-    boolean onBlueSide = isOnBlueSide();
+    boolean onBlueSide = PoseHelpers.isOnBlueSide(getPose());
     double targetRadians;
     if (DriverStation.getAlliance().isPresent()) {
       Alliance alliance = DriverStation.getAlliance().get();
@@ -616,7 +662,10 @@ public class Drivetrain extends SubsystemBase {
       targetRadians = startingPose.getRotation().getRadians();
     }
     Pose2d targetPose = new Pose2d(
-        FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * LaunchingDistances.kMetersFromBarge), startingPose.getY(),
+        FieldConstants.kBargeX
+            + ((onBlueSide ? -1 : 1) * (isUsingHighVelocities.get() ? LaunchingDistances.kMetersFromBargeHigh
+                : LaunchingDistances.kMetersFromBargeLow)),
+        startingPose.getY(),
         new Rotation2d(targetRadians));
 
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startingPose, targetPose);
@@ -628,5 +677,35 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput("PathPlanner/GoToBarge/TargetPose", targetPose);
 
     return AutoBuilder.followPath(path);
+  }
+
+  /**
+   * Calculates the target pose for the robot at the nearest barge launching zone.
+   * This takes in account if the launcher is set to high or low.
+   * 
+   * @param targetAngle Angle that robot should face in its target pose, in
+   *                    radians. CCW is positive.
+   * @return The calculated target pose for the robot at the barge.
+   */
+  public Pose2d getBargeTargetPose(double targetAngle) {
+    System.out.println("getBargeTargetPose");
+    Pose2d currentPose = getPose();
+
+    // Y coordinate stays the same as current pose
+    double targetY = currentPose.getY();
+
+    boolean onBlueSide = PoseHelpers.isOnBlueSide(currentPose);
+
+    double metersFromBarge = isUsingHighVelocities.get() ? LaunchingDistances.kMetersFromBargeHigh
+        : LaunchingDistances.kMetersFromBargeLow;
+
+    // Calculate target translation
+    // (0,0) is ALWAYS on the blue alliance side
+    double targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * metersFromBarge);
+
+    // Calculate target rotation based on side of field that robot is currently on
+    double targetRadians = (onBlueSide ? Math.PI : 0) + targetAngle;
+
+    return new Pose2d(targetX, targetY, new Rotation2d(targetRadians));
   }
 }

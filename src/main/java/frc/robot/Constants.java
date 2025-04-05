@@ -4,21 +4,29 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import com.pathplanner.lib.path.PathConstraints;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -46,8 +54,8 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 2.5;
-    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 10;
+    public static final double kBangBangTranslationalVelocityMetersPerSecond = 1.5;
+    public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 5;
 
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
         kMaxAccelerationMetersPerSecondSquaredPathfinding, kMaxAngularSpeedRadiansPerSecond,
@@ -84,9 +92,30 @@ public final class Constants {
     public static final boolean kGyroReversed = false;
 
     public static class LaunchingDistances {
-      public static final double kMetersFromBarge = 1.30; // 1.30 before March 20
+      // 1.30 before March 20
+      // NORTH BAY
+      public static final double kMetersFromBargeHigh = 1.30;
+      // NEW SETPOINTS
+      public static final double kMetersFromBargeLow = 1.2;
+
       public static final double kToleranceMetersFromBarge = 0.1;
       public static final double kToleranceRadiansFromBarge = 5 * Math.PI / 180;
+
+      public static final double kTargetBargeAngle = 45 * Math.PI / 180;
+      public static final double kTargetBargeAngleLeft = kTargetBargeAngle;
+      public static final double kTargetBargeAngleStraight = 0;
+      public static final double kTargetBargeAngleRight = -kTargetBargeAngle;
+    }
+
+    public static class ReefConstants {
+      // Tag oriented offset from center of robot. +x is in front of tag, +y is left
+      // of tag)
+      public static final Transform2d kOffsetFromTag = new Transform2d(new Translation2d(0.5, 0),
+          new Rotation2d(Math.PI));
+      public static final double kToleranceMetersFromSpot = 0.1;
+      public static final double kToleranceRadiansFromSpot = 5 * Math.PI / 180;
+
+      public static final int[] kReefTagIds = { 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
     }
   }
 
@@ -186,10 +215,10 @@ public final class Constants {
 
     // Angles need to be set in degrees
     public static final double kAngleStowed = -6.5;
-    public static final double kAngleGroundIntake = -44.5; // 39 deg below horizontal
+    public static final double kAngleGroundIntake = -48.5; // 39 deg below horizontal
     public static final double kAngleCoral = -83.5; // 8 deg above horizontal
     public static final double kAngleL2 = -97.5;
-    public static final double kAngleL3 = -142.5;
+    public static final double kAngleL3 = -144.5;
     public static final double kAngleProcessor = -176.5;
 
     // Arm PID fine control bump offsets
@@ -198,6 +227,12 @@ public final class Constants {
 
     // Limit switch stuff
     public static final int kLimitSwitchChannel = 9;
+
+    // Color sensor
+    public static final I2C.Port kColorSensorI2CPort = I2C.Port.kOnboard;
+    public static final Color kAlgaeColor = Color.kTurquoise;
+    public static final double kColorMatchThreshold = 0;
+    public static final int kColorSensorProximityThreshold = 2000;
   }
 
   public static final class IntakeConstants {
@@ -233,25 +268,45 @@ public final class Constants {
     }
 
     public static final class PhotonConstants {
-      public static final double camera1Roll = 0;
-      public static final double camera1Pitch = 10 * Math.PI / 180; // in rad
-      public static final double camera1Yaw = 0;
-      public static final double camera1X = 0.2921; // forward (pos)
-      public static final double camera1Y = 0.127; // left (pos)
-      public static final double camera1Z = 0.4699; // up (pos)
+      // Camera offsets. Rotations are in radians. Translations are in meters.
+      // +x is in front of the robot, +y is to the left of the robot, +z is up
+      public static final double camera1Roll = 0.0;
+      public static final double camera1Pitch = 0.1301;
+      public static final double camera1Yaw = 0.0;
+      public static final double camera1X = 0.307;
+      public static final double camera1Y = 0.180;
+      public static final double camera1Z = 0.750;
+      public static final Vector<N3> kCamera1StandardDeviation = VecBuilder.fill(0.3, 0.3, 0.3);
 
       public static final double camera2Roll = 0;
-      public static final double camera2Pitch = 0; // 10 * Math.PI / 180; // in rad
+      public static final double camera2Pitch = 0;
       public static final double camera2Yaw = Math.PI;
-      public static final double camera2X = -0.2921;
+      public static final double camera2X = -0.3327;
       public static final double camera2Y = 0;
-      public static final double camera2Z = 0.3175;
+      public static final double camera2Z = 0.3708;
+      public static final Vector<N3> kCamera2StandardDeviation = VecBuilder.fill(0.9, 0.9, 0.9);
+
+      public static final double camera3Roll = 0.0;
+      public static final double camera3Pitch = 0.0;
+      public static final double camera3Yaw = 0.7069;
+      public static final double camera3X = 0.238;
+      public static final double camera3Y = -0.294;
+      public static final double camera3Z = 0.625;
+      public static final Vector<N3> kCamera3StandardDeviation = VecBuilder.fill(0.5, 0.5, 0.5);
 
       public static final int kAlgaePipeline = 1;
       public static final int kAprilTagPipeline = 0;
 
       public static final String kCamera1 = "camera1";
       public static final String kCamera2 = "camera2";
+      public static final String kCamera3 = "camera3";
+      public static final String[] kCameras = { kCamera1, kCamera2, kCamera3 };
+      public static final List<Vector<N3>> kCameraStandardDeviations = List.of(
+          kCamera1StandardDeviation,
+          kCamera2StandardDeviation,
+          kCamera3StandardDeviation);
+
+      public static final int numCameras = kCameras.length;
 
       public static final Transform3d kRobotToCam1 = new Transform3d(
           new Translation3d(PhotonConstants.camera1X, PhotonConstants.camera1Y, PhotonConstants.camera1Z),
@@ -259,11 +314,15 @@ public final class Constants {
       public static final Transform3d kRobotToCam2 = new Transform3d(
           new Translation3d(PhotonConstants.camera2X, PhotonConstants.camera2Y, PhotonConstants.camera2Z),
           new Rotation3d(PhotonConstants.camera2Roll, PhotonConstants.camera2Pitch, PhotonConstants.camera2Yaw));
+      public static final Transform3d kRobotToCam3 = new Transform3d(
+          new Translation3d(PhotonConstants.camera3X, PhotonConstants.camera3Y, PhotonConstants.camera3Z),
+          new Rotation3d(PhotonConstants.camera3Roll, PhotonConstants.camera3Pitch, PhotonConstants.camera3Yaw));
+      public static final Transform3d[] kRobotToCams = { kRobotToCam1, kRobotToCam2, kRobotToCam3 };
 
       public static final double kHeightTolerance = 0.5; // meters above and below ground
-      public static final double kAmbiguityDiscardThreshold = 0.7; // ignore targets above this value
+      public static final double kAmbiguityDiscardThreshold = 0.8; // ignore targets above this value
       public static final double kAmbiguityThreshold = 0.3; // targets above this need to be checked
-      public static final double kMinSingleTagArea = 0.3;
+      public static final double kMinSingleTagArea = 0.2;
     }
   }
 
@@ -294,23 +353,52 @@ public final class Constants {
     public static final int kBackCanId = 13;
     public static MotorType kMotorType = MotorType.kBrushless;
 
-    public static final double kPVelocityController = 0;
-    public static final double kIVelocityController = 0;
-    public static final double kDVelocityController = 0;
-    public static final double frontKVelocityFF = 0.0021;
-    public static final double backKVelocityFF = 0.00215;
+    // NORTH BAY
+    // public static final double kPVelocityControllerHigh = 0;
+    // public static final double kIVelocityControllerHigh = 0;
+    // public static final double kDVelocityControllerHigh = 0;
+    // public static final double frontKVelocityFFHigh = 0.0021;
+    // public static final double backKVelocityFFHigh = 0.00215;
+    // public static final ClosedLoopSlot kSlotHigh = ClosedLoopSlot.kSlot0;
+    // Using new gains but with North Bay setpoint (defined below)
+    public static final double kPVelocityControllerHigh = 0.003;
+    public static final double kIVelocityControllerHigh = 0;
+    public static final double kDVelocityControllerHigh = 0;
+    public static final double frontKVelocityFFHigh = 0.0021;
+    public static final double backKVelocityFFHigh = 0.0021;
+    public static final ClosedLoopSlot kSlotHigh = ClosedLoopSlot.kSlot0;
+
+    // NEW GAINS
+    public static final double kPVelocityControllerLow = 0.003;
+    public static final double kIVelocityControllerLow = 0;
+    public static final double kDVelocityControllerLow = 0;
+    public static final double frontKVelocityFFLow = 0.0021;
+    public static final double backKVelocityFFLow = 0.0021;
+    public static final ClosedLoopSlot kSlotLow = ClosedLoopSlot.kSlot1;
 
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
     // Velocities in RPM
     // public static final double kVelocityFront = 2100; // 220 rad/s
     // public static final double kVelocityBack = 2626.056561; // 275 rad/s
-    public static final double kVelocityFront = 1957.6058; // 205 rad/s
-    public static final double kVelocityBack = 2482.817112; // 260 rad/s
+
+    // Dividing by conversion factor: rad/s -> RPM
+
+    // NORTH BAY
+    public static final double kVelocityHighFrontRPM = 200 / kVelocityConversionFactor;
+    public static final double kVelocityHighBackRPM = 253 / kVelocityConversionFactor;
+
+    // NEW SETPOINTS
+    public static final double kVelocityLowFrontRPM = 193 / kVelocityConversionFactor;
+    public static final double kVelocityLowBackRPM = 248 / kVelocityConversionFactor;
+
     public static final double kVelocityYeetBack = 4964;
     public static final double kVelocityYeetForward = 4964;
+
     public static final double kVelocityFrontTolerance = 247.8;
     public static final double kVelocityBackTolerance = 247.8;
+
+    public static final double kBumpOffsetRPM = 1 / kVelocityConversionFactor;
   }
 
   public static class FieldConstants {
