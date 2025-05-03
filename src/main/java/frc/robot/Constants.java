@@ -267,6 +267,12 @@ public final class Constants {
       public static final int kLowerBound = -2;
     }
 
+    public static final class AlgaeInterceptionConstants {
+
+      public static final double maxTime = 10.0; // 10 seconds max simulation time
+      public static final double dt = 0.02; // 20ms time step (50Hz)
+    }
+
     public static final class PhotonConstants {
       // Camera offsets. Rotations are in radians. Translations are in meters.
       // +x is in front of the robot, +y is to the left of the robot, +z is up
