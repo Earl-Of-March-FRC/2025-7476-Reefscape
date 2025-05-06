@@ -271,6 +271,11 @@ public final class Constants {
 
       public static final double maxTime = 10.0; // 10 seconds max simulation time
       public static final double dt = 0.02; // 20ms time step (50Hz)
+      public static final double interceptionUpdateInterval = 0.25; // Update path every 0.25 seconds
+      public static final double minUpdatedPointDistance = 0.5; // Minimum distance change to trigger path update
+                                                                // (meters)
+      public static final double COLLISION_THRESHOLD = 0.3; // 30cm threshold for interception
+
     }
 
     public static final class PhotonConstants {

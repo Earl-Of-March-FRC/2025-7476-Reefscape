@@ -42,8 +42,6 @@ public class AlgaeSubsystem extends SubsystemBase {
 
   private PhotonCamera camera1;
 
-  final double COLLISION_THRESHOLD = 0.3; // 30cm threshold for interception
-
   /**
    * Creates a new AlgaeSubsystem in which creates a new relative to robot object
    * 
@@ -499,7 +497,7 @@ public class AlgaeSubsystem extends SubsystemBase {
       }
 
       // Check for interception
-      if (currentDistance < COLLISION_THRESHOLD) {
+      if (currentDistance < Constants.Vision.AlgaeInterceptionConstants.COLLISION_THRESHOLD) {
         // Midpoint between them
         Translation2d interceptPoint = new Translation2d(
             (robotPosX + algaePosX) / 2,
@@ -558,7 +556,7 @@ public class AlgaeSubsystem extends SubsystemBase {
 
     // If no direct interception was found, return closest approach if it's close
     // enough
-    if (minDistance < COLLISION_THRESHOLD * 1.5) {
+    if (minDistance < Constants.Vision.AlgaeInterceptionConstants.COLLISION_THRESHOLD * 1.5) {
       Translation2d interceptPoint = new Translation2d(
           (minDistanceRobotPos.getX() + minDistanceAlgaePos.getX()) / 2,
           (minDistanceRobotPos.getY() + minDistanceAlgaePos.getY()) / 2);
