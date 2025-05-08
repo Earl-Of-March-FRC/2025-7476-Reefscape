@@ -26,6 +26,7 @@ import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.DriveConstants.LaunchingDistances;
 import frc.robot.commands.drivetrain.*;
+import frc.robot.commands.InterceptAlgaeCmd;
 import frc.robot.commands.StripAlgaeCmd;
 import frc.robot.commands.arm.ArmSetPositionPIDCmd;
 import frc.robot.commands.arm.ArmSetVelocityManualCmd;
@@ -43,6 +44,7 @@ import frc.robot.subsystems.indexer.BeamBreakSensor;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.launcher.Launcher;
+import frc.robot.subsystems.vision.AlgaeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -57,6 +59,7 @@ public class RobotContainer {
 
   public final Drivetrain driveSub;
   public final Gyro gyro;
+  public final AlgaeSubsystem algaeSub;
 
   public final ArmSubsystem armSub;
   private final IntakeSubsystem intakeSub;
@@ -110,6 +113,7 @@ public class RobotContainer {
             DriveConstants.kBackRightChassisAngularOffset),
         gyro, launcherSub::isUsingHighVelocities);
 
+    algaeSub = new AlgaeSubsystem(() -> driveSub.getPose());
     // Register named Commands
     NamedCommands.registerCommand("Calibrate", new CalibrateGyroCmd(driveSub));
     NamedCommands.registerCommand("ArmL2", new ArmSetPositionPIDCmd(armSub, () -> ArmConstants.kAngleL2));
@@ -218,6 +222,10 @@ public class RobotContainer {
             () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight),
             false));
 
+    // Algae intercept command
+    driverController.povDown().whileTrue(
+        new InterceptAlgaeCmd(driveSub, algaeSub, 1, 0.2));
+
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
         Commands.runOnce(() -> {
@@ -242,9 +250,10 @@ public class RobotContainer {
     driverController.rightTrigger().toggleOnTrue(
         new LauncherSetVelocityPIDCmd(launcherSub, () -> launcherSub.getPreferredFrontVelocity(),
             () -> launcherSub.getPreferredBackVelocity()));
-    driverController.povDown().toggleOnTrue(
-        new LauncherSetVelocityPIDCmd(launcherSub, () -> LauncherConstants.kVelocityYeetForward,
-            () -> LauncherConstants.kVelocityYeetBack));
+    // driverController.povDown().toggleOnTrue(
+    // new LauncherSetVelocityPIDCmd(launcherSub, () ->
+    // LauncherConstants.kVelocityYeetForward,
+    // () -> LauncherConstants.kVelocityYeetBack));
 
     // OPERATOR CONTROLLER
 
