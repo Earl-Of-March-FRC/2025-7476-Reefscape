@@ -171,11 +171,12 @@ public class RobotContainer {
                 OIConstants.kDriveDeadband)));
 
     // Manual arm control with
-    armSub.setDefaultCommand(
-        new ArmSetVelocityManualCmd(armSub, () -> MathUtil.applyDeadband(
-            operatorController.getRawAxis(OIConstants.kOperatorArmManualAxis),
-            armSub.getIsUsingPid() ? OIConstants.kArmManualDeadband : OIConstants.kArmDeadband)
-            * ArmConstants.kMaxArmManualSpeedPercent));
+    // armSub.setDefaultCommand(
+    // new ArmSetVelocityManualCmd(armSub, () -> MathUtil.applyDeadband(
+    // operatorController.getRawAxis(OIConstants.kOperatorArmManualAxis),
+    // armSub.getIsUsingPid() ? OIConstants.kArmManualDeadband :
+    // OIConstants.kArmDeadband)
+    // * ArmConstants.kMaxArmManualSpeedPercent));
 
     // Manual intake (arm roller) control with
     intakeSub.setDefaultCommand(
