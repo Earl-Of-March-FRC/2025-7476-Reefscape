@@ -44,12 +44,12 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 4.8; // Default 4.8 - Max net robot translational speed
+    public static final double kMaxSpeedMetersPerSecond = 1; // Default 4.8 - Max net robot translational speed
     public static final double kMaxWheelSpeedMetersPerSecond = 4.8; // Max possible speed for wheel
-    public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    public static final double kMaxAngularSpeed = Math.PI; // radians per second
     public static final double kBalleyPopMetersPerSecond = 0.8; // Max net robot translational speed when intaking algae
                                                                 // stacked on coral
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 2;
     public static final double kMaxAccelerationMetersPerSecondSquaredPathfinding = 1;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
