@@ -219,6 +219,10 @@ public class RobotContainer {
             () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight),
             false));
 
+    // Move to follow April Tag
+    driverController.button(8).whileTrue(new MoveToPoseBangBangCmd(driveSub,
+        () -> driveSub.getFollowAprilTagTargetPose(LaunchingDistances.kTargetBargeAngleStraight), false));
+
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
         Commands.runOnce(() -> {

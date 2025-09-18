@@ -5,6 +5,7 @@
 package frc.robot;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.pathplanner.lib.path.PathConstraints;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -15,6 +16,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -44,9 +46,9 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 1; // Default 4.8 - Max net robot translational speed
-    public static final double kMaxWheelSpeedMetersPerSecond = 4.8; // Max possible speed for wheel
-    public static final double kMaxAngularSpeed = Math.PI; // radians per second
+    public static final double kMaxSpeedMetersPerSecond = 1.5; // Default 4.8 - Max net robot translational speed
+    public static final double kMaxWheelSpeedMetersPerSecond = 1; // Max possible speed for wheel
+    public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
     public static final double kBalleyPopMetersPerSecond = 0.8; // Max net robot translational speed when intaking algae
                                                                 // stacked on coral
     public static final double kMaxAccelerationMetersPerSecondSquared = 2;
@@ -54,7 +56,7 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 1.5;
+    public static final double kBangBangTranslationalVelocityMetersPerSecond = 0.75;
     public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 5;
 
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
@@ -408,6 +410,8 @@ public final class Constants {
     public static final double kFieldWidthY = kfieldLayout.getFieldWidth(); // meters of parallel distance from
                                                                             // processor to processor
     public static final double kBargeX = kFieldLengthX / 2; // meters from drivestation wall to middle of barge
+
+    public static final Optional<Pose3d> kBargeAprilTagPose = kfieldLayout.getTagPose(21);
   }
 
   // PDP CAN IDs
