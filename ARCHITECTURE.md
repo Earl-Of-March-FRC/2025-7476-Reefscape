@@ -17,7 +17,7 @@ Reefscape rewards robots that **strip algae**, **launch it into the barge**, and
 -   **Agile navigation**: Swerve with strong localization lets drivers dart between reef, processor, and staging zones without re-zeroing manually.
 -   **Arm reach vs. extension limits**: Closed-loop arm positions guarantee we hit ground intake, reef removal, and processor angles while staying inside the 20-inch extension envelope.
 -   **Reliable launch energy**: Closed-loop flywheels with selectable profiles keep algae shots clearing the barge even as motors warm up or batteries sag.
--   **Game-piece validation**: Beam breaks, color sensing, and optional ultrasonics confirm whether algae is actually staged before firing so we avoid empty shots or double-feeds.
+-   **Game-piece validation**: Beam breaks confirm whether algae is actually staged before firing so we avoid empty shots or double-feeds.
 
 ## High-Level Control Flow
 
@@ -106,7 +106,7 @@ AutoBuilder.configure(
 
 ### 3. Vision Systems
 
-We use two separate vision systems for different tasks, both hosted on coprocessors so the roboRIO always has CPU headroom for drivetrain control.
+We use one vision systems hosted on a coprocessor so the roboRIO always has CPU headroom for drivetrain control.
 
 #### A. PhotonVision for Pose Estimation
 
@@ -120,11 +120,6 @@ We use two separate vision systems for different tasks, both hosted on coprocess
 odometry.addVisionMeasurement(estimatedPose, visionPose.timestampSeconds);
 ```
 
-#### B. OpenCV for "Algae" (Game Piece) Detection
-
--   **Purpose**: To find and track game pieces.
--   **Code Location**: `limelight/java/AlgaeDetection.java` and `limelight/python/`
--   **How it Works**: This is a classic OpenCV pipeline that runs on a Limelight or Orange Pi. It filters the camera feed for algae green (HSV thresholding), finds the largest resulting contour, and uses a calibrated camera matrix to approximate distance and heading. Scripts publish targets through NetworkTables so commands can auto-align the drivetrain or indexer. Venue lighting changes require reapplying the exposure/white balance presets captured in the engineering notebook.
 
 ### 4. Game Piece Handling: Intake, Indexer, & Launcher
 
@@ -145,7 +140,7 @@ driverController.y().onTrue(new IndexToBeamBreakCmd(indexerSub, () -> 0.75));
 
 -   **Purpose**: To control the angle of the intake/arm mechanism.
 -   **Key Files**: `ArmSubsystem.java`, `ArmSetPositionPIDCmd.java`.
--   **How it Works**: The arm uses the SPARK MAX's onboard **position PID** to move to and hold specific angles. A critical part of this is the **gravity feedforward** term (`kGainFF`), which helps the PID controller by proactively applying power to counteract the force of gravity. A REV Color Sensor V3 mounted near the rollers checks for algae presence and proximity, allowing commands to refuse launches when the arm is empty and giving the drive team confidence that a reef strip actually captured a game piece.
+-   **How it Works**: The arm uses the SPARK MAX's onboard **position PID** to move to and hold specific angles. A critical part of this is the **gravity feedforward** term (`kGainFF`), which helps the PID controller by proactively applying power to counteract the force of gravity.
 
 ```java:ArmSubsystem.java
 // In ArmSubsystem.java periodic() method
@@ -164,10 +159,8 @@ armClosedLoopController.setReference(
 
 -   **NavX Gyro**: Provides continuous heading for field-relative driving. If the gyro drops offline, the drivetrain automatically flips to robot-relative control so the driver still has predictable behavior.
 -   **Beam Break / Ultrasonic Sensors**: Both implement the `IndexerSensor` interface, so we can swap between digital beam breaks and analog ultrasonics when mounting space or reflection issues arise.
--   **REV Color Sensor V3**: Detects algae color and proximity at the intake, backing up driver vision when the reef blocks sightlines.
 -   **Limit/Homing Inputs**: The arm constructor accepts a limit switch channel and exposes `calibrate()` so pit crew can re-zero the encoder between matches.
 -   **PhotonVision Coprocessor (Orange Pi)**: Runs the AprilTag pose pipeline for the dual cameras, publishing pose estimates and per-target metadata that the drivetrain consumes.
--   **Limelight / Orange Pi (Python)**: Hosts algae-detection scripts and the `vision-startup` batch workflow for redeploying code and Python dependencies.
 
 ## Data Logging & Driver Feedback
 
