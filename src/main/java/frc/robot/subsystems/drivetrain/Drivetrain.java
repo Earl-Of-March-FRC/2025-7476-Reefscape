@@ -774,4 +774,37 @@ public class Drivetrain extends SubsystemBase {
 
     return new Pose2d(targetX, targetY, new Rotation2d(targetRadians));
   }
+
+  /**
+   * Calculates the target pose for the robot at the nearest barge launching zone.
+   * This takes in account if the launcher is set to high or low.
+   * 
+   * @param targetAngle Angle that robot should face in its target pose, in
+   *                    radians. CCW is positive.
+   * @return The calculated target pose for the robot at the barge.
+   */
+  public Pose2d getFollowAprilTagTargetPose(double targetAngle) {
+    System.out.println("getBargeTargetPose");
+    Pose2d currentPose = getPose();
+
+    boolean onBlueSide = PoseHelpers.isOnBlueSide(currentPose);
+
+    double metersFromBarge = isUsingHighVelocities.get() ? LaunchingDistances.kMetersFromBargeHigh
+        : LaunchingDistances.kMetersFromBargeLow;
+
+    // Calculate target translation
+    // (0,0) is ALWAYS on the blue alliance side
+    double targetX = FieldConstants.kBargeX + ((onBlueSide ? -1 : 1) * metersFromBarge);
+
+    // Y coordinate is the same as the April tag's Y position
+    double targetY = currentPose.getY();
+    if (FieldConstants.kBargeAprilTagPose.isPresent()) {
+      targetY = FieldConstants.kBargeAprilTagPose.get().getY();
+    }
+
+    // Calculate target rotation based on side of field that robot is currently on
+    double targetRadians = (onBlueSide ? Math.PI : 0) + targetAngle;
+
+    return new Pose2d(targetX, targetY, new Rotation2d(targetRadians));
+  }
 }

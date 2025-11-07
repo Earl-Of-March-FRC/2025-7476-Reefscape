@@ -175,7 +175,9 @@ public class MoveToPoseBangBangCmd extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return translationXController.atSetpoint() && translationYController.atSetpoint()
-        && rotationController.atSetpoint();
+    // return translationXController.atSetpoint() &&
+    // translationYController.atSetpoint()
+    // && rotationController.atSetpoint();
+    return false;
   }
 }

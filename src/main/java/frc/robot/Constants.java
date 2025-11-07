@@ -5,6 +5,7 @@
 package frc.robot;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.pathplanner.lib.path.PathConstraints;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -15,6 +16,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -49,12 +51,12 @@ public final class Constants {
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
     public static final double kBalleyPopMetersPerSecond = 0.8; // Max net robot translational speed when intaking algae
                                                                 // stacked on coral
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 2;
     public static final double kMaxAccelerationMetersPerSecondSquaredPathfinding = 1;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-    public static final double kBangBangTranslationalVelocityMetersPerSecond = 1.5;
+    public static final double kBangBangTranslationalVelocityMetersPerSecond = 0.75;
     public static final double kBangBangRotationalVelocityRadiansPerSecond = (2 * Math.PI) / 5;
 
     public static final PathConstraints kPathfindingConstraints = new PathConstraints(kMaxSpeedMetersPerSecond,
@@ -310,9 +312,9 @@ public final class Constants {
       public static final int kAlgaePipeline = 1;
       public static final int kAprilTagPipeline = 0;
 
-      public static final String kCamera1 = "camera1";
-      public static final String kCamera2 = "camera2";
-      public static final String kCamera3 = "camera3";
+      public static final String kCamera1 = "Arducam_1";
+      public static final String kCamera2 = "Arducam_2";
+      public static final String kCamera3 = "Arducam_3";
       public static final String[] kCameras = { kCamera1, kCamera2, kCamera3 };
       public static final List<Vector<N3>> kCameraStandardDeviations = List.of(
           kCamera1StandardDeviation,
@@ -421,6 +423,8 @@ public final class Constants {
     public static final double kFieldWidthY = kfieldLayout.getFieldWidth(); // meters of parallel distance from
                                                                             // processor to processor
     public static final double kBargeX = kFieldLengthX / 2; // meters from drivestation wall to middle of barge
+
+    public static final Optional<Pose3d> kBargeAprilTagPose = kfieldLayout.getTagPose(21);
   }
 
   // PDP CAN IDs
