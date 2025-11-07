@@ -46,8 +46,8 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 1.5; // Default 4.8 - Max net robot translational speed
-    public static final double kMaxWheelSpeedMetersPerSecond = 1; // Max possible speed for wheel
+    public static final double kMaxSpeedMetersPerSecond = 4.8; // Default 4.8 - Max net robot translational speed
+    public static final double kMaxWheelSpeedMetersPerSecond = 4.8; // Max possible speed for wheel
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
     public static final double kBalleyPopMetersPerSecond = 0.8; // Max net robot translational speed when intaking algae
                                                                 // stacked on coral
@@ -299,9 +299,9 @@ public final class Constants {
       public static final int kAlgaePipeline = 1;
       public static final int kAprilTagPipeline = 0;
 
-      public static final String kCamera1 = "camera1";
-      public static final String kCamera2 = "camera2";
-      public static final String kCamera3 = "camera3";
+      public static final String kCamera1 = "Arducam_1";
+      public static final String kCamera2 = "Arducam_2";
+      public static final String kCamera3 = "Arducam_3";
       public static final String[] kCameras = { kCamera1, kCamera2, kCamera3 };
       public static final List<Vector<N3>> kCameraStandardDeviations = List.of(
           kCamera1StandardDeviation,
