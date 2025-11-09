@@ -189,16 +189,16 @@ public class RobotContainer {
 
     // Drive commands
     driverController.b().onTrue(new CalibrateGyroCmd(driveSub));
-    driverController.x().whileTrue(new AlignReefWithDriveBangBangCmd(
-        driveSub,
-        () -> MathUtil.applyDeadband(
-            driverController.getRawAxis(
-                OIConstants.kDriverControllerYAxis),
-            OIConstants.kDriveDeadband),
-        () -> MathUtil.applyDeadband(
-            driverController.getRawAxis(
-                OIConstants.kDriverControllerXAxis),
-            OIConstants.kDriveDeadband)));
+    // driverController.x().whileTrue(new AlignReefWithDriveBangBangCmd(
+    // driveSub,
+    // () -> MathUtil.applyDeadband(
+    // driverController.getRawAxis(
+    // OIConstants.kDriverControllerYAxis),
+    // OIConstants.kDriveDeadband),
+    // () -> MathUtil.applyDeadband(
+    // driverController.getRawAxis(
+    // OIConstants.kDriverControllerXAxis),
+    // OIConstants.kDriveDeadband)));
 
     // Move to barge launching zone, facing in the specified direction
     driverController.povLeft().whileTrue(
@@ -209,18 +209,21 @@ public class RobotContainer {
         new MoveToPoseBangBangCmd(driveSub,
             () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight),
             false));
-    driverController.a().whileTrue(
-        new MoveToPoseBangBangCmd(driveSub,
-            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight),
-            false));
-    driverController.povRight().whileTrue(
-        new MoveToPoseBangBangCmd(driveSub,
-            () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight),
-            false));
+    // driverController.a().whileTrue(
+    // new MoveToPoseBangBangCmd(driveSub,
+    // () ->
+    // driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleStraight),
+    // false));
+    // driverController.povRight().whileTrue(
+    // new MoveToPoseBangBangCmd(driveSub,
+    // () -> driveSub.getBargeTargetPose(LaunchingDistances.kTargetBargeAngleRight),
+    // false));
 
     // Move to follow April Tag
-    driverController.button(8).whileTrue(new MoveToPoseBangBangCmd(driveSub,
-        () -> driveSub.getFollowAprilTagTargetPose(LaunchingDistances.kTargetBargeAngleStraight), false));
+    // driverController.button(8).whileTrue(new MoveToPoseBangBangCmd(driveSub,
+    // () ->
+    // driveSub.getFollowAprilTagTargetPose(LaunchingDistances.kTargetBargeAngleStraight),
+    // false));
 
     // Toggle field or robot oriented drive
     driverController.leftStick().onTrue(
