@@ -279,6 +279,10 @@ public class Drivetrain extends SubsystemBase {
     hasVisionData = false;
 
     for (int i = 0; i < PhotonConstants.numCameras; i++) {
+      if (i == 2) {
+        continue;
+      }
+
       List<EstimatedRobotPose> visionPoses = getEstimatedGlobalPose(photonPoseEstimators[i], cameras[i],
           PhotonConstants.kRobotToCams[i],
           pose);

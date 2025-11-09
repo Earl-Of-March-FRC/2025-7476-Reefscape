@@ -295,10 +295,10 @@ public final class Constants {
 
       public static final double camera2Roll = 0;
       public static final double camera2Pitch = 0;
-      public static final double camera2Yaw = Math.PI;
-      public static final double camera2X = -0.3327;
-      public static final double camera2Y = 0;
-      public static final double camera2Z = 0.3708;
+      public static final double camera2Yaw = 0.349;
+      public static final double camera2X = 0.248;
+      public static final double camera2Y = -0.292;
+      public static final double camera2Z = 0.335;
       public static final Vector<N3> kCamera2StandardDeviation = VecBuilder.fill(0.9, 0.9, 0.9);
 
       public static final double camera3Roll = 0.0;
