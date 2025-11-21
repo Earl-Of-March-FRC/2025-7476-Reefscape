@@ -282,26 +282,26 @@ public final class Constants {
 
       public static final double camera2Roll = 0;
       public static final double camera2Pitch = 0;
-      public static final double camera2Yaw = Math.PI;
-      public static final double camera2X = -0.3327;
-      public static final double camera2Y = 0;
-      public static final double camera2Z = 0.3708;
+      public static final double camera2Yaw = 0.453786;
+      public static final double camera2X = 0.2675;
+      public static final double camera2Y = 0.2875;
+      public static final double camera2Z = 0.26;
       public static final Vector<N3> kCamera2StandardDeviation = VecBuilder.fill(0.9, 0.9, 0.9);
 
       public static final double camera3Roll = 0.0;
       public static final double camera3Pitch = 0.0;
-      public static final double camera3Yaw = 0.7069;
-      public static final double camera3X = 0.238;
-      public static final double camera3Y = -0.294;
-      public static final double camera3Z = 0.625;
+      public static final double camera3Yaw = Math.PI;
+      public static final double camera3X = 0.3075;
+      public static final double camera3Y = 0;
+      public static final double camera3Z = 0.325;
       public static final Vector<N3> kCamera3StandardDeviation = VecBuilder.fill(0.5, 0.5, 0.5);
 
       public static final int kAlgaePipeline = 1;
       public static final int kAprilTagPipeline = 0;
 
-      public static final String kCamera1 = "camera1";
-      public static final String kCamera2 = "camera2";
-      public static final String kCamera3 = "camera3";
+      public static final String kCamera1 = "Arducam_1";
+      public static final String kCamera2 = "Arducam_2";
+      public static final String kCamera3 = "Arducam_3";
       public static final String[] kCameras = { kCamera1, kCamera2, kCamera3 };
       public static final List<Vector<N3>> kCameraStandardDeviations = List.of(
           kCamera1StandardDeviation,
