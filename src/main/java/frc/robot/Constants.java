@@ -276,7 +276,7 @@ public final class Constants {
       public static final double camera1Pitch = 0.1301;
       public static final double camera1Yaw = 0.0;
       public static final double camera1X = 0.307;
-      public static final double camera1Y = 0.180;
+      public static final double camera1Y = 0.130;
       public static final double camera1Z = 0.750;
       public static final Vector<N3> kCamera1StandardDeviation = VecBuilder.fill(0.3, 0.3, 0.3);
 
@@ -284,14 +284,14 @@ public final class Constants {
       public static final double camera2Pitch = 0;
       public static final double camera2Yaw = 0.453786;
       public static final double camera2X = 0.2675;
-      public static final double camera2Y = 0.2875;
+      public static final double camera2Y = -0.2875;
       public static final double camera2Z = 0.26;
       public static final Vector<N3> kCamera2StandardDeviation = VecBuilder.fill(0.9, 0.9, 0.9);
 
       public static final double camera3Roll = 0.0;
       public static final double camera3Pitch = 0.0;
       public static final double camera3Yaw = Math.PI;
-      public static final double camera3X = 0.3075;
+      public static final double camera3X = -0.3075;
       public static final double camera3Y = 0;
       public static final double camera3Z = 0.325;
       public static final Vector<N3> kCamera3StandardDeviation = VecBuilder.fill(0.5, 0.5, 0.5);
