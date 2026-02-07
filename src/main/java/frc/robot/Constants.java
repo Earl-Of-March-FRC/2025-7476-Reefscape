@@ -360,21 +360,40 @@ public final class Constants {
     // public static final double frontKVelocityFFHigh = 0.0021;
     // public static final double backKVelocityFFHigh = 0.00215;
     // public static final ClosedLoopSlot kSlotHigh = ClosedLoopSlot.kSlot0;
-    // Using new gains but with North Bay setpoint (defined below)
-    public static final double kPVelocityControllerHigh = 0.003;
-    public static final double kIVelocityControllerHigh = 0;
+
+    // Using new values for tuning practice! See the original values below
+    // (commented out)
+    public static final double kPVelocityControllerHigh = 0.00105;
+    public static final double kIVelocityControllerHigh = 0.0000004;
     public static final double kDVelocityControllerHigh = 0;
-    public static final double frontKVelocityFFHigh = 0.0021;
-    public static final double backKVelocityFFHigh = 0.0021;
+    public static final double frontKVelocityFFHigh = 0.0018;
+    public static final double backKVelocityFFHigh = 0.0018;
     public static final ClosedLoopSlot kSlotHigh = ClosedLoopSlot.kSlot0;
 
     // NEW GAINS
-    public static final double kPVelocityControllerLow = 0.003;
+    public static final double kPVelocityControllerLow = 0;
     public static final double kIVelocityControllerLow = 0;
     public static final double kDVelocityControllerLow = 0;
     public static final double frontKVelocityFFLow = 0.0021;
     public static final double backKVelocityFFLow = 0.0021;
     public static final ClosedLoopSlot kSlotLow = ClosedLoopSlot.kSlot1;
+
+    /**
+     * public static final double kPVelocityControllerHigh = 0.003;
+     * public static final double kIVelocityControllerHigh = 0;
+     * public static final double kDVelocityControllerHigh = 0;
+     * public static final double frontKVelocityFFHigh = 0.0021;
+     * public static final double backKVelocityFFHigh = 0.0021;
+     * public static final ClosedLoopSlot kSlotHigh = ClosedLoopSlot.kSlot0;
+     * 
+     * // NEW GAINS
+     * public static final double kPVelocityControllerLow = 0.003;
+     * public static final double kIVelocityControllerLow = 0;
+     * public static final double kDVelocityControllerLow = 0;
+     * public static final double frontKVelocityFFLow = 0.0021;
+     * public static final double backKVelocityFFLow = 0.0021;
+     * public static final ClosedLoopSlot kSlotLow = ClosedLoopSlot.kSlot1;
+     */
 
     public static final double kVelocityConversionFactor = 2.0 * Math.PI / 60.0; // RPM to radians/sec
 
@@ -389,8 +408,8 @@ public final class Constants {
     public static final double kVelocityHighBackRPM = 253 / kVelocityConversionFactor;
 
     // NEW SETPOINTS
-    public static final double kVelocityLowFrontRPM = 193 / kVelocityConversionFactor;
-    public static final double kVelocityLowBackRPM = 248 / kVelocityConversionFactor;
+    public static final double kVelocityLowFrontRPM = 193 / kVelocityConversionFactor;// 193
+    public static final double kVelocityLowBackRPM = 248 / kVelocityConversionFactor; // 248
 
     public static final double kVelocityYeetBack = 4964;
     public static final double kVelocityYeetForward = 4964;
