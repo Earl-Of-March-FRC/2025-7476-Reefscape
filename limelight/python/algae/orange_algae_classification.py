@@ -3,7 +3,7 @@ import numpy as np
 import math
 import logging
 
-from python.network_tables import NetworkTable
+# from python.network_tables import NetworkTable
 
 KNOWN_DIAMETER = 475.00  # Known diameter of algae ball (in mm)
 
@@ -25,7 +25,7 @@ CAM_MATRIX = np.array([[1413.70008, 0, 314.24724784],
                        [0, 1437.31, 240.10474105], 
                        [0, 0, 1]])
 
-# STREAM_URL = "http://photonvision.local:1181/stream.mjpg"
+# STREAM_URL = "http://localhost:1183/stream.mjpg"
 
 STREAM_URL = 0
 
@@ -187,7 +187,7 @@ def main():
     # Initialize ObjectDetection and Computation classes
     obj_detection = ObjectDetection(LOWER_BALL, UPPER_BALL, MIN_AREA, MIN_CIRCULARITY)
     computation = Computation(CAM_MATRIX[0][0], KNOWN_DIAMETER,CAM_MATRIX[1][1]) # Diameter in mm 
-    network_table = NetworkTable()
+    # network_table = NetworkTable()
 
     while True:
         # Read a frame from the camera
@@ -208,13 +208,13 @@ def main():
             y_angle = computation.calculate_vertical_angle(processed_frame, y, 65)
             # distance_in_inches = distance / 25.4
 
-            network_table.send_data(distance, x_angle, y_angle)
+            # network_table.send_data(distance, x_angle, y_angle)
 
-            # print(f"Distance to algae ball: {distance:.2f} cm")
+            print(f"Distance to algae ball: {distance:.2f} cm")
             # print(f"Angle to algae ball relative to camera: {angle:.2f} deg")
 
         # Display the processed frame
-        # cv2.imshow("Ball Detection", processed_frame)
+        cv2.imshow("Ball Detection", processed_frame)
         # cv2.imshow("Contour", mask)
         # cv2.imshow("Edges", edges)
         # cv2.imshow("Filled Edges", filled_edges)
